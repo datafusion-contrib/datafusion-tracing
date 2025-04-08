@@ -1,0 +1,1 @@
+SELECT * from nation order by n_name;

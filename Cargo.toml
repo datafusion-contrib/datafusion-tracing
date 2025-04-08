@@ -1,0 +1,60 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+# This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
+
+[workspace]
+members = [
+    "integration-utils",
+    "datafusion-tracing",
+    "instrumented-object-store",
+    "examples",
+    "tests",
+]
+resolver = "2"
+
+[workspace.package]
+description = "DataFusion tracing of execution plans"
+version = "47.0.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/datafusion-contrib/datafusion-tracing"
+authors = ["DataDog <info@datadoghq.com>"]
+rust-version = "1.82.0"
+
+[workspace.dependencies]
+datafusion = { version = "47.0.0", default-features = false }
+datafusion-tracing = { path = "datafusion-tracing", version = "47.0.0" }
+futures = "0.3"
+instrumented-object-store = { path = "instrumented-object-store", version = "47.0.0" }
+tokio = { version = "1.44" }
+tracing = { version = "0.1" }
+tracing-futures = { version = "0.2", features = ["futures-03"] }
+
+[workspace.lints.clippy]
+used_underscore_binding = "warn"
+
+[workspace.lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tarpaulin)"] }
+unused_qualifications = "deny"
+
+# Enable higher optimization for insta and similar packages in dev mode.
+# This makes snapshot testing faster with less memory usage and quicker diffs
+# while only slightly increasing initial compile time.
+[profile.dev.package]
+insta.opt-level = 3
+similar.opt-level = 3

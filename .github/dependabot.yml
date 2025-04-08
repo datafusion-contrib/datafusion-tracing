@@ -1,0 +1,45 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+version: 2
+updates:
+  # GitHub Actions dependencies used in workflow files
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      gh-actions-packages:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+  
+  # Note: The hardcoded hawkeye_version and taplo_version in .github/workflows/ci.yml
+  # cannot be automatically updated by Dependabot and will need manual updates.
+
+  # Rust dependencies in Cargo.toml files
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+    ignore:
+      # Avoid major version updates for all dependencies
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    # Allow direct dependencies only 
+    allow:
+      - dependency-type: "direct"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: "auto"
