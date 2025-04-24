@@ -32,13 +32,13 @@
 //! <details>
 //! <summary>Jaeger UI</summary>
 //!
-//! ![Jaeger UI screenshot](https://github.com/datafusion-contrib/datafusion-tracing/blob/main/datafusion-tracing/docs/screenshots/jaeger.png)
+//! ![Jaeger UI screenshot](https://raw.githubusercontent.com/datafusion-contrib/datafusion-tracing/main/datafusion-tracing/docs/screenshots/jaeger.png)
 //! </details>
 //!
 //! <details>
 //! <summary>DataDog UI</summary>
 //!
-//! ![DataDog UI screenshot](https://github.com/datafusion-contrib/datafusion-tracing/blob/main/datafusion-tracing/docs/screenshots/datadog.png)
+//! ![DataDog UI screenshot](https://raw.githubusercontent.com/datafusion-contrib/datafusion-tracing/main/datafusion-tracing/docs/screenshots/datadog.png)
 //! </details>
 //!
 //! # Getting Started
@@ -50,7 +50,7 @@
 //! ```toml
 //! [dependencies]
 //! datafusion = "47.0.0"
-//! datafusion-tracing = "47.0.0"
+//! datafusion-tracing = "47.0.1"
 //! ```
 //!
 //! ## Quick Start Example

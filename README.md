@@ -3,6 +3,7 @@
 [![Crates.io][crates-badge]][crates-url]
 [![Apache licensed][license-badge]][license-url]
 [![Build Status][actions-badge]][actions-url]
+[![Documentation][docs-badge]][docs-url]
 
 [crates-badge]: https://img.shields.io/crates/v/datafusion-tracing.svg
 [crates-url]: https://crates.io/crates/datafusion-tracing
@@ -10,8 +11,11 @@
 [license-url]: https://github.com/datafusion-contrib/datafusion-tracing/blob/main/LICENSE
 [actions-badge]: https://github.com/datafusion-contrib/datafusion-tracing/actions/workflows/ci.yml/badge.svg
 [actions-url]: https://github.com/datafusion-contrib/datafusion-tracing/actions?query=branch%3Amain
+[docs-badge]: https://docs.rs/datafusion-tracing/badge.svg
+[docs-url]: https://docs.rs/datafusion-tracing
 
-<img src="https://github.com/datafusion-contrib/datafusion-tracing/blob/main/docs/logo/logo.png" width="512" alt="logo"/>
+
+<img src="https://raw.githubusercontent.com/datafusion-contrib/datafusion-tracing/main/docs/logo/logo.png" width="512" alt="logo"/>
 
 <!-- 
 This section below is auto-generated from the `datafusion-tracing` crate documentation.
@@ -38,13 +42,13 @@ Here's what DataFusion Tracing can look like in practice:
 <details>
 <summary>Jaeger UI</summary>
 
-![Jaeger UI screenshot](https://github.com/datafusion-contrib/datafusion-tracing/blob/main/datafusion-tracing/docs/screenshots/jaeger.png)
+![Jaeger UI screenshot](https://raw.githubusercontent.com/datafusion-contrib/datafusion-tracing/main/datafusion-tracing/docs/screenshots/jaeger.png)
 </details>
 
 <details>
 <summary>DataDog UI</summary>
 
-![DataDog UI screenshot](https://github.com/datafusion-contrib/datafusion-tracing/blob/main/datafusion-tracing/docs/screenshots/datadog.png)
+![DataDog UI screenshot](https://raw.githubusercontent.com/datafusion-contrib/datafusion-tracing/main/datafusion-tracing/docs/screenshots/datadog.png)
 </details>
 
 ## Getting Started
@@ -56,7 +60,7 @@ Include DataFusion Tracing in your project's `Cargo.toml`:
 ```toml
 [dependencies]
 datafusion = "47.0.0"
-datafusion-tracing = "47.0.0"
+datafusion-tracing = "47.0.1"
 ```
 
 ### Quick Start Example
