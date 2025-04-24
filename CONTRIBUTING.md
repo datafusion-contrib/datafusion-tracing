@@ -23,6 +23,15 @@ Fork the repo, create a branch from `main`, make your changes, run the linting s
 
 Use standard Rust formatting, write clear commit messages, document public APIs, add tests for new code, and keep PRs focused.
 
+## Versioning
+
+This project follows semantic versioning (SemVer) with the following constraints:
+
+- The **major** version number must align with the major version of the DataFusion dependency.
+- The **minor** and **patch** versions can change independently based on features and fixes specific to this project.
+
+This allows users to easily understand compatibility with specific DataFusion versions while giving flexibility for this project's own development cycle.
+
 ## License
 
 Contributions are licensed under Apache License 2.0. 
