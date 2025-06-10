@@ -49,8 +49,8 @@
 //!
 //! ```toml
 //! [dependencies]
-//! datafusion = "47.0.0"
-//! datafusion-tracing = "47.0.1"
+//! datafusion = "48.0.0"
+//! datafusion-tracing = "48.0.0"
 //! ```
 //!
 //! ## Quick Start Example

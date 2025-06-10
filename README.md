@@ -59,8 +59,8 @@ Include DataFusion Tracing in your project's `Cargo.toml`:
 
 ```toml
 [dependencies]
-datafusion = "47.0.0"
-datafusion-tracing = "47.0.1"
+datafusion = "48.0.0"
+datafusion-tracing = "48.0.0"
 ```
 
 ### Quick Start Example
@@ -136,7 +136,7 @@ docker run --rm --name jaeger \
   -p 4318:4318 \
   -p 5778:5778 \
   -p 9411:9411 \
-  jaegertracing/jaeger:2.5.0
+  jaegertracing/jaeger:2.7.0
 ```
 
 Once running, you can access the Jaeger UI at http://localhost:16686. For more details, check out their [getting started guide](https://www.jaegertracing.io/docs/latest/getting-started/).

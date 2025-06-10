@@ -17,29 +17,34 @@
 //
 // This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
 
-use crate::metrics::{MetricsRecorder, MetricsRecordingStream};
-use crate::options::InstrumentationOptions;
-use crate::preview::{PreviewFn, PreviewRecorder, PreviewRecordingStream};
-use crate::utils::DefaultDisplay;
-use datafusion::arrow::datatypes::SchemaRef;
-use datafusion::common::Statistics;
-use datafusion::config::ConfigOptions;
-use datafusion::physical_expr::{Distribution, LexRequirement};
-use datafusion::physical_plan::execution_plan::{CardinalityEffect, InvariantLevel};
-use datafusion::physical_plan::metrics::MetricsSet;
-use datafusion::physical_plan::projection::ProjectionExec;
-use datafusion::physical_plan::ExecutionPlanProperties;
-use datafusion::physical_plan::PlanProperties;
+use crate::{
+    metrics::{MetricsRecorder, MetricsRecordingStream},
+    options::InstrumentationOptions,
+    preview::{PreviewFn, PreviewRecorder, PreviewRecordingStream},
+    utils::DefaultDisplay,
+};
 use datafusion::{
+    arrow::datatypes::SchemaRef,
+    common::Statistics,
+    config::ConfigOptions,
     error::Result,
     execution::{SendableRecordBatchStream, TaskContext},
+    physical_expr::{Distribution, LexRequirement},
     physical_plan::{
-        stream::RecordBatchStreamAdapter, DisplayAs, DisplayFormatType, ExecutionPlan,
+        execution_plan::{CardinalityEffect, InvariantLevel},
+        filter_pushdown::{
+            ChildPushdownResult, FilterDescription, FilterPushdownPropagation,
+        },
+        metrics::MetricsSet,
+        projection::ProjectionExec,
+        stream::RecordBatchStreamAdapter,
+        DisplayAs, DisplayFormatType, ExecutionPlan, ExecutionPlanProperties,
+        PhysicalExpr, PlanProperties,
     },
 };
 use delegate::delegate;
-use std::any::Any;
 use std::{
+    any::Any,
     fmt,
     fmt::Debug,
     sync::{Arc, OnceLock},
@@ -208,14 +213,29 @@ impl ExecutionPlan for InstrumentedExec {
                 config: &ConfigOptions,
             ) -> Result<Option<Arc<dyn ExecutionPlan>>>;
             fn metrics(&self) -> Option<MetricsSet>;
+            // We need to delegate to the inner plan's statistics method to preserve behavior,
+            // even though it's deprecated in favor of partition_statistics
+            #[allow(deprecated)]
             fn statistics(&self) -> Result<Statistics>;
+            fn partition_statistics(&self, partition: Option<usize>) -> Result<Statistics>;
             fn supports_limit_pushdown(&self) -> bool;
             fn with_fetch(&self, limit: Option<usize>) -> Option<Arc<dyn ExecutionPlan>>;
+            fn fetch(&self) -> Option<usize>;
             fn cardinality_effect(&self) -> CardinalityEffect;
             fn try_swapping_with_projection(
                 &self,
                 projection: &ProjectionExec,
             ) -> Result<Option<Arc<dyn ExecutionPlan>>>;
+            fn gather_filters_for_pushdown(
+                &self,
+                parent_filters: Vec<Arc<dyn PhysicalExpr>>,
+                config: &ConfigOptions,
+            ) -> Result<FilterDescription>;
+            fn handle_child_pushdown_result(
+                &self,
+                child_pushdown_result: ChildPushdownResult,
+                config: &ConfigOptions,
+            ) -> Result<FilterPushdownPropagation<Arc<dyn ExecutionPlan>>>;
         }
     }
 
