@@ -76,60 +76,6 @@ expression: json_lines
     "level": "INFO",
     "message": "close",
     "span": {
-      "name": "get_range",
-      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
-      "object_store.range": "2933..2941",
-      "object_store.result.content_length": 8,
-      "otel.name": "local_fs.get_range"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "06_object_store_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "order_nations"
-      },
-      {
-        "name": "create_physical_plan"
-      }
-    ],
-    "target": "instrumented_object_store::instrumented_object_store",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "get_range",
-      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
-      "object_store.range": "1872..2933",
-      "object_store.result.content_length": 1061,
-      "otel.name": "local_fs.get_range"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "06_object_store_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "order_nations"
-      },
-      {
-        "name": "create_physical_plan"
-      }
-    ],
-    "target": "instrumented_object_store::instrumented_object_store",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
       "name": "create_physical_plan",
       "physical_plan": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]\n  DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet\n"
     },
@@ -343,7 +289,7 @@ expression: json_lines
       "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
       "datafusion.metrics.output_rows": "25",
       "datafusion.metrics.spill_count": "0",
-      "datafusion.metrics.spilled_bytes": "0",
+      "datafusion.metrics.spilled_bytes": "0.0 B",
       "datafusion.metrics.spilled_rows": "0",
       "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
       "datafusion.node": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]",

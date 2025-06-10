@@ -5,13 +5,13 @@ expression: preview
 +-------------+-------------+-------------+--------+
 | n_nationkey | nation_name | region_name | letter |
 |=============+=============+=============+========|
-| 0           | ALGERIA     | AFRICA      | A      |
+| 1           | ARGENTINA   | AMERICA     | A      |
 |-------------+-------------+-------------+--------|
-| 0           | ALGERIA     | AFRICA      | L      |
+| 1           | ARGENTINA   | AMERICA     | R      |
 |-------------+-------------+-------------+--------|
-| 0           | ALGERIA     | AFRICA      | G      |
+| 1           | ARGENTINA   | AMERICA     | G      |
 |-------------+-------------+-------------+--------|
-| 0           | ALGERIA     | AFRICA      | E      |
+| 1           | ARGENTINA   | AMERICA     | E      |
 |-------------+-------------+-------------+--------|
-| 0           | ALGERIA     | AFRICA      | R      |
+| 1           | ARGENTINA   | AMERICA     | N      |
 +-------------+-------------+-------------+--------+

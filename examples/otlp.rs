@@ -35,7 +35,7 @@
 //! docker run --rm --name jaeger \
 //!   -p 16686:16686 \
 //!   -p 4317:4317 \
-//!   jaegertracing/jaeger:2.5.0
+//!   jaegertracing/jaeger:2.7.0
 //! ```
 //!
 //! After starting Jaeger, you can view traces at http://localhost:16686
