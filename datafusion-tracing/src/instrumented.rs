@@ -38,10 +38,10 @@ use datafusion::{
     },
 };
 use delegate::delegate;
-use std::any::Any;
 use std::{
-    fmt,
-    fmt::Debug,
+    any::Any,
+    collections::HashMap,
+    fmt::{self, Debug},
     sync::{Arc, OnceLock},
 };
 use tracing::{field, Span};
@@ -98,6 +98,23 @@ impl InstrumentedExec {
             preview_recorder: OnceLock::new(),
             span_create_fn,
         }
+    }
+
+    /// Creates a new `InstrumentedExec` with the same configuration as this instance but with a different inner execution plan.
+    ///
+    /// This method is used when the optimizer needs to replace the inner execution plan while preserving
+    /// all the instrumentation settings (metrics recording, preview limits, span creation function, etc.).
+    fn with_new_inner(&self, inner: Arc<dyn ExecutionPlan>) -> Arc<dyn ExecutionPlan> {
+        Arc::new(InstrumentedExec::new(
+            inner,
+            self.span_create_fn.clone(),
+            &InstrumentationOptions {
+                record_metrics: self.record_metrics,
+                preview_limit: self.preview_limit,
+                preview_fn: self.preview_fn.clone(),
+                custom_fields: HashMap::new(), // custom fields are not used by `InstrumentedExec`, only by the higher-level `instrument_with_spans` macro family
+            },
+        ))
     }
 
     /// Retrieves the tracing span, initializing it if necessary.
@@ -186,11 +203,6 @@ impl InstrumentedExec {
 
 impl ExecutionPlan for InstrumentedExec {
     // Delegate all ExecutionPlan methods to the inner plan, except for `as_any` and `execute`.
-    //
-    // Note: Methods returning a new ExecutionPlan instance delegate directly to the inner plan,
-    // resulting in loss of instrumentation. This is intentional since instrumentation should
-    // be applied by the final PhysicalOptimizerRule pass. Therefore, any resulting plans will
-    // be re-instrumented after optimizer transformations.
     delegate! {
         to self.inner {
             fn name(&self) -> &str;
@@ -202,30 +214,62 @@ impl ExecutionPlan for InstrumentedExec {
             fn maintains_input_order(&self) -> Vec<bool>;
             fn benefits_from_input_partitioning(&self) -> Vec<bool>;
             fn children(&self) -> Vec<&Arc<dyn ExecutionPlan>>;
-            fn repartitioned(
-                &self,
-                target_partitions: usize,
-                config: &ConfigOptions,
-            ) -> Result<Option<Arc<dyn ExecutionPlan>>>;
             fn metrics(&self) -> Option<MetricsSet>;
             fn statistics(&self) -> Result<Statistics>;
             fn supports_limit_pushdown(&self) -> bool;
-            fn with_fetch(&self, limit: Option<usize>) -> Option<Arc<dyn ExecutionPlan>>;
             fn cardinality_effect(&self) -> CardinalityEffect;
-            fn try_swapping_with_projection(
-                &self,
-                projection: &ProjectionExec,
-            ) -> Result<Option<Arc<dyn ExecutionPlan>>>;
         }
     }
 
-    delegate! {
-        to self.inner.clone() {
-            fn with_new_children(
-                self: Arc<Self>,
-                children: Vec<Arc<dyn ExecutionPlan>>,
-            ) -> Result<Arc<dyn ExecutionPlan>>;
+    /// Delegate to the inner plan for repartitioning and rewrap with an InstrumentedExec.
+    fn repartitioned(
+        &self,
+        target_partitions: usize,
+        config: &ConfigOptions,
+    ) -> Result<Option<Arc<dyn ExecutionPlan>>> {
+        if let Some(new_inner) = self
+            .inner
+            .clone()
+            .repartitioned(target_partitions, config)?
+        {
+            Ok(Some(self.with_new_inner(new_inner)))
+        } else {
+            Ok(None)
         }
+    }
+
+    /// Delegate to the inner plan for fetching and rewrap with an InstrumentedExec.
+    fn with_fetch(&self, limit: Option<usize>) -> Option<Arc<dyn ExecutionPlan>> {
+        if let Some(new_inner) = self.inner.clone().with_fetch(limit) {
+            Some(self.with_new_inner(new_inner))
+        } else {
+            None
+        }
+    }
+
+    /// Delegate to the inner plan for swapping with a projection and rewrap with an InstrumentedExec.
+    fn try_swapping_with_projection(
+        &self,
+        projection: &ProjectionExec,
+    ) -> Result<Option<Arc<dyn ExecutionPlan>>> {
+        if let Some(new_inner) = self
+            .inner
+            .clone()
+            .try_swapping_with_projection(projection)?
+        {
+            Ok(Some(self.with_new_inner(new_inner)))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Delegate to the inner plan for creating new children and rewrap with an InstrumentedExec.
+    fn with_new_children(
+        self: Arc<Self>,
+        children: Vec<Arc<dyn ExecutionPlan>>,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        let new_inner = self.inner.clone().with_new_children(children)?;
+        Ok(self.with_new_inner(new_inner))
     }
 
     fn as_any(&self) -> &dyn Any {
