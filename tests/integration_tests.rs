@@ -165,6 +165,23 @@ async fn test_scrabble_all_options() -> Result<()> {
     .await
 }
 
+#[tokio::test(flavor = "multi_thread", worker_threads = 8)]
+async fn test_recursive() -> Result<()> {
+    execute_test_case("08_recursive", &QueryTestCase::new("recursive")).await
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 8)]
+async fn test_recursive_all_options() -> Result<()> {
+    execute_test_case(
+        "09_recursive_all_options",
+        &QueryTestCase::new("recursive")
+            .with_metrics_collection()
+            .with_row_limit(5)
+            .with_compact_preview(),
+    )
+    .await
+}
+
 /// Executes the provided [`QueryTestCase`], setting up tracing and verifying
 /// log output according to its parameters.
 async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Result<()> {
