@@ -1,5 +1,5 @@
 ---
-source: integration/tests/integration_tests.rs
+source: tests/integration_tests.rs
 expression: preview
 ---
 +----------+

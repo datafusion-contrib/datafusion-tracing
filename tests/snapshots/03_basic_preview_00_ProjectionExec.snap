@@ -1,9 +1,0 @@
----
-source: integration/tests/integration_tests.rs
-expression: preview
----
-+----------+
-| Int64(1) |
-+----------+
-| 1        |
-+----------+
