@@ -23,7 +23,7 @@ use futures::stream::BoxStream;
 use futures::StreamExt;
 use object_store::{
     path::Path, GetOptions, GetResult, ListResult, MultipartUpload, ObjectMeta,
-    ObjectStore, PutMultipartOpts, PutOptions, PutPayload, PutResult, Result, UploadPart,
+    ObjectStore, PutMultipartOptions, PutOptions, PutPayload, PutResult, Result, UploadPart,
 };
 use std::fmt::{Display, Formatter};
 use std::ops::Range;
@@ -199,7 +199,7 @@ impl ObjectStore for InstrumentedObjectStore {
     async fn put_multipart_opts(
         &self,
         location: &Path,
-        opts: PutMultipartOpts,
+        opts: PutMultipartOptions,
     ) -> Result<Box<dyn MultipartUpload>> {
         let result = self.inner.put_multipart_opts(location, opts).await?;
         Ok(Box::new(InstrumentedMultiPartUpload::new(

@@ -73,6 +73,53 @@ expression: json_lines
     "span": {
       "datafusion.boundedness": "Bounded",
       "datafusion.emission_type": "Incremental",
+      "datafusion.node": "WorkTableExec: name=numbers",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "WorkTableExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "RecursiveQueryExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "CoalescePartitionsExec",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "CoalescePartitionsExec",
+        "region": "us-west"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
       "datafusion.node": "RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1",
       "datafusion.partitioning": "RoundRobinBatch(8)",
       "env": "production",
@@ -298,6 +345,53 @@ expression: json_lines
     "span": {
       "datafusion.boundedness": "Bounded",
       "datafusion.emission_type": "Incremental",
+      "datafusion.node": "WorkTableExec: name=numbers",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "WorkTableExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "RecursiveQueryExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "CoalescePartitionsExec",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "CoalescePartitionsExec",
+        "region": "us-west"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
       "datafusion.node": "RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1",
       "datafusion.partitioning": "RoundRobinBatch(8)",
       "env": "production",
@@ -510,6 +604,53 @@ expression: json_lines
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
+        "region": "us-west"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.node": "WorkTableExec: name=numbers",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "WorkTableExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "RecursiveQueryExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "CoalescePartitionsExec",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],

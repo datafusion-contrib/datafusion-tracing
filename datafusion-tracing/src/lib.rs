@@ -49,8 +49,8 @@
 //!
 //! ```toml
 //! [dependencies]
-//! datafusion = "48.0.0"
-//! datafusion-tracing = "48.0.1"
+//! datafusion = "49.0.0"
+//! datafusion-tracing = "49.0.0"
 //! ```
 //!
 //! ## Quick Start Example
@@ -108,14 +108,6 @@
 //! ```
 //!
 //! A more complete example can be found in the [examples directory](https://github.com/datafusion-contrib/datafusion-tracing/tree/main/examples).
-//!
-//! # Limitations
-//!
-//! ## Recursive Queries
-//!
-//! When using DataFusion Tracing with recursive queries (e.g., those using `WITH RECURSIVE`), nodes of type `WorkTableExec` are intentionally not instrumented. This is due to a current limitation in DataFusion: instrumenting these nodes can break recursive query execution and result in errors such as `Unexpected empty work table.`
-//!
-//! As a result, while most of the recursive query plan will be traced and metrics will be collected, some internal operations related to recursion will not be visible in the trace until upstream support is available. See [issue #5](https://github.com/datafusion-contrib/datafusion-tracing/issues/5) for details and tracking progress on this limitation.
 //!
 
 mod instrument_rule;
