@@ -1,0 +1,143 @@
+---
+source: tests/integration_tests.rs
+expression: json_lines
+---
+[
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "read_query",
+      "query": "SELECT 1;"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "03_basic_preview"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "select_one"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "logical_plan": "Projection: Int64(1) [Int64(1):Int64]\n  EmptyRelation []",
+      "name": "parse_sql",
+      "sql": "SELECT 1;"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "03_basic_preview"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "select_one"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "create_physical_plan",
+      "physical_plan": "ProjectionExec: expr=[1 as Int64(1)]\n  PlaceholderRowExec\n"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "03_basic_preview"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "select_one"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.node": "PlaceholderRowExec",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "PlaceholderRowExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "03_basic_preview"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "select_one"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.node": "ProjectionExec: expr=[1 as Int64(1)]",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "ProjectionExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "03_basic_preview"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "select_one"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "run_traced_query",
+      "query_name": "select_one"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "03_basic_preview"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  }
+]

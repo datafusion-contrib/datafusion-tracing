@@ -1,0 +1,75 @@
+name: CI
+
+# ────── Triggers ────────────────────────────────────────────────────────────────
+on:
+  push:
+    paths-ignore:
+    - docs/**
+    - '**.md'
+    - .github/ISSUE_TEMPLATE/**
+    - .github/pull_request_template.md
+  pull_request:
+    paths-ignore:
+    - docs/**
+    - '**.md'
+    - .github/ISSUE_TEMPLATE/**
+    - .github/pull_request_template.md
+  workflow_dispatch:
+
+# ────── Global settings ─────────────────────────────────────────────────────────
+concurrency:
+  group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  HAWKEYE_VERSION: "6.0.3"
+  TAPLO_VERSION:  "0.8.1"
+  RDME_VERSION:  "1.4.8"
+
+# ────── Jobs ────────────────────────────────────────────────────────────────────
+jobs:
+
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+      with: { fetch-depth: 1 }
+
+    - uses: dtolnay/rust-toolchain@stable
+
+    - uses: Swatinem/rust-cache@v2.7.8
+      with:
+        cache-all-crates: true # caches Taplo, HawkEye, and cargo-rdme builds too
+        env-vars: "CARGO CC CFLAGS CXX CMAKE RUST HAWKEYE TAPLO RDME"
+
+    - name: Install dev tools (cached after first run)
+      run: |
+        cargo install --locked taplo-cli@${{ env.TAPLO_VERSION }}
+        cargo install --locked hawkeye@${{ env.HAWKEYE_VERSION }}
+        cargo install --locked cargo-rdme@${{ env.RDME_VERSION }}
+
+    - run: ./ci/scripts/hawkeye_fmt.sh      # license headers
+    - run: ./ci/scripts/rust_toml_fmt.sh    # TOML formatting
+    - run: ./ci/scripts/rust_fmt.sh         # Rust formatting
+    - run: ./ci/scripts/readme_sync.sh      # Readme synchronization
+
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+      with: { fetch-depth: 1 }
+
+    - uses: dtolnay/rust-toolchain@stable
+
+    - uses: Swatinem/rust-cache@v2.7.8
+
+    - run: cargo check  --workspace --all-targets --locked
+    - run: cargo build  --workspace --all-targets
+    - run: ./ci/scripts/rust_clippy.sh      # needs build artefacts
+    - run: ./ci/scripts/rust_docs.sh        # needs build artefacts
+    - run: cargo test  --workspace --all-targets

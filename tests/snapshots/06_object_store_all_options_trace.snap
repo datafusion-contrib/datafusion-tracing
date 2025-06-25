@@ -1,0 +1,334 @@
+---
+source: tests/integration_tests.rs
+expression: json_lines
+---
+[
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "read_query",
+      "query": "SELECT * from nation order by n_name;"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  Projection: nation.n_nationkey, nation.n_name, nation.n_regionkey, nation.n_comment [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n    TableScan: nation [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+      "name": "parse_sql",
+      "sql": "SELECT * from nation order by n_name;"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/nation.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 2941, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "name": "create_physical_plan"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "create_physical_plan",
+      "physical_plan": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]\n  DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet\n"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
+      "object_store.range": "2933..2941",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.node": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "DataSourceExec",
+        "region": "us-west"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
+      "object_store.range": "1872..2933",
+      "object_store.result.content_length": 1061,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.node": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "DataSourceExec",
+        "region": "us-west"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_ranges",
+      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
+      "object_store.ranges": "[4..167, 167..448, 448..560, 560..1595]",
+      "object_store.result.content_length": 1591,
+      "otel.name": "local_fs.get_ranges"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.node": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Incremental",
+        "datafusion.node": "DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "DataSourceExec",
+        "region": "us-west"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.bloom_filter_eval_time": "0.00ms",
+      "datafusion.metrics.bytes_scanned": "1591",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.file_open_errors": "0",
+      "datafusion.metrics.file_scan_errors": "0",
+      "datafusion.metrics.metadata_load_time": "0.00ms",
+      "datafusion.metrics.num_predicate_creation_errors": "0",
+      "datafusion.metrics.output_rows": "25",
+      "datafusion.metrics.page_index_eval_time": "0.00ms",
+      "datafusion.metrics.page_index_rows_matched": "0",
+      "datafusion.metrics.page_index_rows_pruned": "0",
+      "datafusion.metrics.predicate_evaluation_errors": "0",
+      "datafusion.metrics.pushdown_rows_matched": "0",
+      "datafusion.metrics.pushdown_rows_pruned": "0",
+      "datafusion.metrics.row_groups_matched_bloom_filter": "0",
+      "datafusion.metrics.row_groups_matched_statistics": "0",
+      "datafusion.metrics.row_groups_pruned_bloom_filter": "0",
+      "datafusion.metrics.row_groups_pruned_statistics": "0",
+      "datafusion.metrics.row_pushdown_eval_time": "0.00ms",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.statistics_eval_time": "0.00ms",
+      "datafusion.metrics.time_elapsed_opening": "0.00ms",
+      "datafusion.metrics.time_elapsed_processing": "0.00ms",
+      "datafusion.metrics.time_elapsed_scanning_total": "0.00ms",
+      "datafusion.metrics.time_elapsed_scanning_until_data": "0.00ms",
+      "datafusion.node": "DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "DataSourceExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "25",
+      "datafusion.metrics.spill_count": "0",
+      "datafusion.metrics.spilled_bytes": "0.0 B",
+      "datafusion.metrics.spilled_rows": "0",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "SortExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "run_traced_query",
+      "query_name": "order_nations"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  }
+]

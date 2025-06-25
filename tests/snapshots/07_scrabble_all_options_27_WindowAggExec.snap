@@ -1,0 +1,37 @@
+---
+source: tests/integration_tests.rs
+expression: preview
+---
++------------+------------+------------+-----------+-----------+
+| region_nam | nation_nam | scrabble_s | rank()    | avg(natio |
+| e          | e          | core       | PARTITION | n_scores. |
+|            |            |            | BY [natio | scrabble_ |
+|            |            |            | n_scores. | score)    |
+|            |            |            | region_na | PARTITION |
+|            |            |            | me] ORDER | BY [natio |
+|            |            |            | BY [natio | n_scores. |
+|            |            |            | n_scores. | region_na |
+|            |            |            | scrabble_ | me] ROWS  |
+|            |            |            | score     | BETWEEN   |
+|            |            |            | DESC      | UNBOUNDED |
+|            |            |            | NULLS     | PRECEDING |
+|            |            |            | FIRST]    | AND       |
+|            |            |            | RANGE     | UNBOUNDED |
+|            |            |            | BETWEEN   | FOLLOWING |
+|            |            |            | UNBOUNDED |           |
+|            |            |            | PRECEDING |           |
+|            |            |            | AND       |           |
+|            |            |            | CURRENT   |           |
+|            |            |            | ROW       |           |
+|============+============+============+===========+===========|
+| AMERICA    | BRAZIL     | 17         | 1         | 11.0      |
+|------------+------------+------------+-----------+-----------|
+| AMERICA    | UNITED     | 13         | 2         | 11.0      |
+|            | STATES     |            |           |           |
+|------------+------------+------------+-----------+-----------|
+| AMERICA    | ARGENTINA  | 10         | 3         | 11.0      |
+|------------+------------+------------+-----------+-----------|
+| AMERICA    | CANADA     | 9          | 4         | 11.0      |
+|------------+------------+------------+-----------+-----------|
+| AMERICA    | PERU       | 6          | 5         | 11.0      |
++------------+------------+------------+-----------+-----------+
