@@ -34,6 +34,6 @@ workspace = true
 datafusion = { workspace = true, features = ["parquet", "nested_expressions"] }
 datafusion-tracing = { workspace = true }
 instrumented-object-store = { workspace = true }
-object_store = { version = "0.12.1", default-features = false }
+object_store = { version = "0.12.3", default-features = false }
 tracing = { workspace = true }
 url = { version = "2.5" }
