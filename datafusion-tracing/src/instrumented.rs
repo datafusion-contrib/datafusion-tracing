@@ -29,11 +29,12 @@ use datafusion::{
     config::ConfigOptions,
     error::Result,
     execution::{SendableRecordBatchStream, TaskContext},
-    physical_expr::{Distribution, LexRequirement},
+    physical_expr::{Distribution, OrderingRequirements},
     physical_plan::{
         execution_plan::{CardinalityEffect, InvariantLevel},
         filter_pushdown::{
-            ChildPushdownResult, FilterDescription, FilterPushdownPropagation,
+            ChildPushdownResult, FilterDescription, FilterPushdownPhase,
+            FilterPushdownPropagation,
         },
         metrics::MetricsSet,
         projection::ProjectionExec,
@@ -215,7 +216,7 @@ impl ExecutionPlan for InstrumentedExec {
             fn properties(&self) -> &PlanProperties;
             fn check_invariants(&self, check: InvariantLevel) -> Result<()>;
             fn required_input_distribution(&self) -> Vec<Distribution>;
-            fn required_input_ordering(&self) -> Vec<Option<LexRequirement>>;
+            fn required_input_ordering(&self) -> Vec<Option<OrderingRequirements>>;
             fn maintains_input_order(&self) -> Vec<bool>;
             fn benefits_from_input_partitioning(&self) -> Vec<bool>;
             fn children(&self) -> Vec<&Arc<dyn ExecutionPlan>>;
@@ -230,11 +231,13 @@ impl ExecutionPlan for InstrumentedExec {
             fn cardinality_effect(&self) -> CardinalityEffect;
             fn gather_filters_for_pushdown(
                 &self,
+                phase: FilterPushdownPhase,
                 parent_filters: Vec<Arc<dyn PhysicalExpr>>,
                 config: &ConfigOptions,
             ) -> Result<FilterDescription>;
             fn handle_child_pushdown_result(
                 &self,
+                phase: FilterPushdownPhase,
                 child_pushdown_result: ChildPushdownResult,
                 config: &ConfigOptions,
             ) -> Result<FilterPushdownPropagation<Arc<dyn ExecutionPlan>>>;
@@ -290,6 +293,15 @@ impl ExecutionPlan for InstrumentedExec {
     ) -> Result<Arc<dyn ExecutionPlan>> {
         let new_inner = self.inner.clone().with_new_children(children)?;
         Ok(self.with_new_inner(new_inner))
+    }
+
+    /// Delegate to the inner plan for injecting run-time state and rewrap with an InstrumentedExec.
+    fn with_new_state(
+        &self,
+        state: Arc<dyn Any + Send + Sync>,
+    ) -> Option<Arc<dyn ExecutionPlan>> {
+        let new_inner = self.inner.with_new_state(state)?;
+        Some(self.with_new_inner(new_inner))
     }
 
     fn as_any(&self) -> &dyn Any {
