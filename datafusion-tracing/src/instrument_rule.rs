@@ -22,7 +22,6 @@ use crate::instrumented::SpanCreateFn;
 use crate::options::InstrumentationOptions;
 use datafusion::common::runtime::{set_join_set_tracer, JoinSetTracer};
 use datafusion::common::tree_node::{Transformed, TransformedResult, TreeNode};
-use datafusion::physical_plan::work_table::WorkTableExec;
 use datafusion::{
     config::ConfigOptions, physical_optimizer::PhysicalOptimizerRule,
     physical_plan::ExecutionPlan,
@@ -70,15 +69,8 @@ impl PhysicalOptimizerRule for InstrumentRule {
         _config: &ConfigOptions,
     ) -> datafusion::error::Result<Arc<dyn ExecutionPlan>> {
         // Iterate over the plan and wrap each node with InstrumentedExec
-        //
-        // NOTE: Recursive queries dynamically rebuild the execution plan during execution and assume one of the nodes is a `WorkTableExec`.
-        // Wrapping it with `InstrumentedExec` would break the recursive query, so for now we only instrument non-`WorkTableExec` nodes.
-        //
-        // TODO: Remove this limitation once `with_work_table` is made a trait method of `ExecutionPlan` (tracked by https://github.com/apache/datafusion/pull/16469)
         plan.transform(|plan| {
-            if plan.as_any().downcast_ref::<InstrumentedExec>().is_none()
-                && plan.as_any().downcast_ref::<WorkTableExec>().is_none()
-            {
+            if plan.as_any().downcast_ref::<InstrumentedExec>().is_none() {
                 // Node is not InstrumentedExec; wrap it
                 Ok(Transformed::yes(Arc::new(InstrumentedExec::new(
                     plan,
