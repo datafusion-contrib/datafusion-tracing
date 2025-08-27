@@ -60,4 +60,4 @@
 
 mod instrumented_object_store;
 
-pub use instrumented_object_store::instrument_object_store;
+pub use instrumented_object_store::{instrument_object_store, InstrumentedObjectStore};

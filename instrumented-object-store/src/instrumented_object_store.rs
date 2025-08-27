@@ -42,22 +42,27 @@ pub fn instrument_object_store(
 
 /// A wrapper around an `ObjectStore` that instruments all public methods with tracing.
 #[derive(Clone, Debug)]
-struct InstrumentedObjectStore {
-    inner: Arc<dyn ObjectStore>,
+pub struct InstrumentedObjectStore<T: ObjectStore> {
+    inner: T,
     name: String,
 }
 
-impl InstrumentedObjectStore {
+impl<T: ObjectStore> InstrumentedObjectStore<T> {
     /// Creates a new `InstrumentedObjectStore` wrapping the provided `ObjectStore`.
     ///
     /// # Arguments
     ///
-    /// * `store` - An `Arc`-wrapped `dyn ObjectStore` to be instrumented.
-    pub fn new(store: Arc<dyn ObjectStore>, name: &str) -> Self {
+    /// * `store` - An `ObjectStore` to be instrumented.
+    pub fn new(store: T, name: impl Into<String>) -> Self {
         Self {
             inner: store,
-            name: name.to_owned(),
+            name: name.into(),
         }
+    }
+
+    /// Returns a reference to the inner `ObjectStore`.
+    pub fn inner(&self) -> &T {
+        &self.inner
     }
 }
 
@@ -128,14 +133,14 @@ where
     result
 }
 
-impl Display for InstrumentedObjectStore {
+impl<T: ObjectStore> Display for InstrumentedObjectStore<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         Display::fmt(&self.inner, f)
     }
 }
 
 #[async_trait]
-impl ObjectStore for InstrumentedObjectStore {
+impl<T: ObjectStore> ObjectStore for InstrumentedObjectStore<T> {
     /// Save the provided bytes to the specified location with tracing.
     #[instrument(
         skip_all,
