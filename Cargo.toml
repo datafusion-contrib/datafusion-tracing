@@ -37,7 +37,7 @@ authors = ["DataDog <info@datadoghq.com>"]
 rust-version = "1.82.0"
 
 [workspace.dependencies]
-datafusion = { version = "49.0.0", default-features = false }
+datafusion = { version = "49.0.2", default-features = false }
 datafusion-tracing = { path = "datafusion-tracing", version = "49.0.0" }
 futures = "0.3"
 instrumented-object-store = { path = "instrumented-object-store", version = "49.0.0" }
