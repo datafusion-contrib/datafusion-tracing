@@ -168,6 +168,17 @@ cargo build --workspace
 cargo test --workspace
 ```
 
+### Test data: generate TPCH Parquet files
+
+Integration tests and examples expect TPCH tables in Parquet format to be present in `integration-utils/data` (not checked in). Generate them locally with:
+
+```bash
+cargo install tpchgen-cli
+./dev/generate_tpch_parquet.sh
+```
+
+This produces all TPCH tables at scale factor 0.1 as single Parquet files in `integration-utils/data`. CI installs `tpchgen-cli` and runs the same script automatically before tests. If a required file is missing, the helper library will return a clear error instructing you to run the script.
+
 ## Contributing
 
 Contributions are welcome. Make sure your code passes all tests, follow existing formatting and coding styles, and include tests and documentation. See [CONTRIBUTING.md](https://github.com/datafusion-contrib/datafusion-tracing/blob/main/CONTRIBUTING.md) for detailed guidelines.

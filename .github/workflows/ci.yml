@@ -26,6 +26,7 @@ env:
   HAWKEYE_VERSION: "6.0.3"
   TAPLO_VERSION:  "0.8.1"
   RDME_VERSION:  "1.4.8"
+  TPCHGEN_VERSION: "2.0.0"
 
 # ────── Jobs ────────────────────────────────────────────────────────────────────
 jobs:
@@ -67,6 +68,15 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
 
     - uses: Swatinem/rust-cache@v2.8.0
+      with:
+        cache-all-crates: true # caches Tpchgen-cli builds too
+        env-vars: "CARGO CC CFLAGS CXX CMAKE RUST TPCHGEN"
+
+    - name: Install tpchgen-cli
+      run: cargo install --locked tpchgen-cli@${{ env.TPCHGEN_VERSION }}
+
+    - name: Generate TPCH Parquet data (SF=0.1)
+      run: ./dev/generate_tpch_parquet.sh
 
     - run: cargo check  --workspace --all-targets --locked
     - run: cargo build  --workspace --all-targets

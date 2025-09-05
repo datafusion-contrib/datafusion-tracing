@@ -152,24 +152,36 @@ pub fn tpch_tables_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data")
 }
 
-/// Registers TPCH Parquet tables required for executing the queries.
+/// Registers all TPCH Parquet tables required for executing the queries.
 #[instrument(level = "info", skip(ctx))]
 async fn register_tpch_tables(ctx: &SessionContext) -> Result<()> {
     // Construct the path to the directory containing Parquet data.
     let data_dir = tpch_tables_dir();
 
-    // Register each table (nation, region) from Parquet files.
-    for table in ["nation", "region"] {
+    // Generate and register each table from Parquet files.
+    // This includes all standard TPCH tables so examples/tests can rely on them.
+    for table in [
+        "nation",
+        "region",
+        "part",
+        "supplier",
+        "partsupp",
+        "customer",
+        "orders",
+        "lineitem",
+    ] {
         let listing_options = ListingOptions::new(Arc::new(ParquetFormat::default()));
 
+        let parquet_path = data_dir.join(table).with_extension("parquet");
+        if !parquet_path.exists() {
+            return Err(internal_datafusion_err!(
+                "Missing TPCH Parquet file: {}.\nGenerate TPCH data first by running: ./dev/generate_tpch_parquet.sh\nThis script requires 'tpchgen-cli' (install with: cargo install tpchgen-cli)",
+                parquet_path.display()
+            ));
+        }
+
         // Generate the file path URL for the Parquet data.
-        let table_path = format!(
-            "file://{}",
-            data_dir
-                .join(table)
-                .with_extension("parquet")
-                .to_string_lossy()
-        );
+        let table_path = format!("file://{}", parquet_path.to_string_lossy());
 
         info!("Registering table '{}' from {}", table, table_path);
 
