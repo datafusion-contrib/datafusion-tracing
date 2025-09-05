@@ -44,6 +44,8 @@ static SUBSCRIBER_INIT: Once = Once::new();
 struct QueryTestCase<'a> {
     /// The SQL query to run.
     sql_query: &'a str,
+    /// Whether to instrument the object store for this test.
+    record_object_store: bool,
     /// Whether to collect (record) metrics for this test.
     should_record_metrics: bool,
     /// Maximum number of rows to preview in logs.
@@ -62,6 +64,11 @@ impl<'a> QueryTestCase<'a> {
             sql_query,
             ..Default::default()
         }
+    }
+
+    fn with_object_store_collection(mut self) -> Self {
+        self.record_object_store = true;
+        self
     }
 
     fn with_metrics_collection(mut self) -> Self {
@@ -141,6 +148,7 @@ async fn test_object_store_all_options() -> Result<()> {
     execute_test_case(
         "06_object_store_all_options",
         &QueryTestCase::new("order_nations")
+            .with_object_store_collection()
             .with_metrics_collection()
             .with_row_limit(5)
             .with_compact_preview(),
@@ -182,6 +190,12 @@ async fn test_recursive_all_options() -> Result<()> {
     .await
 }
 
+#[tokio::test(flavor = "multi_thread", worker_threads = 8)]
+async fn test_topk_lineitem() -> Result<()> {
+    // Expect a filled `DynamicFilterPhysicalExpr` on the `DataSourceExec` "datafusion.node" field
+    execute_test_case("10_topk_lineitem", &QueryTestCase::new("topk_lineitem")).await
+}
+
 /// Executes the provided [`QueryTestCase`], setting up tracing and verifying
 /// log output according to its parameters.
 async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Result<()> {
@@ -190,6 +204,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
 
     // Initialize the DataFusion session with the requested options.
     let ctx = init_session(
+        test_case.record_object_store,
         test_case.should_record_metrics,
         test_case.row_limit,
         test_case.use_compact_preview,
@@ -215,7 +230,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     // Bind insta settings for snapshot testing.
     let _insta_guard = insta_settings::settings().bind_to_scope();
 
-    // If we have a row_limit, do dedicated assertions on the previews.
+    // If we have a preview row_limit, do dedicated assertions on the previews.
     if test_case.row_limit > 0 {
         let mut preview_id = 0;
         for json_line in &json_lines {

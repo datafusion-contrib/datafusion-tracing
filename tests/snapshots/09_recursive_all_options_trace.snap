@@ -93,7 +93,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -134,7 +133,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -176,7 +174,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -218,7 +215,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -260,7 +256,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -302,7 +297,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -340,7 +334,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -381,7 +374,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -423,7 +415,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -465,7 +456,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -507,7 +497,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -549,7 +538,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -587,7 +575,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -628,7 +615,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -669,7 +655,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -710,7 +695,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -751,7 +735,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -792,7 +775,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",

@@ -114,6 +114,7 @@ mod instrument_rule;
 mod instrumented;
 mod instrumented_macros;
 mod metrics;
+mod node;
 mod options;
 mod preview;
 mod preview_utils;

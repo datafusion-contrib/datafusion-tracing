@@ -52,7 +52,7 @@ expression: json_lines
     "span": {
       "name": "head",
       "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
-      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/nation.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 2941, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/nation.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 2670, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
       "otel.name": "local_fs.head"
     },
     "spans": [
@@ -99,8 +99,8 @@ expression: json_lines
     "span": {
       "name": "get_ranges",
       "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
-      "object_store.ranges": "[4..167, 167..448, 448..560, 560..1595]",
-      "object_store.result.content_length": 1591,
+      "object_store.ranges": "[4..172, 172..477, 477..554, 554..1714]",
+      "object_store.result.content_length": 1710,
       "otel.name": "local_fs.get_ranges"
     },
     "spans": [
@@ -115,7 +115,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Final",
-        "datafusion.node": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -125,7 +124,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -144,7 +142,7 @@ expression: json_lines
       "datafusion.boundedness": "Bounded",
       "datafusion.emission_type": "Incremental",
       "datafusion.metrics.bloom_filter_eval_time": "0.00ms",
-      "datafusion.metrics.bytes_scanned": "1591",
+      "datafusion.metrics.bytes_scanned": "1710",
       "datafusion.metrics.elapsed_compute": "0.00ms",
       "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
       "datafusion.metrics.file_open_errors": "0",
