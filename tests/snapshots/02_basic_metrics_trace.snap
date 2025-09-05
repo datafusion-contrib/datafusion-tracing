@@ -28,7 +28,7 @@ expression: json_lines
     "level": "INFO",
     "message": "close",
     "span": {
-      "logical_plan": "Projection: Int64(1) [Int64(1):Int64]\n  EmptyRelation []",
+      "logical_plan": "Projection: Int64(1) [Int64(1):Int64]\n  EmptyRelation: rows=1 []",
       "name": "parse_sql",
       "sql": "SELECT 1;"
     },

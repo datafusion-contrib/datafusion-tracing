@@ -28,7 +28,7 @@ expression: json_lines
     "level": "INFO",
     "message": "close",
     "span": {
-      "logical_plan": "Projection: numbers.n [n:Int64]\n  SubqueryAlias: numbers [n:Int64]\n    Projection: n AS n [n:Int64]\n      RecursiveQuery: is_distinct=false [n:Int64]\n        Projection: Int64(1) AS n [n:Int64]\n          EmptyRelation []\n        Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n          Filter: numbers.n < Int64(3) [n:Int64]\n            TableScan: numbers [n:Int64]",
+      "logical_plan": "Projection: numbers.n [n:Int64]\n  SubqueryAlias: numbers [n:Int64]\n    Projection: n AS n [n:Int64]\n      RecursiveQuery: is_distinct=false [n:Int64]\n        Projection: Int64(1) AS n [n:Int64]\n          EmptyRelation: rows=1 []\n        Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n          Filter: numbers.n < Int64(3) [n:Int64]\n            TableScan: numbers [n:Int64]",
       "name": "parse_sql",
       "sql": "WITH RECURSIVE numbers(n) AS (\n    SELECT 1 AS n\n    UNION ALL\n    SELECT n + 1 FROM numbers WHERE n < 3\n) SELECT n FROM numbers"
     },

@@ -33,7 +33,7 @@ documentation = "https://docs.rs/datafusion-tracing"
 homepage = "https://github.com/datafusion-contrib/datafusion-tracing"
 
 [dependencies]
-comfy-table = { version = "7.1.4" }
+comfy-table = { version = "7.2.0" }
 datafusion = { workspace = true }
 delegate = "0.13"
 futures = { workspace = true }

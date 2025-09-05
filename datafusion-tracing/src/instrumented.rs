@@ -207,6 +207,7 @@ impl InstrumentedExec {
     }
 }
 
+#[warn(clippy::missing_trait_methods)]
 impl ExecutionPlan for InstrumentedExec {
     // Delegate all ExecutionPlan methods to the inner plan, except for `as_any` and `execute`.
     delegate! {
@@ -235,13 +236,11 @@ impl ExecutionPlan for InstrumentedExec {
                 parent_filters: Vec<Arc<dyn PhysicalExpr>>,
                 config: &ConfigOptions,
             ) -> Result<FilterDescription>;
-            fn handle_child_pushdown_result(
-                &self,
-                phase: FilterPushdownPhase,
-                child_pushdown_result: ChildPushdownResult,
-                config: &ConfigOptions,
-            ) -> Result<FilterPushdownPropagation<Arc<dyn ExecutionPlan>>>;
         }
+    }
+
+    fn static_name() -> &'static str {
+        "InstrumentedExec"
     }
 
     /// Delegate to the inner plan for repartitioning and rewrap with an InstrumentedExec.
@@ -286,12 +285,41 @@ impl ExecutionPlan for InstrumentedExec {
         }
     }
 
+    /// Delegate to the inner plan for handling child pushdown result and rewrap with an InstrumentedExec.
+    fn handle_child_pushdown_result(
+        &self,
+        phase: FilterPushdownPhase,
+        child_pushdown_result: ChildPushdownResult,
+        config: &ConfigOptions,
+    ) -> Result<FilterPushdownPropagation<Arc<dyn ExecutionPlan>>> {
+        // If the inner plan updated itself, rewrap the updated node to preserve instrumentation
+        let FilterPushdownPropagation {
+            filters,
+            updated_node,
+        } = self.inner.handle_child_pushdown_result(
+            phase,
+            child_pushdown_result,
+            config,
+        )?;
+        let updated_node = updated_node.map(|n| self.with_new_inner(n));
+        Ok(FilterPushdownPropagation {
+            filters,
+            updated_node,
+        })
+    }
+
     /// Delegate to the inner plan for creating new children and rewrap with an InstrumentedExec.
     fn with_new_children(
         self: Arc<Self>,
         children: Vec<Arc<dyn ExecutionPlan>>,
     ) -> Result<Arc<dyn ExecutionPlan>> {
         let new_inner = self.inner.clone().with_new_children(children)?;
+        Ok(self.with_new_inner(new_inner))
+    }
+
+    /// Delegate to the inner plan for resetting state and rewrap with an InstrumentedExec.
+    fn reset_state(self: Arc<Self>) -> Result<Arc<dyn ExecutionPlan>> {
+        let new_inner = self.inner.clone().reset_state()?;
         Ok(self.with_new_inner(new_inner))
     }
 
