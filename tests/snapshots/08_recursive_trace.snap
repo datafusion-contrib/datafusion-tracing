@@ -92,21 +92,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -139,21 +128,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -186,21 +164,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -233,21 +200,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -280,21 +236,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -327,7 +272,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -364,21 +308,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -411,21 +344,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -458,21 +380,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -505,21 +416,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -552,21 +452,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -599,7 +488,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
@@ -636,21 +524,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -683,21 +560,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -730,21 +596,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -777,21 +632,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -824,21 +668,10 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",
         "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.node": "CoalescePartitionsExec",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "CoalescePartitionsExec",
         "region": "us-west"
       }
     ],
@@ -871,7 +704,6 @@ expression: json_lines
       {
         "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
-        "datafusion.node": "RecursiveQueryExec: name=numbers, is_distinct=false",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
         "name": "InstrumentedExec",

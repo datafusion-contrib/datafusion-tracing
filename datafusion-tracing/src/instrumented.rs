@@ -19,9 +19,9 @@
 
 use crate::{
     metrics::{MetricsRecorder, MetricsRecordingStream},
+    node::{NodeRecorder, NodeRecordingStream},
     options::InstrumentationOptions,
     preview::{PreviewFn, PreviewRecorder, PreviewRecordingStream},
-    utils::DefaultDisplay,
 };
 use datafusion::{
     arrow::datatypes::SchemaRef,
@@ -69,6 +69,9 @@ pub struct InstrumentedExec {
     /// Metrics recorder lazily initialized during execution, shared safely across concurrent partition executions.
     metrics_recorder: OnceLock<Arc<MetricsRecorder>>,
 
+    /// Node recorder lazily initialized during execution, shared safely across concurrent partition executions.
+    node_recorder: OnceLock<Arc<NodeRecorder>>,
+
     preview_limit: usize,
     preview_fn: Option<Arc<PreviewFn>>,
 
@@ -99,6 +102,7 @@ impl InstrumentedExec {
             span: OnceLock::new(),
             record_metrics: options.record_metrics,
             metrics_recorder: OnceLock::new(),
+            node_recorder: OnceLock::new(),
             preview_limit: options.preview_limit,
             preview_fn: options.preview_fn.clone(),
             preview_recorder: OnceLock::new(),
@@ -181,15 +185,26 @@ impl InstrumentedExec {
         ))
     }
 
+    /// Wraps the given stream with a completion recorder so fields that are only
+    /// fully qualified after execution (such as `datafusion.node`) are recorded
+    /// once all partitions have finished executing.
+    fn node_recording_stream(
+        &self,
+        inner_stream: SendableRecordBatchStream,
+        span: &Span,
+    ) -> SendableRecordBatchStream {
+        let recorder = self
+            .node_recorder
+            .get_or_init(|| Arc::new(NodeRecorder::new(self.inner.clone(), span.clone())))
+            .clone();
+        Box::pin(NodeRecordingStream::new(inner_stream, recorder))
+    }
+
     /// Creates a tracing span populated with metadata about the execution plan.
     fn create_populated_span(&self) -> Span {
         let span = self.span_create_fn.as_ref()();
 
         span.record("otel.name", field::display(self.inner.name()));
-        span.record(
-            "datafusion.node",
-            field::display(DefaultDisplay(self.inner.as_ref())),
-        );
         span.record(
             "datafusion.partitioning",
             field::display(self.inner.properties().partitioning.clone()),
@@ -346,10 +361,14 @@ impl ExecutionPlan for InstrumentedExec {
 
         let inner_stream = span.in_scope(|| self.inner.execute(partition, context))?;
 
-        // Wrap the inner stream with metrics recording capability (only if inner metrics are available).
-        let metrics_stream = self.metrics_recording_stream(inner_stream, &span);
+        // Wrap the stream with node recording so `datafusion.node` is recorded only after
+        // completion, once it is fully qualified.
+        let node_stream = self.node_recording_stream(inner_stream, &span);
 
-        // Wrap the inner stream with batch preview recording (only if preview limit is set).
+        // Wrap the stream with metrics recording capability (only if inner metrics are available).
+        let metrics_stream = self.metrics_recording_stream(node_stream, &span);
+
+        // Wrap the stream with batch preview recording (only if preview limit is set).
         let preview_stream =
             self.preview_recording_stream(metrics_stream, &span, partition);
 

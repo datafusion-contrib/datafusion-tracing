@@ -55,17 +55,6 @@ impl Drop for MetricsRecorder {
         let Some(metrics) = self.execution_plan.metrics() else {
             return;
         };
-        for metric in metrics.iter() {
-            self.span.record(
-                format!(
-                    "datafusion.metrics._{}.{}",
-                    metric.partition().unwrap_or_default(),
-                    metric.value().name()
-                )
-                .as_str(),
-                field::display(metric.value()),
-            );
-        }
         for metric in metrics.aggregate_by_name().iter() {
             self.span.record(
                 format!("datafusion.metrics.{}", metric.value().name()).as_str(),

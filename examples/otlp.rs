@@ -80,7 +80,7 @@ async fn main() -> Result<()> {
 #[instrument(level = "info")]
 async fn run_otlp_example() -> Result<()> {
     // Initialize the DataFusion session context.
-    let ctx = init_session(true, 5, true).await?;
+    let ctx = init_session(true, true, 5, true).await?;
 
     // Run the SQL query with tracing enabled.
     run_traced_query(&ctx, QUERY_NAME).await?;

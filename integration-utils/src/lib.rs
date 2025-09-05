@@ -39,8 +39,8 @@
 //! use integration_utils::{init_session, run_traced_query};
 //!
 //! # async fn example() -> datafusion::error::Result<()> {
-//! // Initialize a session with tracing enabled
-//! let ctx = init_session(true, 5, true).await?;
+//! // Initialize a session with all tracing options enabled
+//! let ctx = init_session(true, true, 5, true).await?;
 //!
 //! // Run a traced query - results and execution details will be logged
 //! run_traced_query(&ctx, "simple_query").await?;
@@ -83,6 +83,7 @@ pub async fn run_traced_query(ctx: &SessionContext, query_name: &str) -> Result<
 
     // Execute the physical plan and collect results.
     let results = collect(physical_plan.clone(), ctx.task_ctx()).await?;
+
     info!("Query Results:\n{}", pretty_format_batches(&results)?);
 
     Ok(())
@@ -90,6 +91,7 @@ pub async fn run_traced_query(ctx: &SessionContext, query_name: &str) -> Result<
 
 #[instrument(level = "info")]
 pub async fn init_session(
+    record_object_store: bool,
     record_metrics: bool,
     preview_limit: usize,
     compact_preview: bool,
@@ -109,10 +111,14 @@ pub async fn init_session(
 
     // Instrument the local filesystem object store for tracing file access.
     let local_store = Arc::new(object_store::local::LocalFileSystem::new());
-    let instrumented_store = instrument_object_store(local_store, "local_fs");
+    let object_store = if record_object_store {
+        instrument_object_store(local_store, "local_fs")
+    } else {
+        local_store
+    };
 
     // Register the instrumented object store for handling file:// URLs.
-    ctx.register_object_store(&Url::parse("file://").unwrap(), instrumented_store);
+    ctx.register_object_store(&Url::parse("file://").unwrap(), object_store);
 
     // Register the tpch tables.
     register_tpch_tables(&ctx).await?;
@@ -161,13 +167,7 @@ async fn register_tpch_tables(ctx: &SessionContext) -> Result<()> {
     // Generate and register each table from Parquet files.
     // This includes all standard TPCH tables so examples/tests can rely on them.
     for table in [
-        "nation",
-        "region",
-        "part",
-        "supplier",
-        "partsupp",
-        "customer",
-        "orders",
+        "nation", "region", "part", "supplier", "partsupp", "customer", "orders",
         "lineitem",
     ] {
         let listing_options = ListingOptions::new(Arc::new(ParquetFormat::default()));
