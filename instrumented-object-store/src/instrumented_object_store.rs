@@ -135,6 +135,7 @@ impl Display for InstrumentedObjectStore {
 }
 
 #[async_trait]
+#[warn(clippy::missing_trait_methods)]
 impl ObjectStore for InstrumentedObjectStore {
     /// Save the provided bytes to the specified location with tracing.
     #[instrument(
