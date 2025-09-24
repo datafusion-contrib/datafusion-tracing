@@ -1207,7 +1207,7 @@ dependencies = [
 
 [[package]]
 name = "datafusion-tracing"
-version = "50.0.1"
+version = "50.0.2"
 dependencies = [
  "comfy-table",
  "datafusion",
@@ -1223,7 +1223,7 @@ dependencies = [
 
 [[package]]
 name = "datafusion-tracing-examples"
-version = "50.0.1"
+version = "50.0.2"
 dependencies = [
  "datafusion",
  "integration-utils",
@@ -1238,7 +1238,7 @@ dependencies = [
 
 [[package]]
 name = "datafusion-tracing-tests"
-version = "50.0.1"
+version = "50.0.2"
 dependencies = [
  "datafusion",
  "insta",
@@ -1815,7 +1815,7 @@ dependencies = [
 
 [[package]]
 name = "instrumented-object-store"
-version = "50.0.1"
+version = "50.0.2"
 dependencies = [
  "async-trait",
  "bytes",
@@ -1835,7 +1835,7 @@ checksum = "8bb03732005da905c88227371639bf1ad885cc712789c011c31c5fb3ab3ccf02"
 
 [[package]]
 name = "integration-utils"
-version = "50.0.1"
+version = "50.0.2"
 dependencies = [
  "datafusion",
  "datafusion-tracing",

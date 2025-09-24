@@ -60,7 +60,7 @@ Include DataFusion Tracing in your project's `Cargo.toml`:
 ```toml
 [dependencies]
 datafusion = "50.0.0"
-datafusion-tracing = "50.0.1"
+datafusion-tracing = "50.0.2"
 ```
 
 ### Compatibility note
