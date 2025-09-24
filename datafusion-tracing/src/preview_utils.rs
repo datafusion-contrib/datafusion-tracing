@@ -105,8 +105,16 @@ pub fn pretty_format_compact_batch(
         .force_no_tty()
         .load_preset(table_preset)
         .set_content_arrangement(ContentArrangement::Dynamic)
-        .set_truncation_indicator("…")
         .set_header(header.into_iter().take(nb_displayed_columns));
+
+    // Ellipsis truncation indicator requires comfy-table >= 7.1.4.
+    // Arrow currently pins comfy-table to 7.1.2 to preserve its MSRV
+    // (comfy-table 7.2.0 bumped MSRV to Rust 1.85 while Arrow remains at 1.84).
+    // See https://github.com/apache/arrow-rs/issues/8243 and https://github.com/apache/arrow-rs/pull/8244.
+    // Arrow chose an exact pin instead of a `~7.1` requirement; the latter would
+    // also preserve MSRV while allowing 7.1.x (including 7.1.4).
+    // Re-enable once Arrow relaxes this pin to allow >= 7.1.4.
+    //table.set_truncation_indicator("…");
 
     for formatted_row in formatted_values {
         table.add_row(formatted_row.into_iter().take(nb_displayed_columns));
