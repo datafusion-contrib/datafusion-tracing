@@ -118,6 +118,31 @@
 //!
 //! A more complete example can be found in the [examples directory](https://github.com/datafusion-contrib/datafusion-tracing/tree/main/examples).
 //!
+//! ## Optimizer rule ordering (put instrumentation last)
+//!
+//! Always register the instrumentation rule last in your physical optimizer chain.
+//!
+//! - Many optimizer rules identify nodes using `as_any().downcast_ref::<ConcreteExec>()`.
+//!   Since instrumentation wraps each node in a private `InstrumentedExec`, those downcasts
+//!   won’t match if instrumentation runs first, causing rules to be skipped or, in code
+//!   that assumes success, to panic.
+//! - Some rules may rewrite parts of the plan after instrumentation. While `InstrumentedExec`
+//!   re-wraps many common mutations, placing the rule last guarantees full, consistent
+//!   coverage regardless of other rules’ behaviors.
+//!
+//! Why is `InstrumentedExec` private?
+//!
+//! - To prevent downstream code from downcasting to or unwrapping the wrapper, which would be
+//!   brittle and force long-term compatibility constraints on its internals. The public
+//!   contract is the optimizer rule, not the concrete node.
+//!
+//! How to ensure it is last:
+//!
+//! - When chaining: `builder.with_physical_optimizer_rule(rule_a)
+//!   .with_physical_optimizer_rule(rule_b)
+//!   .with_physical_optimizer_rule(instrument_rule)`
+//! - Or collect: `builder.with_physical_optimizer_rules(vec![..., instrument_rule])`
+//!
 
 mod instrument_rule;
 mod instrumented;
