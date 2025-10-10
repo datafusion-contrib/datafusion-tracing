@@ -52,12 +52,72 @@
 use std::time::Duration;
 
 use datafusion::{common::internal_datafusion_err, error::Result};
-use integration_utils::{init_session, run_traced_query};
+use integration_utils::{DistributedMode, SessionBuilder, run_traced_query};
 use opentelemetry::{KeyValue, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;
 use opentelemetry_sdk::{Resource, trace::Sampler};
 use tracing::{Instrument, Level};
 use tracing_subscriber::{Registry, fmt, prelude::*};
+
+/// Internal helper macro for generating match arms using repetition.
+/// This uses Rust's macro repetition syntax ($(...)*).
+macro_rules! generate_query_span_match {
+    ($i:expr, $mode_name:expr, $query_name:expr, $($num:tt),*) => {
+        match ($i, $mode_name) {
+            $(
+                ($num, "Memory") => tracing::info_span!(
+                    concat!("tpch_query_", stringify!($num), "_memory"),
+                    query = %$query_name,
+                    query_num = $i,
+                    distributed_mode = $mode_name
+                ),
+                ($num, "Localhost") => tracing::info_span!(
+                    concat!("tpch_query_", stringify!($num), "_localhost"),
+                    query = %$query_name,
+                    query_num = $i,
+                    distributed_mode = $mode_name
+                ),
+            )*
+            _ => unreachable!("Invalid query number or mode"),
+        }
+    };
+}
+
+/// Macro to generate span creation for all query/mode combinations.
+/// This is necessary because tracing span names must be compile-time constants.
+///
+/// Usage: create_query_span!(query_num, mode_name, query_name)
+macro_rules! create_query_span {
+    ($i:expr, $mode_name:expr, $query_name:expr) => {
+        generate_query_span_match!(
+            $i,
+            $mode_name,
+            $query_name,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22
+        )
+    };
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -74,26 +134,52 @@ async fn main() -> Result<()> {
 }
 
 async fn run_distributed_otlp_example() -> Result<()> {
-    // Loop over all 22 TPCH queries
-    for i in 1..=22 {
-        let query_name = format!("tpch/q{}", i);
+    // Test both distributed execution modes
+    let modes = [
+        (DistributedMode::Memory, "Memory"),
+        (DistributedMode::Localhost, "Localhost"),
+    ];
 
-        // Create a new root span for each query to ensure independent traces.
-        // This span will be the root of a new trace tree.
-        let span = tracing::info_span!("tpch_query", query = %query_name, query_num = i);
+    for (mode, mode_name) in modes {
+        tracing::info!("Starting TPCH queries with {} distributed mode", mode_name);
 
-        // Execute the query within the new root span context.
-        async {
-            tracing::info!("Running TPCH query: {}", query_name);
+        // Loop over all 22 TPCH queries
+        for i in 1..=22 {
+            let query_name = format!("tpch/q{}", i);
 
-            // Initialize a distinct DataFusion session context for each query.
-            let ctx = init_session(false, true, 5, true, true).await?;
+            // Create a new root span for each query to ensure independent traces.
+            // This span will be the root of a new trace tree.
+            // Note: Span names must be compile-time constants, so we use a macro to generate them.
+            let span = create_query_span!(i, mode_name, query_name);
 
-            // Run the SQL query with tracing enabled.
-            run_traced_query(&ctx, &query_name).await
+            // Execute the query within the new root span context.
+            async {
+                tracing::info!(
+                    "Running TPCH query: {} in {} mode",
+                    query_name,
+                    mode_name
+                );
+
+                // Initialize a distinct DataFusion session context for each query.
+                let ctx = SessionBuilder::new()
+                    .with_metrics()
+                    .with_preview(5)
+                    .with_compact_preview()
+                    .with_distributed_mode(mode)
+                    .build()
+                    .await?;
+
+                // Run the SQL query with tracing enabled.
+                run_traced_query(&ctx, &query_name).await
+            }
+            .instrument(span)
+            .await?;
         }
-        .instrument(span)
-        .await?;
+
+        tracing::info!(
+            "Completed all TPCH queries with {} distributed mode",
+            mode_name
+        );
     }
 
     Ok(())

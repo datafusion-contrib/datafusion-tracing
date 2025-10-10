@@ -23,7 +23,7 @@ use std::sync::{Arc, Mutex, Once, OnceLock};
 
 use datafusion::error::Result;
 use insta::{assert_json_snapshot, assert_snapshot};
-use integration_utils::{init_session, run_traced_query};
+use integration_utils::{DistributedMode, SessionBuilder, run_traced_query};
 use serde_json::Value;
 use tracing::{Instrument, Level};
 use tracing_subscriber::fmt::format::FmtSpan;
@@ -40,51 +40,53 @@ static LOG_BUFFER: OnceLock<Arc<Mutex<Vec<u8>>>> = OnceLock::new();
 static SUBSCRIBER_INIT: Once = Once::new();
 
 /// A struct describing how a particular query test should be run.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 struct QueryTestCase<'a> {
     /// The SQL query to run.
     sql_query: &'a str,
-    /// Whether to instrument the object store for this test.
-    record_object_store: bool,
-    /// Whether to collect (record) metrics for this test.
-    should_record_metrics: bool,
+    /// Session builder for configuring the DataFusion session.
+    session_builder: SessionBuilder,
     /// Maximum number of rows to preview in logs.
     row_limit: usize,
-    /// Use compact formatting for the row preview.
-    use_compact_preview: bool,
     /// Indices of spans for which preview assertions should be skipped.
     ignored_preview_spans: &'a [usize],
     /// Whether to ignore the full trace in assertions.
     ignore_full_trace: bool,
-    /// Whether to run the test in distributed mode.
-    distributed: bool,
 }
 
 impl<'a> QueryTestCase<'a> {
     fn new(sql_query: &'a str) -> Self {
         Self {
             sql_query,
-            ..Default::default()
+            session_builder: SessionBuilder::new(),
+            row_limit: 0,
+            ignored_preview_spans: &[],
+            ignore_full_trace: false,
         }
     }
 
-    fn with_object_store_collection(mut self) -> Self {
-        self.record_object_store = true;
+    fn with_object_store_tracing(mut self) -> Self {
+        self.session_builder = self.session_builder.with_object_store_tracing();
         self
     }
 
-    fn with_metrics_collection(mut self) -> Self {
-        self.should_record_metrics = true;
+    fn with_metrics(mut self) -> Self {
+        self.session_builder = self.session_builder.with_metrics();
         self
     }
 
-    fn with_row_limit(mut self, limit: usize) -> Self {
+    fn with_preview(mut self, limit: usize) -> Self {
         self.row_limit = limit;
+        self.session_builder = self.session_builder.with_preview(limit);
         self
     }
 
-    fn with_compact_preview(mut self) -> Self {
-        self.use_compact_preview = true;
+    fn with_compact_preview(mut self, limit: usize) -> Self {
+        self.row_limit = limit;
+        self.session_builder = self
+            .session_builder
+            .with_preview(limit)
+            .with_compact_preview();
         self
     }
 
@@ -98,22 +100,36 @@ impl<'a> QueryTestCase<'a> {
         self
     }
 
-    fn distributed(mut self) -> Self {
-        self.distributed = true;
+    fn distributed_memory(mut self) -> Self {
+        self.session_builder = self
+            .session_builder
+            .with_distributed_mode(DistributedMode::Memory);
         self
+    }
+
+    fn distributed_localhost(mut self) -> Self {
+        self.session_builder = self
+            .session_builder
+            .with_distributed_mode(DistributedMode::Localhost);
+        self
+    }
+
+    /// Returns the session builder for this test case.
+    fn session_builder(self) -> SessionBuilder {
+        self.session_builder
     }
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_basic() -> Result<()> {
-    execute_test_case("01_basic", &QueryTestCase::new("select_one")).await
+    execute_test_case("01_basic", QueryTestCase::new("select_one")).await
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_basic_metrics() -> Result<()> {
     execute_test_case(
         "02_basic_metrics",
-        &QueryTestCase::new("select_one").with_metrics_collection(),
+        QueryTestCase::new("select_one").with_metrics(),
     )
     .await
 }
@@ -122,7 +138,7 @@ async fn test_basic_metrics() -> Result<()> {
 async fn test_basic_preview() -> Result<()> {
     execute_test_case(
         "03_basic_preview",
-        &QueryTestCase::new("select_one").with_row_limit(5),
+        QueryTestCase::new("select_one").with_preview(5),
     )
     .await
 }
@@ -131,9 +147,7 @@ async fn test_basic_preview() -> Result<()> {
 async fn test_basic_compact_preview() -> Result<()> {
     execute_test_case(
         "04_basic_compact_preview",
-        &QueryTestCase::new("select_one")
-            .with_row_limit(5)
-            .with_compact_preview(),
+        QueryTestCase::new("select_one").with_compact_preview(5),
     )
     .await
 }
@@ -142,10 +156,9 @@ async fn test_basic_compact_preview() -> Result<()> {
 async fn test_basic_all_options() -> Result<()> {
     execute_test_case(
         "05_basic_all_options",
-        &QueryTestCase::new("select_one")
-            .with_metrics_collection()
-            .with_row_limit(5)
-            .with_compact_preview(),
+        QueryTestCase::new("select_one")
+            .with_metrics()
+            .with_compact_preview(5),
     )
     .await
 }
@@ -154,11 +167,10 @@ async fn test_basic_all_options() -> Result<()> {
 async fn test_object_store_all_options() -> Result<()> {
     execute_test_case(
         "06_object_store_all_options",
-        &QueryTestCase::new("order_nations")
-            .with_object_store_collection()
-            .with_metrics_collection()
-            .with_row_limit(5)
-            .with_compact_preview(),
+        QueryTestCase::new("order_nations")
+            .with_object_store_tracing()
+            .with_metrics()
+            .with_compact_preview(5),
     )
     .await
 }
@@ -167,10 +179,9 @@ async fn test_object_store_all_options() -> Result<()> {
 async fn test_scrabble_all_options() -> Result<()> {
     execute_test_case(
         "07_scrabble_all_options",
-        &QueryTestCase::new("tpch_scrabble")
-            .with_metrics_collection()
-            .with_row_limit(5)
-            .with_compact_preview()
+        QueryTestCase::new("tpch_scrabble")
+            .with_metrics()
+            .with_compact_preview(5)
             // skip preview assertions for these spans as they depend on the partitioning
             // and are not deterministic
             .ignore_preview_spans(&[15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25])
@@ -182,17 +193,16 @@ async fn test_scrabble_all_options() -> Result<()> {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_recursive() -> Result<()> {
-    execute_test_case("08_recursive", &QueryTestCase::new("recursive")).await
+    execute_test_case("08_recursive", QueryTestCase::new("recursive")).await
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_recursive_all_options() -> Result<()> {
     execute_test_case(
         "09_recursive_all_options",
-        &QueryTestCase::new("recursive")
-            .with_metrics_collection()
-            .with_row_limit(5)
-            .with_compact_preview(),
+        QueryTestCase::new("recursive")
+            .with_metrics()
+            .with_compact_preview(5),
     )
     .await
 }
@@ -200,41 +210,49 @@ async fn test_recursive_all_options() -> Result<()> {
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_topk_lineitem() -> Result<()> {
     // Expect a filled `DynamicFilterPhysicalExpr` on the `DataSourceExec` "datafusion.node" field
-    execute_test_case("10_topk_lineitem", &QueryTestCase::new("topk_lineitem")).await
+    execute_test_case("10_topk_lineitem", QueryTestCase::new("topk_lineitem")).await
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_weather() -> Result<()> {
-    execute_test_case("11_weather", &QueryTestCase::new("weather")).await
+    execute_test_case("11_weather", QueryTestCase::new("weather")).await
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
-async fn test_distributed_weather() -> Result<()> {
+async fn test_distributed_weather_memory() -> Result<()> {
     execute_test_case(
-        "12_distributed_weather",
-        &QueryTestCase::new("weather").distributed(),
+        "12_distributed_weather_memory",
+        QueryTestCase::new("weather").distributed_memory(),
+    )
+    .await
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 8)]
+async fn test_distributed_weather_localhost() -> Result<()> {
+    execute_test_case(
+        "13_distributed_weather_localhost",
+        QueryTestCase::new("weather").distributed_localhost(),
     )
     .await
 }
 
 /// Executes the provided [`QueryTestCase`], setting up tracing and verifying
 /// log output according to its parameters.
-async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Result<()> {
+async fn execute_test_case(test_name: &str, test_case: QueryTestCase<'_>) -> Result<()> {
     // Initialize tracing infrastructure and collect a log buffer.
     let log_buffer = init_tracing();
 
+    // Store test case parameters before consuming it
+    let sql_query = test_case.sql_query;
+    let row_limit = test_case.row_limit;
+    let ignored_preview_spans = test_case.ignored_preview_spans;
+    let ignore_full_trace = test_case.ignore_full_trace;
+
     // Initialize the DataFusion session with the requested options.
-    let ctx = init_session(
-        test_case.record_object_store,
-        test_case.should_record_metrics,
-        test_case.row_limit,
-        test_case.use_compact_preview,
-        test_case.distributed,
-    )
-    .await?;
+    let ctx = test_case.session_builder().build().await?;
 
     // Run the SQL query with tracing enabled.
-    run_traced_query(&ctx, test_case.sql_query)
+    run_traced_query(&ctx, sql_query)
         .instrument(tracing::info_span!("test", test_name = %test_name))
         .await?;
 
@@ -253,7 +271,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     let _insta_guard = insta_settings::settings().bind_to_scope();
 
     // If we have a preview row_limit, do dedicated assertions on the previews.
-    if test_case.row_limit > 0 {
+    if row_limit > 0 {
         let mut preview_id = 0;
         for json_line in &json_lines {
             if let Some(span_name) = extract_json_field_value(json_line, "otel.name") {
@@ -261,7 +279,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
                     extract_json_field_value(json_line, "datafusion.preview")
                 {
                     // Only assert if we have not been asked to ignore this preview span.
-                    if !test_case.ignored_preview_spans.contains(&preview_id) {
+                    if !ignored_preview_spans.contains(&preview_id) {
                         assert_snapshot!(
                             format!("{test_name}_{:02}_{span_name}", preview_id),
                             preview
@@ -274,7 +292,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     }
 
     // General assertion on the full trace.
-    if !test_case.ignore_full_trace {
+    if !ignore_full_trace {
         // Redact `datafusion.preview` values as they are often non-deterministic.
         preview_redacted_settings().bind(|| {
             assert_json_snapshot!(format!("{test_name}_trace"), json_lines);

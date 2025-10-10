@@ -13,14 +13,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -35,14 +35,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -56,14 +56,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -83,14 +83,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -110,14 +110,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -137,14 +137,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -164,14 +164,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -191,14 +191,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -218,14 +218,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -245,14 +245,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -272,14 +272,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -299,14 +299,14 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       },
       {
         "name": "run_traced_query",
         "query_name": "weather"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -320,10 +320,10 @@ expression: json_lines
     "spans": [
       {
         "name": "test",
-        "test_name": "12_distributed_weather"
+        "test_name": "12_distributed_weather_memory"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   }

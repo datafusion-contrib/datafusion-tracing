@@ -32,7 +32,7 @@ use tonic::transport::{Endpoint, Server};
 const DUMMY_URL: &str = "http://localhost:50051";
 const MAX_MESSAGE_SIZE: usize = 2 * 1024 * 1024 * 1024; // 2GB
 
-/// [ChannelResolver] implementation that returns gRPC clients baked by an in-memory
+/// [ChannelResolver] implementation that returns gRPC clients backed by an in-memory
 /// tokio duplex rather than a TCP connection.
 #[derive(Clone)]
 pub(crate) struct InMemoryChannelResolver {
