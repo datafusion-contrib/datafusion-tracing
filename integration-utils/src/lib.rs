@@ -61,12 +61,16 @@ use datafusion::{
     error::Result, execution::SessionStateBuilder,
     physical_optimizer::PhysicalOptimizerRule, prelude::*,
 };
+use datafusion_distributed::{DistributedExt, DistributedPhysicalOptimizerRule};
 use datafusion_tracing::{
     InstrumentationOptions, instrument_with_info_spans, pretty_format_compact_batch,
 };
 use instrumented_object_store::instrument_object_store;
 use tracing::{field, info, instrument};
 use url::Url;
+
+mod channel_resolver;
+use channel_resolver::InMemoryChannelResolver;
 
 /// Executes the SQL query with instrumentation enabled, providing detailed tracing output.
 #[instrument(level = "info", skip(ctx))]
@@ -95,17 +99,23 @@ pub async fn init_session(
     record_metrics: bool,
     preview_limit: usize,
     compact_preview: bool,
+    distributed: bool,
 ) -> Result<SessionContext> {
     // Configure the session state with instrumentation for query execution.
-    let session_state = SessionStateBuilder::new()
+    let mut session_state_builder = SessionStateBuilder::new()
         .with_default_features()
-        .with_config(SessionConfig::default().with_target_partitions(8)) // Enforce target partitions to ensure consistent test results regardless of the number of CPU cores.
-        .with_physical_optimizer_rule(create_instrumentation_rule(
-            record_metrics,
-            preview_limit,
-            compact_preview,
-        ))
-        .build();
+        .with_config(SessionConfig::default().with_target_partitions(8)); // Enforce target partitions to ensure consistent test results regardless of the number of CPU cores.
+    if distributed {
+        session_state_builder = session_state_builder
+            .with_distributed_channel_resolver(InMemoryChannelResolver::new())
+            .with_physical_optimizer_rule(Arc::new(
+                DistributedPhysicalOptimizerRule::new(),
+            ));
+    }
+    session_state_builder = session_state_builder.with_physical_optimizer_rule(
+        create_instrumentation_rule(record_metrics, preview_limit, compact_preview),
+    );
+    let session_state = session_state_builder.build();
 
     let ctx = SessionContext::new_with_state(session_state);
 
@@ -153,8 +163,8 @@ pub fn create_instrumentation_rule(
     )
 }
 
-/// Returns the path to the directory containing the TPCH Parquet tables.
-pub fn tpch_tables_dir() -> PathBuf {
+/// Returns the path to the directory containing the Parquet tables.
+pub fn data_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data")
 }
 
@@ -162,7 +172,15 @@ pub fn tpch_tables_dir() -> PathBuf {
 #[instrument(level = "info", skip(ctx))]
 async fn register_tpch_tables(ctx: &SessionContext) -> Result<()> {
     // Construct the path to the directory containing Parquet data.
-    let data_dir = tpch_tables_dir();
+    let data_dir = data_dir();
+
+    // Register the weather table.
+    ctx.register_parquet(
+        "weather",
+        data_dir.join("weather").to_string_lossy(),
+        ParquetReadOptions::default(),
+    )
+    .await?;
 
     // Generate and register each table from Parquet files.
     // This includes all standard TPCH tables so examples/tests can rely on them.

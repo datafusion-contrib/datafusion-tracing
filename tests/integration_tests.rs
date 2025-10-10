@@ -56,6 +56,8 @@ struct QueryTestCase<'a> {
     ignored_preview_spans: &'a [usize],
     /// Whether to ignore the full trace in assertions.
     ignore_full_trace: bool,
+    /// Whether to run the test in distributed mode.
+    distributed: bool,
 }
 
 impl<'a> QueryTestCase<'a> {
@@ -93,6 +95,11 @@ impl<'a> QueryTestCase<'a> {
 
     fn ignore_full_trace(mut self) -> Self {
         self.ignore_full_trace = true;
+        self
+    }
+
+    fn distributed(mut self) -> Self {
+        self.distributed = true;
         self
     }
 }
@@ -196,6 +203,20 @@ async fn test_topk_lineitem() -> Result<()> {
     execute_test_case("10_topk_lineitem", &QueryTestCase::new("topk_lineitem")).await
 }
 
+#[tokio::test(flavor = "multi_thread", worker_threads = 8)]
+async fn test_weather() -> Result<()> {
+    execute_test_case("11_weather", &QueryTestCase::new("weather")).await
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 8)]
+async fn test_distributed_weather() -> Result<()> {
+    execute_test_case(
+        "12_distributed_weather",
+        &QueryTestCase::new("weather").distributed(),
+    )
+    .await
+}
+
 /// Executes the provided [`QueryTestCase`], setting up tracing and verifying
 /// log output according to its parameters.
 async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Result<()> {
@@ -208,6 +229,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
         test_case.should_record_metrics,
         test_case.row_limit,
         test_case.use_compact_preview,
+        test_case.distributed,
     )
     .await?;
 

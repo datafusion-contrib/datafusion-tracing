@@ -31,9 +31,19 @@ rust-version = { workspace = true }
 workspace = true
 
 [dependencies]
+arrow = "56.1"
+arrow-flight = "56.1"
+async-trait = "0.1"
 datafusion = { workspace = true, features = ["parquet", "nested_expressions"] }
+datafusion-distributed = { git = "https://github.com/datafusion-contrib/datafusion-distributed", branch = "main" }
 datafusion-tracing = { workspace = true }
+futures = { workspace = true }
+hyper-util = "0.1"
 instrumented-object-store = { workspace = true }
 object_store = { version = "0.12.1", default-features = false }
+tokio = { workspace = true, features = ["full"] }
+tokio-stream = "0.1"
+tonic = { version = "0.13", features = ["transport"] }
+tower = "0.5"
 tracing = { workspace = true }
 url = { version = "2.5" }
