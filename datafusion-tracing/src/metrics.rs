@@ -26,7 +26,7 @@ use pin_project::pin_project;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
-use tracing::{field, Span};
+use tracing::{Span, field};
 
 /// Records execution metrics and automatically logs them via tracing upon completion.
 ///
