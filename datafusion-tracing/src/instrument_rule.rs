@@ -20,14 +20,14 @@
 use crate::instrumented::InstrumentedExec;
 use crate::instrumented::SpanCreateFn;
 use crate::options::InstrumentationOptions;
-use datafusion::common::runtime::{set_join_set_tracer, JoinSetTracer};
+use datafusion::common::runtime::{JoinSetTracer, set_join_set_tracer};
 use datafusion::common::tree_node::{Transformed, TransformedResult, TreeNode};
 use datafusion::{
     config::ConfigOptions, physical_optimizer::PhysicalOptimizerRule,
     physical_plan::ExecutionPlan,
 };
-use futures::future::BoxFuture;
 use futures::FutureExt;
+use futures::future::BoxFuture;
 use std::any::Any;
 use std::fmt::Debug;
 use std::sync::Arc;

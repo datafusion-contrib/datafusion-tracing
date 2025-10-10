@@ -56,13 +56,13 @@ use datafusion::arrow::util::pretty::pretty_format_batches;
 use datafusion::common::internal_datafusion_err;
 use datafusion::datasource::file_format::parquet::ParquetFormat;
 use datafusion::datasource::listing::ListingOptions;
-use datafusion::physical_plan::{collect, displayable, ExecutionPlan};
+use datafusion::physical_plan::{ExecutionPlan, collect, displayable};
 use datafusion::{
     error::Result, execution::SessionStateBuilder,
     physical_optimizer::PhysicalOptimizerRule, prelude::*,
 };
 use datafusion_tracing::{
-    instrument_with_info_spans, pretty_format_compact_batch, InstrumentationOptions,
+    InstrumentationOptions, instrument_with_info_spans, pretty_format_compact_batch,
 };
 use instrumented_object_store::instrument_object_store;
 use tracing::{field, info, instrument};

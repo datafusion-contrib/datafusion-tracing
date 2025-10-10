@@ -27,7 +27,7 @@ use integration_utils::{init_session, run_traced_query};
 use serde_json::Value;
 use tracing::{Instrument, Level};
 use tracing_subscriber::fmt::format::FmtSpan;
-use tracing_subscriber::{fmt, prelude::*, Registry};
+use tracing_subscriber::{Registry, fmt, prelude::*};
 
 use crate::test_utils::in_memory_writer::InMemoryMakeWriter;
 use crate::test_utils::insta_settings;

@@ -54,11 +54,11 @@ use std::time::Duration;
 
 use datafusion::{common::internal_datafusion_err, error::Result};
 use integration_utils::{init_session, run_traced_query};
-use opentelemetry::{trace::TracerProvider, KeyValue};
+use opentelemetry::{KeyValue, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;
-use opentelemetry_sdk::{trace::Sampler, Resource};
-use tracing::{instrument, Level};
-use tracing_subscriber::{fmt, prelude::*, Registry};
+use opentelemetry_sdk::{Resource, trace::Sampler};
+use tracing::{Level, instrument};
+use tracing_subscriber::{Registry, fmt, prelude::*};
 
 // Query to be executed for demonstration purposes.
 const QUERY_NAME: &str = "tpch_scrabble";

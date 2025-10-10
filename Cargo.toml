@@ -30,11 +30,11 @@ resolver = "2"
 [workspace.package]
 description = "DataFusion tracing of execution plans"
 version = "50.0.2"
-edition = "2021"
+edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/datafusion-contrib/datafusion-tracing"
 authors = ["DataDog <info@datadoghq.com>"]
-rust-version = "1.82.0"
+rust-version = "1.86.0"
 
 [workspace.dependencies]
 datafusion = { version = "50.0.0", default-features = false }
