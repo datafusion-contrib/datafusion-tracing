@@ -17,7 +17,9 @@
 //
 // This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
 
+use std::future::Future;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::pin::Pin;
 
 use arrow_flight::flight_service_client::FlightServiceClient;
 use arrow_flight::flight_service_server::FlightServiceServer;
@@ -32,7 +34,10 @@ use datafusion_distributed::{
 };
 use tokio::sync::oneshot;
 use tonic::transport::{Channel, Server};
+use tower::ServiceBuilder;
 use url::Url;
+
+use super::trace_middleware::{TracingClientLayer, TracingServerLayer};
 
 /// Channel resolver for localhost workers that connects via TCP
 #[derive(Clone)]
@@ -70,6 +75,12 @@ impl ChannelResolver for LocalhostChannelResolver {
                 let channel = Channel::from_shared(url.to_string())
                     .unwrap()
                     .connect_lazy();
+
+                // Wrap the channel with tracing middleware to inject trace context
+                let channel = ServiceBuilder::new()
+                    .layer(TracingClientLayer)
+                    .service(channel);
+
                 let channel = FlightServiceClient::new(BoxCloneSyncChannel::new(channel));
                 v.insert(channel.clone());
                 Ok(channel)
@@ -78,14 +89,30 @@ impl ChannelResolver for LocalhostChannelResolver {
     }
 }
 
+/// Configuration for worker instrumentation
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct WorkerInstrumentationConfig {
+    pub record_metrics: bool,
+    pub preview_limit: usize,
+    pub compact_preview: bool,
+}
+
 /// Spawns localhost workers on the specified ports
-pub(crate) async fn spawn_localhost_workers(ports: &[u16]) -> Result<()> {
+pub(crate) async fn spawn_localhost_workers(
+    ports: &[u16],
+    instrumentation_config: Option<WorkerInstrumentationConfig>,
+) -> Result<()> {
     let mut ready_receivers = Vec::new();
 
     for &port in ports {
         let all_ports = ports.to_vec();
         let (ready_tx, ready_rx) = oneshot::channel();
         ready_receivers.push(ready_rx);
+
+        // Don't create a worker span here - workers should only create spans when handling
+        // requests, using the trace context extracted from the gRPC metadata. This ensures
+        // worker spans are properly linked to the parent coordinator trace.
+        tracing::info!("Spawning localhost worker on port {}", port);
 
         tokio::spawn(async move {
             let localhost_resolver = LocalhostChannelResolver::new(all_ports);
@@ -94,20 +121,36 @@ pub(crate) async fn spawn_localhost_workers(ports: &[u16]) -> Result<()> {
                 move |ctx: DistributedSessionBuilderContext| {
                     let local_host_resolver = localhost_resolver.clone();
                     async move {
-                        Ok(SessionStateBuilder::new()
+                        let mut builder = SessionStateBuilder::new()
                             .with_runtime_env(ctx.runtime_env)
                             .with_distributed_channel_resolver(local_host_resolver)
-                            .with_default_features()
-                            .build())
+                            .with_default_features();
+
+                        // Build and add instrumentation rule if config is provided
+                        if let Some(config) = instrumentation_config {
+                            let instrumentation_rule = crate::session::create_instrumentation_rule_with_worker_id(
+                                config.record_metrics,
+                                config.preview_limit,
+                                config.compact_preview,
+                                Some(format!("localhost:{}", port)),
+                            );
+                            builder = builder.with_physical_optimizer_rule(instrumentation_rule);
+                        }
+
+                        Ok(builder.build())
                     }
                 },
             )
             .expect("Failed to create ArrowFlightEndpoint");
 
             let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), port);
-            let server = Server::builder()
-                .add_service(FlightServiceServer::new(endpoint))
-                .serve(addr);
+
+            // Wrap the FlightService with tracing middleware to extract trace context
+            let service = ServiceBuilder::new()
+                .layer(TracingServerLayer)
+                .service(FlightServiceServer::new(endpoint));
+
+            let server = Server::builder().add_service(service).serve(addr);
 
             // Notify that we're about to start serving (the server will bind immediately)
             let _ = ready_tx.send(());
@@ -116,6 +159,93 @@ pub(crate) async fn spawn_localhost_workers(ports: &[u16]) -> Result<()> {
                 .await
                 .unwrap_or_else(|_| panic!("Failed to start worker on port {}", port));
         });
+    }
+
+    // Wait for all workers to signal they're ready
+    for (i, ready_rx) in ready_receivers.into_iter().enumerate() {
+        ready_rx.await.map_err(|_| {
+            DataFusionError::Execution(format!(
+                "Worker on port {} failed to start",
+                ports[i]
+            ))
+        })?;
+    }
+
+    Ok(())
+}
+
+/// Spawns localhost workers with task-local buffer support for separate log buffers per worker
+pub(crate) async fn spawn_localhost_workers_with_buffers<F, Fut>(
+    ports: &[u16],
+    instrumentation_config: Option<WorkerInstrumentationConfig>,
+    task_local_wrapper: F,
+) -> Result<()>
+where
+    F: Fn(u16, Pin<Box<dyn Future<Output = ()> + Send>>) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = ()> + Send + 'static,
+{
+    let mut ready_receivers = Vec::new();
+
+    for &port in ports {
+        let all_ports = ports.to_vec();
+        let (ready_tx, ready_rx) = oneshot::channel();
+        ready_receivers.push(ready_rx);
+
+        // Don't create a worker span here - workers should only create spans when handling
+        // requests, using the trace context extracted from the gRPC metadata. This ensures
+        // worker spans are properly linked to the parent coordinator trace.
+        tracing::info!("Spawning localhost worker on port {}", port);
+
+        // Clone the wrapper function for this task
+        let wrapper = &task_local_wrapper;
+
+        let worker_future = async move {
+            let localhost_resolver = LocalhostChannelResolver::new(all_ports);
+
+            let endpoint = ArrowFlightEndpoint::try_new(
+                move |ctx: DistributedSessionBuilderContext| {
+                    let local_host_resolver = localhost_resolver.clone();
+                    async move {
+                        let mut builder = SessionStateBuilder::new()
+                            .with_runtime_env(ctx.runtime_env)
+                            .with_distributed_channel_resolver(local_host_resolver)
+                            .with_default_features();
+
+                        // Build and add instrumentation rule if config is provided
+                        if let Some(config) = instrumentation_config {
+                            let instrumentation_rule = crate::session::create_instrumentation_rule_with_worker_id(
+                                config.record_metrics,
+                                config.preview_limit,
+                                config.compact_preview,
+                                Some(format!("localhost:{}", port)),
+                            );
+                            builder = builder.with_physical_optimizer_rule(instrumentation_rule);
+                        }
+
+                        Ok(builder.build())
+                    }
+                },
+            )
+            .expect("Failed to create ArrowFlightEndpoint");
+
+            let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), port);
+
+            // Wrap the FlightService with tracing middleware to extract trace context
+            let service = ServiceBuilder::new()
+                .layer(TracingServerLayer)
+                .service(FlightServiceServer::new(endpoint));
+
+            let server = Server::builder().add_service(service).serve(addr);
+
+            // Notify that we're about to start serving (the server will bind immediately)
+            let _ = ready_tx.send(());
+
+            server
+                .await
+                .unwrap_or_else(|_| panic!("Failed to start worker on port {}", port));
+        };
+
+        tokio::spawn(wrapper(port, Box::pin(worker_future)));
     }
 
     // Wait for all workers to signal they're ready
@@ -141,8 +271,8 @@ mod tests {
         // Use high-numbered ports to avoid conflicts
         let ports = vec![50051, 50052, 50053];
 
-        // Spawn workers
-        spawn_localhost_workers(&ports)
+        // Spawn workers (without instrumentation for this test)
+        spawn_localhost_workers(&ports, None)
             .await
             .expect("Failed to spawn workers");
 
@@ -201,7 +331,7 @@ mod tests {
 
         // Measure time to spawn and become ready
         let start = std::time::Instant::now();
-        spawn_localhost_workers(&ports)
+        spawn_localhost_workers(&ports, None)
             .await
             .expect("Failed to spawn workers");
         let elapsed = start.elapsed();
@@ -227,7 +357,7 @@ mod tests {
     #[tokio::test]
     async fn test_empty_ports_list() {
         // Spawning with no ports should succeed (no-op)
-        let result = spawn_localhost_workers(&[]).await;
+        let result = spawn_localhost_workers(&[], None).await;
         assert!(result.is_ok());
     }
 }

@@ -20,7 +20,7 @@ expression: json_lines
         "query_name": "recursive"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -42,7 +42,7 @@ expression: json_lines
         "query_name": "recursive"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -63,44 +63,7 @@ expression: json_lines
         "query_name": "recursive"
       }
     ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.node": "WorkTableExec: name=numbers",
-      "datafusion.partitioning": "UnknownPartitioning(1)",
-      "datafusion.preview": "<redacted>",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "WorkTableExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -140,7 +103,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -181,7 +144,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -222,7 +185,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -263,7 +226,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -304,44 +267,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.node": "WorkTableExec: name=numbers",
-      "datafusion.partitioning": "UnknownPartitioning(1)",
-      "datafusion.preview": "<redacted>",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "WorkTableExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -381,248 +307,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.metrics.elapsed_compute": "0.00ms",
-      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.metrics.output_rows": "1",
-      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.node": "FilterExec: n@0 < 3",
-      "datafusion.partitioning": "RoundRobinBatch(8)",
-      "datafusion.preview": "<redacted>",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "FilterExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.metrics.elapsed_compute": "0.00ms",
-      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.metrics.output_rows": "1",
-      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.node": "CoalesceBatchesExec: target_batch_size=8192",
-      "datafusion.partitioning": "RoundRobinBatch(8)",
-      "datafusion.preview": "<redacted>",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "CoalesceBatchesExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.metrics.elapsed_compute": "0.00ms",
-      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.metrics.output_rows": "1",
-      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.node": "ProjectionExec: expr=[n@0 + 1 as numbers.n + Int64(1)]",
-      "datafusion.partitioning": "RoundRobinBatch(8)",
-      "datafusion.preview": "<redacted>",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "ProjectionExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.metrics.elapsed_compute": "0.00ms",
-      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.metrics.output_rows": "1",
-      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.node": "CoalescePartitionsExec",
-      "datafusion.partitioning": "UnknownPartitioning(1)",
-      "datafusion.preview": "<redacted>",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "CoalescePartitionsExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.node": "WorkTableExec: name=numbers",
-      "datafusion.partitioning": "UnknownPartitioning(1)",
-      "datafusion.preview": "<redacted>",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "WorkTableExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.metrics.fetch_time": "0.00ms",
-      "datafusion.metrics.repartition_time": "0.00ms",
-      "datafusion.metrics.send_time": "0.00ms",
-      "datafusion.node": "RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1",
-      "datafusion.partitioning": "RoundRobinBatch(8)",
-      "datafusion.preview": "<redacted>",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "RepartitionExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -662,7 +347,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -702,7 +387,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -742,7 +427,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -782,7 +467,7 @@ expression: json_lines
         "region": "us-west"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -810,7 +495,7 @@ expression: json_lines
         "query_name": "recursive"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -842,7 +527,194 @@ expression: json_lines
         "query_name": "recursive"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.node": "WorkTableExec: name=numbers",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "WorkTableExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      }
+    ],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.fetch_time": "0.00ms",
+      "datafusion.metrics.repartition_time": "0.00ms",
+      "datafusion.metrics.send_time": "0.00ms",
+      "datafusion.node": "RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1",
+      "datafusion.partitioning": "RoundRobinBatch(8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "RepartitionExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      }
+    ],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "1",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "FilterExec: n@0 < 3",
+      "datafusion.partitioning": "RoundRobinBatch(8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "FilterExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      }
+    ],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "1",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "CoalesceBatchesExec: target_batch_size=8192",
+      "datafusion.partitioning": "RoundRobinBatch(8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "CoalesceBatchesExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      }
+    ],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "1",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "ProjectionExec: expr=[n@0 + 1 as numbers.n + Int64(1)]",
+      "datafusion.partitioning": "RoundRobinBatch(8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "ProjectionExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      }
+    ],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "1",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "CoalescePartitionsExec",
+      "datafusion.partitioning": "UnknownPartitioning(1)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "CoalescePartitionsExec",
+      "region": "us-west"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      }
+    ],
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -874,7 +746,7 @@ expression: json_lines
         "query_name": "recursive"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -891,7 +763,7 @@ expression: json_lines
         "test_name": "09_recursive_all_options"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   }

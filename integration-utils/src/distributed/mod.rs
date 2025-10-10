@@ -22,15 +22,20 @@
 //! This module provides channel resolvers and utilities for distributed query execution:
 //! - `in_memory`: In-memory channel resolver for fast testing
 //! - `localhost`: TCP-based localhost worker resolver for more realistic testing
+//! - `trace_middleware`: Tower middleware for trace context propagation
 
 mod in_memory;
 mod localhost;
+pub mod trace_middleware;
 
 pub(crate) use in_memory::InMemoryChannelResolver;
-pub(crate) use localhost::{LocalhostChannelResolver, spawn_localhost_workers};
+pub(crate) use localhost::{
+    LocalhostChannelResolver, WorkerInstrumentationConfig, spawn_localhost_workers,
+    spawn_localhost_workers_with_buffers,
+};
 
 /// Default ports to use for localhost workers in distributed mode
-pub(crate) const DEFAULT_WORKER_PORTS: &[u16] = &[50051, 50052, 50053, 50054];
+pub(crate) const DEFAULT_WORKER_PORTS: &[u16] = &[50051, 50052, 50053];
 
 /// Distributed execution mode configuration
 #[derive(Debug, Clone, Copy)]

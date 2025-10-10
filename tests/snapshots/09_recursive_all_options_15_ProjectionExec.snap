@@ -1,9 +1,0 @@
----
-source: tests/integration_tests.rs
-expression: preview
----
-+---+
-| n |
-|===|
-| 1 |
-+---+

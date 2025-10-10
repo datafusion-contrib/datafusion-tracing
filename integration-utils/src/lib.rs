@@ -78,4 +78,4 @@ mod session;
 pub use data::data_dir;
 pub use distributed::DistributedMode;
 pub use query::{create_physical_plan, parse_sql, read_query, run_traced_query};
-pub use session::{SessionBuilder, create_instrumentation_rule, init_session};
+pub use session::{SessionBuilder, WorkerTaskWrapper, create_instrumentation_rule};

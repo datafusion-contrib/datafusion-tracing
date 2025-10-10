@@ -28,6 +28,9 @@ use datafusion_distributed::{
 };
 use hyper_util::rt::TokioIo;
 use tonic::transport::{Endpoint, Server};
+use tower::ServiceBuilder;
+
+use super::trace_middleware::{TracingClientLayer, TracingServerLayer};
 
 const DUMMY_URL: &str = "http://localhost:50051";
 const MAX_MESSAGE_SIZE: usize = 2 * 1024 * 1024 * 1024; // 2GB
@@ -55,6 +58,11 @@ impl InMemoryChannelResolver {
                 async move { Ok::<_, std::io::Error>(TokioIo::new(client)) }
             }));
 
+        // Wrap the channel with tracing middleware to inject trace context
+        let channel = ServiceBuilder::new()
+            .layer(TracingClientLayer)
+            .service(channel);
+
         let this = Self {
             channel: FlightServiceClient::new(BoxCloneSyncChannel::new(channel))
                 .max_decoding_message_size(MAX_MESSAGE_SIZE)
@@ -76,12 +84,15 @@ impl InMemoryChannelResolver {
             .unwrap();
 
         tokio::spawn(async move {
+            // Wrap the FlightService with tracing middleware to extract trace context
+            let service = ServiceBuilder::new().layer(TracingServerLayer).service(
+                FlightServiceServer::new(endpoint)
+                    .max_decoding_message_size(MAX_MESSAGE_SIZE)
+                    .max_encoding_message_size(MAX_MESSAGE_SIZE),
+            );
+
             Server::builder()
-                .add_service(
-                    FlightServiceServer::new(endpoint)
-                        .max_decoding_message_size(MAX_MESSAGE_SIZE)
-                        .max_encoding_message_size(MAX_MESSAGE_SIZE),
-                )
+                .add_service(service)
                 .serve_with_incoming(tokio_stream::once(Ok::<_, std::io::Error>(server)))
                 .await
         });

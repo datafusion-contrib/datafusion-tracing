@@ -136,8 +136,8 @@ async fn main() -> Result<()> {
 async fn run_distributed_otlp_example() -> Result<()> {
     // Test both distributed execution modes
     let modes = [
-        (DistributedMode::Memory, "Memory"),
         (DistributedMode::Localhost, "Localhost"),
+        (DistributedMode::Memory, "Memory"),
     ];
 
     for (mode, mode_name) in modes {
@@ -187,6 +187,13 @@ async fn run_distributed_otlp_example() -> Result<()> {
 
 /// Initializes OpenTelemetry and tracing infrastructure to enable tracing of query execution.
 fn init_tracing() -> Result<opentelemetry_sdk::trace::SdkTracerProvider> {
+    // Set up the global text map propagator for trace context propagation across gRPC boundaries.
+    // This is essential for distributed tracing to work - without it, worker spans won't be
+    // linked to parent traces.
+    opentelemetry::global::set_text_map_propagator(
+        opentelemetry_sdk::propagation::TraceContextPropagator::new(),
+    );
+
     // Set service metadata for tracing.
     let resource = Resource::builder()
         .with_attribute(KeyValue::new("service.name", "datafusion-tracing"))

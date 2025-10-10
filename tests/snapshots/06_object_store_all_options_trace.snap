@@ -20,7 +20,7 @@ expression: json_lines
         "query_name": "order_nations"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -42,7 +42,7 @@ expression: json_lines
         "query_name": "order_nations"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -89,7 +89,7 @@ expression: json_lines
         "query_name": "order_nations"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -185,7 +185,7 @@ expression: json_lines
         "query_name": "order_nations"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -220,7 +220,7 @@ expression: json_lines
         "query_name": "order_nations"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -237,7 +237,7 @@ expression: json_lines
         "test_name": "06_object_store_all_options"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   }

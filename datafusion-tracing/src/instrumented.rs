@@ -347,8 +347,9 @@ impl ExecutionPlan for InstrumentedExec {
         Some(self.with_new_inner(new_inner))
     }
 
+    /// Delegate to the inner plan for downcasting.
     fn as_any(&self) -> &dyn Any {
-        self
+        self.inner.as_any()
     }
 
     /// Executes the plan for a given partition and context, instrumented with tracing and metrics recording.

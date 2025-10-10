@@ -1063,7 +1063,7 @@ dependencies = [
 [[package]]
 name = "datafusion-distributed"
 version = "0.1.0"
-source = "git+https://github.com/datafusion-contrib/datafusion-distributed?branch=main#a638e6dc90a39d4c3d45139e4e5684db5f30279f"
+source = "git+https://github.com/geoffreyclaude/datafusion-distributed?branch=feat%2Ftracing#78ad4895fc8b6f3679ad1b87df407c6f1d62f2b2"
 dependencies = [
  "arrow-flight",
  "async-trait",
@@ -1535,6 +1535,8 @@ dependencies = [
  "datafusion",
  "insta",
  "integration-utils",
+ "opentelemetry",
+ "opentelemetry_sdk",
  "serde_json",
  "tokio",
  "tracing",
@@ -2182,15 +2184,19 @@ dependencies = [
  "datafusion-distributed",
  "datafusion-tracing",
  "futures",
+ "http",
  "hyper-util",
  "instrumented-object-store",
  "object_store",
+ "opentelemetry",
+ "pin-project-lite",
  "structopt",
  "tokio",
  "tokio-stream",
  "tonic",
  "tower",
  "tracing",
+ "tracing-opentelemetry",
  "url",
 ]
 

@@ -36,16 +36,21 @@ arrow-flight = "56.1"
 async-trait = "0.1"
 dashmap = "6.1"
 datafusion = { workspace = true, features = ["parquet", "nested_expressions"] }
-datafusion-distributed = { git = "https://github.com/datafusion-contrib/datafusion-distributed", branch = "main" }
+datafusion-distributed = { git = "https://github.com/geoffreyclaude/datafusion-distributed", branch = "feat/tracing" }
+# datafusion-distributed = { path = "../../datafusion-distributed" }
 datafusion-tracing = { workspace = true }
 futures = { workspace = true }
+http = "1.0"
 hyper-util = "0.1"
 instrumented-object-store = { workspace = true }
 object_store = { version = "0.12.1", default-features = false }
+opentelemetry = { version = "0.30", features = ["trace"] }
+pin-project-lite = "0.2"
 structopt = "0.3"
 tokio = { workspace = true, features = ["full"] }
 tokio-stream = "0.1"
 tonic = { version = "0.13", features = ["transport"] }
 tower = "0.5"
 tracing = { workspace = true }
+tracing-opentelemetry = { version = "0.31" }
 url = { version = "2.5" }

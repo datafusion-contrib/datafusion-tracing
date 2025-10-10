@@ -68,19 +68,19 @@ impl PhysicalOptimizerRule for InstrumentRule {
         plan: Arc<dyn ExecutionPlan>,
         _config: &ConfigOptions,
     ) -> datafusion::error::Result<Arc<dyn ExecutionPlan>> {
-        // Iterate over the plan and wrap each node with InstrumentedExec
+        // Wrap each node in the plan tree with InstrumentedExec.
+        // Since InstrumentedExec delegates as_any() to its inner node, it's transparent
+        // for downcasting - other code can still identify wrapped nodes by their actual type.
+        //
+        // Note: This will wrap every node, even if the rule is called multiple times on
+        // the same plan (unusual but possible). The resulting double-wrapping creates
+        // duplicate telemetry but remains functionally correct.
         plan.transform(|plan| {
-            if plan.as_any().downcast_ref::<InstrumentedExec>().is_none() {
-                // Node is not InstrumentedExec; wrap it
-                Ok(Transformed::yes(Arc::new(InstrumentedExec::new(
-                    plan,
-                    self.span_create_fn.clone(),
-                    &self.options,
-                ))))
-            } else {
-                // Node is already InstrumentedExec; do not wrap again
-                Ok(Transformed::no(plan))
-            }
+            Ok(Transformed::yes(Arc::new(InstrumentedExec::new(
+                plan,
+                self.span_create_fn.clone(),
+                &self.options,
+            ))))
         })
         .data()
     }

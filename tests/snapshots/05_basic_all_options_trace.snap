@@ -20,7 +20,7 @@ expression: json_lines
         "query_name": "select_one"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -42,7 +42,7 @@ expression: json_lines
         "query_name": "select_one"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -63,7 +63,7 @@ expression: json_lines
         "query_name": "select_one"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -91,7 +91,7 @@ expression: json_lines
         "query_name": "select_one"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -123,7 +123,7 @@ expression: json_lines
         "query_name": "select_one"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::session",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },
@@ -140,7 +140,7 @@ expression: json_lines
         "test_name": "05_basic_all_options"
       }
     ],
-    "target": "integration_utils",
+    "target": "integration_utils::query",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   }
