@@ -27,7 +27,7 @@ use pin_project::pin_project;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
-use tracing::{field, Span};
+use tracing::{Span, field};
 
 /// Records the `datafusion.node` span field once execution completes across all
 /// partitions, when the value is fully qualified.

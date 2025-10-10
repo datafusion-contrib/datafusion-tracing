@@ -165,7 +165,7 @@ impl RecordBatchStream for PreviewRecordingStream {
 }
 
 fn default_preview_fn(batch: &RecordBatch) -> Result<String, ArrowError> {
-    pretty_format_batches(&[batch.clone()]).map(|b| b.to_string())
+    pretty_format_batches(std::slice::from_ref(batch)).map(|b| b.to_string())
 }
 
 impl PreviewRecorder {

@@ -141,7 +141,7 @@ mod tests {
     use datafusion::arrow::datatypes::{DataType, Field, Schema};
     use datafusion::arrow::error::ArrowError;
     use datafusion::arrow::record_batch::RecordBatch;
-    use insta::{assert_snapshot, Settings};
+    use insta::{Settings, assert_snapshot};
     use std::sync::Arc;
 
     fn insta_settings() -> Settings {
@@ -206,7 +206,7 @@ mod tests {
         let description = Arc::new(StringArray::from(vec![
             "Paris is renowned as the City of Light, celebrated for its rich history, magnificent architecture, and vibrant arts scene. The city boasts iconic landmarks such as the Eiffel Tower and the Louvre, along with charming streets, quaint cafés, and a deep cultural heritage that continues to inspire artists, writers, and travelers from around the world.",
             "London is a dynamic and cosmopolitan metropolis that seamlessly blends its storied past with modern innovation. The city offers an array of historical sites, diverse neighborhoods, and world-class museums and theaters. Its bustling markets, green parks, and ever-evolving cultural scene make London a hub of creativity, commerce, and community life.",
-            "Barcelona is a lively coastal city known for its striking modernist architecture, Mediterranean beaches, and eclectic cultural offerings. From the whimsical creations of Antoni Gaudí to the vibrant street life and renowned culinary delights, Barcelona captivates visitors with its unique blend of historic charm and contemporary energy."
+            "Barcelona is a lively coastal city known for its striking modernist architecture, Mediterranean beaches, and eclectic cultural offerings. From the whimsical creations of Antoni Gaudí to the vibrant street life and renowned culinary delights, Barcelona captivates visitors with its unique blend of historic charm and contemporary energy.",
         ]));
         let city_name = Arc::new(StringArray::from(vec!["Paris", "London", "Barcelona"]));
         let emojis = Arc::new(StringArray::from(vec![
