@@ -17,5 +17,5 @@
 //
 // This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
 
-pub mod in_memory_writer;
 pub mod insta_settings;
+pub mod multi_buffer_writer;

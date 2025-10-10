@@ -1,0 +1,2704 @@
+---
+source: tests/integration_tests.rs
+expression: json_lines
+---
+[
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "list",
+      "object_store.prefix": "<TPCH_TABLES_DIR>/weather",
+      "otel.name": "local_fs.list"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000001.parquet",
+      "object_store.range": "45453..45461",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000000.parquet",
+      "object_store.range": "46076..46084",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000002.parquet",
+      "object_store.range": "45816..45824",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000001.parquet",
+      "object_store.range": "42765..45453",
+      "object_store.result.content_length": 2688,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000000.parquet",
+      "object_store.range": "43382..46076",
+      "object_store.result.content_length": 2694,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000002.parquet",
+      "object_store.range": "43126..45816",
+      "object_store.result.content_length": 2690,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000001.parquet",
+      "object_store.range": "33199..42765",
+      "object_store.result.content_length": 9566,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000000.parquet",
+      "object_store.range": "33807..43382",
+      "object_store.result.content_length": 9575,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/weather/result-000002.parquet",
+      "object_store.range": "33542..43126",
+      "object_store.result.content_length": 9584,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/nation.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 2670, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
+      "object_store.range": "2662..2670",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
+      "object_store.range": "1987..2662",
+      "object_store.result.content_length": 675,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
+      "object_store.range": "1714..1987",
+      "object_store.result.content_length": 273,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/region.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/region.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 1227, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/region.parquet",
+      "object_store.range": "1219..1227",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/region.parquet",
+      "object_store.range": "698..1219",
+      "object_store.result.content_length": 521,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/region.parquet",
+      "object_store.range": "486..698",
+      "object_store.result.content_length": 212,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/part.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/part.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 6902976, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/part.parquet",
+      "object_store.range": "6902968..6902976",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/part.parquet",
+      "object_store.range": "6900356..6902968",
+      "object_store.result.content_length": 2612,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/part.parquet",
+      "object_store.range": "6895687..6900356",
+      "object_store.result.content_length": 4669,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/supplier.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/supplier.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 901201, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/supplier.parquet",
+      "object_store.range": "901193..901201",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/supplier.parquet",
+      "object_store.range": "900000..901193",
+      "object_store.result.content_length": 1193,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/supplier.parquet",
+      "object_store.range": "899497..900000",
+      "object_store.result.content_length": 503,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/partsupp.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/partsupp.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 44858110, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/partsupp.parquet",
+      "object_store.range": "44858102..44858110",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/partsupp.parquet",
+      "object_store.range": "44845947..44858102",
+      "object_store.result.content_length": 12155,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/partsupp.parquet",
+      "object_store.range": "44824571..44845947",
+      "object_store.result.content_length": 21376,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/customer.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/customer.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 13933574, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/customer.parquet",
+      "object_store.range": "13933566..13933574",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/customer.parquet",
+      "object_store.range": "13928771..13933566",
+      "object_store.result.content_length": 4795,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/customer.parquet",
+      "object_store.range": "13923894..13928771",
+      "object_store.result.content_length": 4877,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/orders.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/orders.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 63497280, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/orders.parquet",
+      "object_store.range": "63497272..63497280",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/orders.parquet",
+      "object_store.range": "63478285..63497272",
+      "object_store.result.content_length": 18987,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: Some(Memory), worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/orders.parquet",
+      "object_store.range": "63446814..63478285",
+      "object_store.result.content_length": 31471,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: Some(Memory), worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 0, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 0, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "head",
+      "object_store.location": "<TPCH_TABLES_DIR>/lineitem.parquet",
+      "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/lineitem.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 231669547, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
+      "otel.name": "local_fs.head"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/lineitem.parquet",
+      "object_store.range": "231669539..231669547",
+      "object_store.result.content_length": 8,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/lineitem.parquet",
+      "object_store.range": "231563065..231669539",
+      "object_store.result.content_length": 106474,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: Some(Localhost), worker_task_wrapper: true }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: Some(Localhost), worker_task_wrapper: true }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "get_range",
+      "object_store.location": "<TPCH_TABLES_DIR>/lineitem.parquet",
+      "object_store.range": "231380664..231563065",
+      "object_store.result.content_length": 182401,
+      "otel.name": "local_fs.get_range"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      },
+      {
+        "name": "register_tpch_tables"
+      }
+    ],
+    "target": "instrumented_object_store::instrumented_object_store",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 5, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "read_query",
+      "query": "SELECT\n    count(*),\n    \"MinTemp\"\nFROM weather\nGROUP BY \"MinTemp\"\n"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "13_distributed_weather_localhost"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "weather"
+      }
+    ],
+    "target": "integration_utils::query",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 0, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 0, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 5, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "logical_plan": "Projection: count(Int64(1)) AS count(*), weather.MinTemp [count(*):Int64, MinTemp:Float64;N]\n  Aggregate: groupBy=[[weather.MinTemp]], aggr=[[count(Int64(1))]] [MinTemp:Float64;N, count(Int64(1)):Int64]\n    TableScan: weather [MinTemp:Float64;N, MaxTemp:Float64;N, Rainfall:Float64;N, Evaporation:Float64;N, Sunshine:Utf8View;N, WindGustDir:Utf8View;N, WindGustSpeed:Utf8View;N, WindDir9am:Utf8View;N, WindDir3pm:Utf8View;N, WindSpeed9am:Utf8View;N, WindSpeed3pm:Int64;N, Humidity9am:Int64;N, Humidity3pm:Int64;N, Pressure9am:Float64;N, Pressure3pm:Float64;N, Cloud9am:Int64;N, Cloud3pm:Int64;N, Temp9am:Float64;N, Temp3pm:Float64;N, RainToday:Utf8View;N, RISK_MM:Float64;N, RainTomorrow:Utf8View;N]",
+      "name": "parse_sql",
+      "sql": "SELECT\n    count(*),\n    \"MinTemp\"\nFROM weather\nGROUP BY \"MinTemp\"\n"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "13_distributed_weather_localhost"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "weather"
+      }
+    ],
+    "target": "integration_utils::query",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 0, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 0, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "02_basic_metrics"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "01_basic"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "create_physical_plan",
+      "physical_plan": "DistributedExec\n  CoalescePartitionsExec\n    [Stage 2] => NetworkCoalesceExec: output_partitions=16, input_tasks=2\n      ProjectionExec: expr=[count(Int64(1))@1 as count(*), MinTemp@0 as MinTemp]\n        AggregateExec: mode=FinalPartitioned, gby=[MinTemp@0 as MinTemp], aggr=[count(Int64(1))]\n          CoalesceBatchesExec: target_batch_size=8192\n            [Stage 1] => NetworkShuffleExec: output_partitions=8, input_tasks=2\n              RepartitionExec: partitioning=Hash([MinTemp@0], 16), input_partitions=8\n                RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=2\n                  AggregateExec: mode=Partial, gby=[MinTemp@0 as MinTemp], aggr=[count(Int64(1))]\n                    PartitionIsolatorExec: t0:[p0,p1,__] t1:[__,__,p0] \n                      DataSourceExec: file_groups={3 groups: [[<TPCH_TABLES_DIR>/weather/result-000000.parquet], [<TPCH_TABLES_DIR>/weather/result-000001.parquet], [<TPCH_TABLES_DIR>/weather/result-000002.parquet]]}, projection=[MinTemp], file_type=parquet\n"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "13_distributed_weather_localhost"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "weather"
+      }
+    ],
+    "target": "integration_utils::query",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "04_basic_compact_preview"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: true, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "05_basic_all_options"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "12_distributed_weather_memory"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "03_basic_preview"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "08_recursive"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "09_recursive_all_options"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "06_object_store_all_options"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 0, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "register_tpch_tables"
+    },
+    "spans": [
+      {
+        "name": "build",
+        "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+      }
+    ],
+    "target": "integration_utils::data",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: true, preview_limit: 5, compact_preview: true, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "build",
+      "self": "SessionBuilder { record_object_store: false, record_metrics: false, preview_limit: 0, compact_preview: false, distributed_mode: None, worker_task_wrapper: false }"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "test",
+      "test_name": "11_weather"
+    },
+    "spans": [],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.bloom_filter_eval_time": "0.00ms",
+      "datafusion.metrics.bytes_scanned": "3569",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.file_open_errors": "0",
+      "datafusion.metrics.file_scan_errors": "0",
+      "datafusion.metrics.metadata_load_time": "0.00ms",
+      "datafusion.metrics.num_predicate_creation_errors": "0",
+      "datafusion.metrics.output_rows": "244",
+      "datafusion.metrics.page_index_eval_time": "0.00ms",
+      "datafusion.metrics.page_index_rows_matched": "0",
+      "datafusion.metrics.page_index_rows_pruned": "0",
+      "datafusion.metrics.predicate_evaluation_errors": "0",
+      "datafusion.metrics.pushdown_rows_matched": "0",
+      "datafusion.metrics.pushdown_rows_pruned": "0",
+      "datafusion.metrics.row_groups_matched_bloom_filter": "0",
+      "datafusion.metrics.row_groups_matched_statistics": "0",
+      "datafusion.metrics.row_groups_pruned_bloom_filter": "0",
+      "datafusion.metrics.row_groups_pruned_statistics": "0",
+      "datafusion.metrics.row_pushdown_eval_time": "0.00ms",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.statistics_eval_time": "0.00ms",
+      "datafusion.metrics.time_elapsed_opening": "0.00ms",
+      "datafusion.metrics.time_elapsed_processing": "0.00ms",
+      "datafusion.metrics.time_elapsed_scanning_total": "0.00ms",
+      "datafusion.metrics.time_elapsed_scanning_until_data": "0.00ms",
+      "datafusion.node": "DataSourceExec: file_groups={3 groups: [[<TPCH_TABLES_DIR>/weather/result-000000.parquet], [<TPCH_TABLES_DIR>/weather/result-000001.parquet], [<TPCH_TABLES_DIR>/weather/result-000002.parquet]]}, projection=[MinTemp], file_type=parquet",
+      "datafusion.partitioning": "UnknownPartitioning(3)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "DataSourceExec",
+      "region": "us-west",
+      "worker.id": "localhost:50051"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.node": "PartitionIsolatorExec: t0:[p0,p1,__] t1:[__,__,p0] ",
+      "datafusion.partitioning": "UnknownPartitioning(2)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "PartitionIsolatorExec",
+      "region": "us-west",
+      "worker.id": "localhost:50051"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "160",
+      "datafusion.metrics.peak_mem_used": "12672",
+      "datafusion.metrics.skipped_aggregation_rows": "0",
+      "datafusion.metrics.spill_count": "0",
+      "datafusion.metrics.spilled_bytes": "0.0 B",
+      "datafusion.metrics.spilled_rows": "0",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "AggregateExec: mode=Partial, gby=[MinTemp@0 as MinTemp], aggr=[count(Int64(1))]",
+      "datafusion.partitioning": "UnknownPartitioning(2)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "AggregateExec",
+      "region": "us-west",
+      "worker.id": "localhost:50051"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.fetch_time": "0.00ms",
+      "datafusion.metrics.repartition_time": "0.00ms",
+      "datafusion.metrics.send_time": "0.00ms",
+      "datafusion.node": "RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=2",
+      "datafusion.partitioning": "RoundRobinBatch(8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "RepartitionExec",
+      "region": "us-west",
+      "worker.id": "localhost:50051"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.fetch_time": "0.00ms",
+      "datafusion.metrics.repartition_time": "0.00ms",
+      "datafusion.metrics.send_time": "0.00ms",
+      "datafusion.node": "RepartitionExec: partitioning=Hash([MinTemp@0], 16), input_partitions=8",
+      "datafusion.partitioning": "Hash([MinTemp@0], 16)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "RepartitionExec",
+      "region": "us-west",
+      "worker.id": "localhost:50051"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.bloom_filter_eval_time": "0.00ms",
+      "datafusion.metrics.bytes_scanned": "1835",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.file_open_errors": "0",
+      "datafusion.metrics.file_scan_errors": "0",
+      "datafusion.metrics.metadata_load_time": "0.00ms",
+      "datafusion.metrics.num_predicate_creation_errors": "0",
+      "datafusion.metrics.output_rows": "122",
+      "datafusion.metrics.page_index_eval_time": "0.00ms",
+      "datafusion.metrics.page_index_rows_matched": "0",
+      "datafusion.metrics.page_index_rows_pruned": "0",
+      "datafusion.metrics.predicate_evaluation_errors": "0",
+      "datafusion.metrics.pushdown_rows_matched": "0",
+      "datafusion.metrics.pushdown_rows_pruned": "0",
+      "datafusion.metrics.row_groups_matched_bloom_filter": "0",
+      "datafusion.metrics.row_groups_matched_statistics": "0",
+      "datafusion.metrics.row_groups_pruned_bloom_filter": "0",
+      "datafusion.metrics.row_groups_pruned_statistics": "0",
+      "datafusion.metrics.row_pushdown_eval_time": "0.00ms",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.statistics_eval_time": "0.00ms",
+      "datafusion.metrics.time_elapsed_opening": "0.00ms",
+      "datafusion.metrics.time_elapsed_processing": "0.00ms",
+      "datafusion.metrics.time_elapsed_scanning_total": "0.00ms",
+      "datafusion.metrics.time_elapsed_scanning_until_data": "0.00ms",
+      "datafusion.node": "DataSourceExec: file_groups={3 groups: [[<TPCH_TABLES_DIR>/weather/result-000000.parquet], [<TPCH_TABLES_DIR>/weather/result-000001.parquet], [<TPCH_TABLES_DIR>/weather/result-000002.parquet]]}, projection=[MinTemp], file_type=parquet",
+      "datafusion.partitioning": "UnknownPartitioning(3)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "DataSourceExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.node": "PartitionIsolatorExec: t0:[p0,p1,__] t1:[__,__,p0] ",
+      "datafusion.partitioning": "UnknownPartitioning(2)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "PartitionIsolatorExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "89",
+      "datafusion.metrics.peak_mem_used": "6472",
+      "datafusion.metrics.skipped_aggregation_rows": "0",
+      "datafusion.metrics.spill_count": "0",
+      "datafusion.metrics.spilled_bytes": "0.0 B",
+      "datafusion.metrics.spilled_rows": "0",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "AggregateExec: mode=Partial, gby=[MinTemp@0 as MinTemp], aggr=[count(Int64(1))]",
+      "datafusion.partitioning": "UnknownPartitioning(2)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "AggregateExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.fetch_time": "0.00ms",
+      "datafusion.metrics.repartition_time": "0.00ms",
+      "datafusion.metrics.send_time": "0.00ms",
+      "datafusion.node": "RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=2",
+      "datafusion.partitioning": "RoundRobinBatch(8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "RepartitionExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.fetch_time": "0.00ms",
+      "datafusion.metrics.repartition_time": "0.00ms",
+      "datafusion.metrics.send_time": "0.00ms",
+      "datafusion.node": "RepartitionExec: partitioning=Hash([MinTemp@0], 16), input_partitions=8",
+      "datafusion.partitioning": "Hash([MinTemp@0], 16)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "RepartitionExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.node": "[Stage 1] => NetworkShuffleExec: output_partitions=8, input_tasks=2",
+      "datafusion.partitioning": "Hash([MinTemp@0], 8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "NetworkShuffleExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "138",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "CoalesceBatchesExec: target_batch_size=8192",
+      "datafusion.partitioning": "Hash([MinTemp@0], 8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "CoalesceBatchesExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "102",
+      "datafusion.metrics.peak_mem_used": "39856",
+      "datafusion.metrics.spill_count": "0",
+      "datafusion.metrics.spilled_bytes": "0.0 B",
+      "datafusion.metrics.spilled_rows": "0",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "AggregateExec: mode=FinalPartitioned, gby=[MinTemp@0 as MinTemp], aggr=[count(Int64(1))]",
+      "datafusion.partitioning": "Hash([MinTemp@0], 8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "AggregateExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "102",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "ProjectionExec: expr=[count(Int64(1))@1 as count(*), MinTemp@0 as MinTemp]",
+      "datafusion.partitioning": "Hash([MinTemp@1], 8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "ProjectionExec",
+      "region": "us-west",
+      "worker.id": "localhost:50052"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.node": "[Stage 1] => NetworkShuffleExec: output_partitions=8, input_tasks=2",
+      "datafusion.partitioning": "Hash([MinTemp@0], 8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "NetworkShuffleExec",
+      "region": "us-west",
+      "worker.id": "localhost:50053"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Incremental",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "111",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "CoalesceBatchesExec: target_batch_size=8192",
+      "datafusion.partitioning": "Hash([MinTemp@0], 8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "CoalesceBatchesExec",
+      "region": "us-west",
+      "worker.id": "localhost:50053"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "78",
+      "datafusion.metrics.peak_mem_used": "39472",
+      "datafusion.metrics.spill_count": "0",
+      "datafusion.metrics.spilled_bytes": "0.0 B",
+      "datafusion.metrics.spilled_rows": "0",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "AggregateExec: mode=FinalPartitioned, gby=[MinTemp@0 as MinTemp], aggr=[count(Int64(1))]",
+      "datafusion.partitioning": "Hash([MinTemp@0], 8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "AggregateExec",
+      "region": "us-west",
+      "worker.id": "localhost:50053"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.boundedness": "Bounded",
+      "datafusion.emission_type": "Final",
+      "datafusion.metrics.elapsed_compute": "0.00ms",
+      "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_rows": "78",
+      "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.node": "ProjectionExec: expr=[count(Int64(1))@1 as count(*), MinTemp@0 as MinTemp]",
+      "datafusion.partitioning": "Hash([MinTemp@1], 8)",
+      "datafusion.preview": "<redacted>",
+      "env": "production",
+      "name": "InstrumentedExec",
+      "otel.name": "ProjectionExec",
+      "region": "us-west",
+      "worker.id": "localhost:50053"
+    },
+    "spans": [],
+    "target": "integration_utils::session",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "grpc_request",
+      "otel.kind": "server",
+      "rpc.method": "DoGet",
+      "rpc.service": "arrow.flight.protocol.FlightService",
+      "rpc.system": "grpc"
+    },
+    "spans": [],
+    "target": "integration_utils::distributed::trace_middleware",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  }
+]

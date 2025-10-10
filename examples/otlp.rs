@@ -53,12 +53,12 @@
 use std::time::Duration;
 
 use datafusion::{common::internal_datafusion_err, error::Result};
-use integration_utils::{init_session, run_traced_query};
-use opentelemetry::{trace::TracerProvider, KeyValue};
+use integration_utils::{SessionBuilder, run_traced_query};
+use opentelemetry::{KeyValue, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;
-use opentelemetry_sdk::{trace::Sampler, Resource};
-use tracing::{instrument, Level};
-use tracing_subscriber::{fmt, prelude::*, Registry};
+use opentelemetry_sdk::{Resource, trace::Sampler};
+use tracing::{Level, instrument};
+use tracing_subscriber::{Registry, fmt, prelude::*};
 
 // Query to be executed for demonstration purposes.
 const QUERY_NAME: &str = "tpch_scrabble";
@@ -80,7 +80,13 @@ async fn main() -> Result<()> {
 #[instrument(level = "info")]
 async fn run_otlp_example() -> Result<()> {
     // Initialize the DataFusion session context.
-    let ctx = init_session(true, true, 5, true).await?;
+    let ctx = SessionBuilder::new()
+        .with_object_store_tracing()
+        .with_metrics()
+        .with_preview(5)
+        .with_compact_preview()
+        .build()
+        .await?;
 
     // Run the SQL query with tracing enabled.
     run_traced_query(&ctx, QUERY_NAME).await?;

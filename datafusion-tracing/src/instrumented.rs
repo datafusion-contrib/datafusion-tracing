@@ -31,6 +31,8 @@ use datafusion::{
     execution::{SendableRecordBatchStream, TaskContext},
     physical_expr::{Distribution, OrderingRequirements},
     physical_plan::{
+        DisplayAs, DisplayFormatType, ExecutionPlan, ExecutionPlanProperties,
+        PhysicalExpr, PlanProperties,
         execution_plan::{CardinalityEffect, InvariantLevel},
         filter_pushdown::{
             ChildPushdownResult, FilterDescription, FilterPushdownPhase,
@@ -39,8 +41,6 @@ use datafusion::{
         metrics::MetricsSet,
         projection::ProjectionExec,
         stream::RecordBatchStreamAdapter,
-        DisplayAs, DisplayFormatType, ExecutionPlan, ExecutionPlanProperties,
-        PhysicalExpr, PlanProperties,
     },
 };
 use delegate::delegate;
@@ -50,7 +50,7 @@ use std::{
     fmt::{self, Debug},
     sync::{Arc, OnceLock},
 };
-use tracing::{field, Span};
+use tracing::{Span, field};
 use tracing_futures::Instrument;
 
 /// Type alias for a function that creates a tracing span.
@@ -347,8 +347,9 @@ impl ExecutionPlan for InstrumentedExec {
         Some(self.with_new_inner(new_inner))
     }
 
+    /// Delegate to the inner plan for downcasting.
     fn as_any(&self) -> &dyn Any {
-        self
+        self.inner.as_any()
     }
 
     /// Executes the plan for a given partition and context, instrumented with tracing and metrics recording.

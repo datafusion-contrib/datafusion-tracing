@@ -35,6 +35,10 @@ workspace = true
 name = "otlp"
 path = "otlp.rs"
 
+[[example]]
+name = "distributed_otlp"
+path = "distributed_otlp.rs"
+
 [dependencies]
 datafusion = { workspace = true, features = ["parquet", "nested_expressions"] }
 integration-utils = { path = "../integration-utils" }

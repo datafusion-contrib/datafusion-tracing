@@ -19,17 +19,17 @@
 
 use async_trait::async_trait;
 use bytes::Bytes;
-use futures::stream::BoxStream;
 use futures::StreamExt;
+use futures::stream::BoxStream;
 use object_store::{
-    path::Path, GetOptions, GetResult, ListResult, MultipartUpload, ObjectMeta,
-    ObjectStore, PutMultipartOptions, PutOptions, PutPayload, PutResult, Result,
-    UploadPart,
+    GetOptions, GetResult, ListResult, MultipartUpload, ObjectMeta, ObjectStore,
+    PutMultipartOptions, PutOptions, PutPayload, PutResult, Result, UploadPart,
+    path::Path,
 };
 use std::fmt::{Display, Formatter};
 use std::ops::Range;
 use std::sync::Arc;
-use tracing::{instrument, Span};
+use tracing::{Span, instrument};
 use tracing_futures::Instrument;
 
 /// Instruments the provided `ObjectStore` with tracing.

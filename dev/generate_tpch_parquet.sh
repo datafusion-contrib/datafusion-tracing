@@ -33,10 +33,10 @@ if ! command -v tpchgen-cli >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Generating TPCH Parquet data (SF=0.1) into $OUT_DIR"
+echo "Generating TPCH Parquet data (SF=1) into $OUT_DIR"
 
 # Generate all tables, single file per table, Parquet format
-tpchgen-cli --scale-factor 0.1 --format parquet --output-dir "$OUT_DIR"
+tpchgen-cli --scale-factor 1 --format parquet --output-dir "$OUT_DIR"
 
 echo "TPCH Parquet generation complete. Files in $OUT_DIR:"
 ls -1 "$OUT_DIR" | sed 's/^/ - /'

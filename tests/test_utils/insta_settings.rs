@@ -49,7 +49,7 @@ pub fn settings() -> Settings {
     // Redact environment dependent paths to parquet files
     // from: "object_store.location": "usr/home/user.name/workspace/datafusion-tracing/integration/data/nation.parquet"
     // to  : "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet"
-    let tpch_tables_dir = integration_utils::tpch_tables_dir()
+    let tpch_tables_dir = integration_utils::data_dir()
         .to_string_lossy()
         .trim_start_matches(std::path::is_separator)
         .to_string();
