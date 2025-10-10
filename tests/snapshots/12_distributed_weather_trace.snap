@@ -8,7 +8,7 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "read_query",
-      "query": "SELECT\n    count(*),\n    \"MinTemp\"\nFROM weather\nGROUP BY \"MinTemp\""
+      "query": "SELECT\n    count(*),\n    \"MinTemp\"\nFROM weather\nGROUP BY \"MinTemp\"\n"
     },
     "spans": [
       {
@@ -30,7 +30,7 @@ expression: json_lines
     "span": {
       "logical_plan": "Projection: count(Int64(1)) AS count(*), weather.MinTemp [count(*):Int64, MinTemp:Float64;N]\n  Aggregate: groupBy=[[weather.MinTemp]], aggr=[[count(Int64(1))]] [MinTemp:Float64;N, count(Int64(1)):Int64]\n    TableScan: weather [MinTemp:Float64;N, MaxTemp:Float64;N, Rainfall:Float64;N, Evaporation:Float64;N, Sunshine:Utf8View;N, WindGustDir:Utf8View;N, WindGustSpeed:Utf8View;N, WindDir9am:Utf8View;N, WindDir3pm:Utf8View;N, WindSpeed9am:Utf8View;N, WindSpeed3pm:Int64;N, Humidity9am:Int64;N, Humidity3pm:Int64;N, Pressure9am:Float64;N, Pressure3pm:Float64;N, Cloud9am:Int64;N, Cloud3pm:Int64;N, Temp9am:Float64;N, Temp3pm:Float64;N, RainToday:Utf8View;N, RISK_MM:Float64;N, RainTomorrow:Utf8View;N]",
       "name": "parse_sql",
-      "sql": "SELECT\n    count(*),\n    \"MinTemp\"\nFROM weather\nGROUP BY \"MinTemp\""
+      "sql": "SELECT\n    count(*),\n    \"MinTemp\"\nFROM weather\nGROUP BY \"MinTemp\"\n"
     },
     "spans": [
       {

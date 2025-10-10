@@ -30,6 +30,7 @@ use hyper_util::rt::TokioIo;
 use tonic::transport::{Endpoint, Server};
 
 const DUMMY_URL: &str = "http://localhost:50051";
+const MAX_MESSAGE_SIZE: usize = 2 * 1024 * 1024 * 1024; // 2GB
 
 /// [ChannelResolver] implementation that returns gRPC clients baked by an in-memory
 /// tokio duplex rather than a TCP connection.
@@ -40,7 +41,7 @@ pub(crate) struct InMemoryChannelResolver {
 
 impl InMemoryChannelResolver {
     pub fn new() -> Self {
-        let (client, server) = tokio::io::duplex(1024 * 1024);
+        let (client, server) = tokio::io::duplex(1024 * 1024); // 1MB buffer
 
         let mut client = Some(client);
         let channel = Endpoint::try_from(DUMMY_URL)
@@ -55,7 +56,9 @@ impl InMemoryChannelResolver {
             }));
 
         let this = Self {
-            channel: FlightServiceClient::new(BoxCloneSyncChannel::new(channel)),
+            channel: FlightServiceClient::new(BoxCloneSyncChannel::new(channel))
+                .max_decoding_message_size(MAX_MESSAGE_SIZE)
+                .max_encoding_message_size(MAX_MESSAGE_SIZE),
         };
         let this_clone = this.clone();
 
@@ -74,7 +77,11 @@ impl InMemoryChannelResolver {
 
         tokio::spawn(async move {
             Server::builder()
-                .add_service(FlightServiceServer::new(endpoint))
+                .add_service(
+                    FlightServiceServer::new(endpoint)
+                        .max_decoding_message_size(MAX_MESSAGE_SIZE)
+                        .max_encoding_message_size(MAX_MESSAGE_SIZE),
+                )
                 .serve_with_incoming(tokio_stream::once(Ok::<_, std::io::Error>(server)))
                 .await
         });
