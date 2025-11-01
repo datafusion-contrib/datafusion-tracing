@@ -38,10 +38,10 @@ path = "otlp.rs"
 [dependencies]
 datafusion = { workspace = true, features = ["parquet", "nested_expressions"] }
 integration-utils = { path = "../integration-utils" }
-opentelemetry = { version = "0.30", features = ["trace"] }
-opentelemetry-otlp = { version = "0.30", features = ["grpc-tonic"] }
-opentelemetry_sdk = { version = "0.30", features = ["rt-tokio", "rt-tokio-current-thread"] }
+opentelemetry = { version = "0.31", features = ["trace"] }
+opentelemetry-otlp = { version = "0.31", features = ["grpc-tonic"] }
+opentelemetry_sdk = { version = "0.31", features = ["rt-tokio", "rt-tokio-current-thread"] }
 tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
 tracing = { workspace = true }
-tracing-opentelemetry = { version = "0.31", features = ["default"] }
+tracing-opentelemetry = { version = "0.32", features = ["default"] }
 tracing-subscriber = { version = "0.3", features = ["json"] }
