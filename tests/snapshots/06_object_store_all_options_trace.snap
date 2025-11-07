@@ -114,15 +114,6 @@ expression: json_lines
       },
       {
         "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Final",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "SortExec",
-        "region": "us-west"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
         "datafusion.emission_type": "Incremental",
         "datafusion.partitioning": "UnknownPartitioning(1)",
         "env": "production",
