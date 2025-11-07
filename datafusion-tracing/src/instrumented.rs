@@ -359,7 +359,7 @@ impl ExecutionPlan for InstrumentedExec {
     ) -> Result<SendableRecordBatchStream> {
         let span = self.get_span();
 
-        let inner_stream = span.in_scope(|| self.inner.execute(partition, context))?;
+        let inner_stream = self.inner.execute(partition, context)?;
 
         // Wrap the stream with node recording so `datafusion.node` is recorded only after
         // completion, once it is fully qualified.
