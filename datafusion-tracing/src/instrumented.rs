@@ -90,6 +90,12 @@ impl Debug for InstrumentedExec {
     }
 }
 
+impl Drop for InstrumentedExec {
+    fn drop(&mut self) {
+        log::warn!("Dropping InstrumentedExec node: {:?}", self.inner);
+    }
+}
+
 impl InstrumentedExec {
     /// Creates a new `InstrumentedExec` that wraps an execution plan with tracing and metrics.
     pub fn new(

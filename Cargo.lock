@@ -1214,6 +1214,7 @@ dependencies = [
  "delegate",
  "futures",
  "insta",
+ "log",
  "pin-project",
  "tokio",
  "tracing",
