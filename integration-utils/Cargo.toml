@@ -31,7 +31,7 @@ rust-version = { workspace = true }
 workspace = true
 
 [dependencies]
-datafusion = { workspace = true, features = ["parquet", "nested_expressions"] }
+datafusion = { workspace = true, features = ["nested_expressions", "parquet", "sql"] }
 datafusion-tracing = { workspace = true }
 instrumented-object-store = { workspace = true }
 object_store = { version = "0.12.1", default-features = false }
