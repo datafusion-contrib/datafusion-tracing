@@ -49,18 +49,9 @@
 //!
 //! ```toml
 //! [dependencies]
-//! datafusion = "50.0.0"
-//! datafusion-tracing = "50.0.2"
+//! datafusion = "51.0.0"
+//! datafusion-tracing = "51.0.0"
 //! ```
-//!
-//! ## Compatibility note
-//! The ellipsis truncation indicator in `pretty_format_compact_batch` is disabled in this version
-//! because it requires `comfy-table >= 7.1.4`, while Apache Arrow currently pins `comfy-table` to
-//! `7.1.2` to preserve its MSRV. Context: `comfy-table 7.2.0` bumped MSRV to Rust 1.85 while Arrow
-//! remains at 1.84. See [arrow-rs issue #8243](https://github.com/apache/arrow-rs/issues/8243)
-//! and [PR #8244](https://github.com/apache/arrow-rs/pull/8244). Arrow used an exact pin rather
-//! than `~7.1`, which would also preserve MSRV while allowing 7.1.x (including 7.1.4). We will
-//! re-enable it once Arrow relaxes the pin to allow `>= 7.1.4`.
 //!
 //! ## Quick Start Example
 //!
