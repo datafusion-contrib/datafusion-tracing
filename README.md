@@ -119,31 +119,6 @@ async fn main() -> Result<()> {
 
 A more complete example can be found in the [examples directory](https://github.com/datafusion-contrib/datafusion-tracing/tree/main/examples).
 
-### Optimizer rule ordering (put instrumentation last)
-
-Always register the instrumentation rule last in your physical optimizer chain.
-
-- Many optimizer rules identify nodes using `as_any().downcast_ref::<ConcreteExec>()`.
-  Since instrumentation wraps each node in a private `InstrumentedExec`, those downcasts
-  won’t match if instrumentation runs first, causing rules to be skipped or, in code
-  that assumes success, to panic.
-- Some rules may rewrite parts of the plan after instrumentation. While `InstrumentedExec`
-  re-wraps many common mutations, placing the rule last guarantees full, consistent
-  coverage regardless of other rules’ behaviors.
-
-Why is `InstrumentedExec` private?
-
-- To prevent downstream code from downcasting to or unwrapping the wrapper, which would be
-  brittle and force long-term compatibility constraints on its internals. The public
-  contract is the optimizer rule, not the concrete node.
-
-How to ensure it is last:
-
-- When chaining: `builder.with_physical_optimizer_rule(rule_a)
-  .with_physical_optimizer_rule(rule_b)
-  .with_physical_optimizer_rule(instrument_rule)`
-- Or collect: `builder.with_physical_optimizer_rules(vec![..., instrument_rule])`
-
 <!-- cargo-rdme end -->
 
 ## Setting Up a Collector
@@ -173,6 +148,31 @@ For a cloud-native approach, DataDog offers a hosted solution for OpenTelemetry 
 ### Other Collectors
 
 Of course, you can use any OpenTelemetry-compatible collector. The [official OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) is a good starting point if you want to build a custom setup.
+
+## Using with Multiple Optimizer Rules
+
+If you're using custom physical optimizer rules alongside the instrumentation rule, always register the instrumentation rule last in your physical optimizer chain so that:
+
+- You capture the final optimized plan, not an intermediate one.
+- Instrumentation stays purely observational—other optimizer rules never have to deal with instrumented nodes.
+
+To keep the instrumentation rule last in the chain, either chain calls:
+
+```rust
+builder.with_physical_optimizer_rule(rule_a)
+    .with_physical_optimizer_rule(rule_b)
+    .with_physical_optimizer_rule(instrument_rule)
+```
+
+Or pass a vector:
+
+```rust
+builder.with_physical_optimizer_rules(vec![..., instrument_rule])
+```
+
+### InstrumentedExec visibility
+
+Instrumentation is designed to be mostly invisible: with the rule registered last, other optimizer rules typically never see `InstrumentedExec` at all. The wrapper itself is intentionally private so downstream code cannot depend on its internals; the supported surface is the optimizer rule and the standard `ExecutionPlan` trait.
 
 ## Repository Structure
 
