@@ -29,7 +29,7 @@ resolver = "2"
 
 [workspace.package]
 description = "DataFusion tracing of execution plans"
-version = "51.0.0"
+version = "52.0.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/datafusion-contrib/datafusion-tracing"
@@ -37,10 +37,10 @@ authors = ["DataDog <info@datadoghq.com>"]
 rust-version = "1.86.0"
 
 [workspace.dependencies]
-datafusion = { version = "51.0.0", default-features = false }
-datafusion-tracing = { path = "datafusion-tracing", version = "51.0.0" }
+datafusion = { git = "https://github.com/apache/datafusion", branch = "branch-52", default-features = false }
+datafusion-tracing = { path = "datafusion-tracing", version = "52.0.0" }
 futures = "0.3"
-instrumented-object-store = { path = "instrumented-object-store", version = "51.0.0" }
+instrumented-object-store = { path = "instrumented-object-store", version = "52.0.0" }
 tokio = { version = "1.48" }
 tracing = { version = "0.1" }
 tracing-futures = { version = "0.2", features = ["futures-03"] }

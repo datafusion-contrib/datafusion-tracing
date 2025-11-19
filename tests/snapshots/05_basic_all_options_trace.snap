@@ -103,6 +103,7 @@ expression: json_lines
       "datafusion.emission_type": "Incremental",
       "datafusion.metrics.elapsed_compute": "0.00ms",
       "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
+      "datafusion.metrics.output_batches": "1",
       "datafusion.metrics.output_rows": "1",
       "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
       "datafusion.node": "ProjectionExec: expr=[1 as Int64(1)]",

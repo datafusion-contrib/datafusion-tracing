@@ -166,7 +166,7 @@ async fn test_scrabble_all_options() -> Result<()> {
             .with_compact_preview()
             // skip preview assertions for these spans as they depend on the partitioning
             // and are not deterministic
-            .ignore_preview_spans(&[15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25])
+            .ignore_preview_spans(&[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25])
             // ignore the full trace assertions as they are not deterministic: exact span ordering can vary for this complex query
             .ignore_full_trace(),
     )

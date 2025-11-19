@@ -51,7 +51,7 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "create_physical_plan",
-      "physical_plan": "SortPreservingMergeExec: [l_orderkey@0 ASC NULLS LAST, l_linenumber@1 ASC NULLS LAST], fetch=3\n  SortExec: TopK(fetch=3), expr=[l_orderkey@0 ASC NULLS LAST, l_linenumber@1 ASC NULLS LAST], preserve_partitioning=[true]\n    ProjectionExec: expr=[l_orderkey@0 as l_orderkey, l_linenumber@1 as l_linenumber, l_shipmode@3 as l_shipmode, l_quantity@2 as l_quantity]\n      CoalesceBatchesExec: target_batch_size=8192\n        FilterExec: l_shipmode@3 = SHIP\n          DataSourceExec: file_groups={8 groups: [[<TPCH_TABLES_DIR>/lineitem.parquet:0..2516294], [<TPCH_TABLES_DIR>/lineitem.parquet:2516294..5032588], [<TPCH_TABLES_DIR>/lineitem.parquet:5032588..7548882], [<TPCH_TABLES_DIR>/lineitem.parquet:7548882..10065176], [<TPCH_TABLES_DIR>/lineitem.parquet:10065176..12581470], [<TPCH_TABLES_DIR>/lineitem.parquet:12581470..15097764], [<TPCH_TABLES_DIR>/lineitem.parquet:15097764..17614058], [<TPCH_TABLES_DIR>/lineitem.parquet:17614058..20130345]]}, projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], file_type=parquet, predicate=l_shipmode@3 = SHIP AND DynamicFilter [ empty ], pruning_predicate=l_shipmode_null_count@2 != row_count@3 AND l_shipmode_min@0 <= SHIP AND SHIP <= l_shipmode_max@1, required_guarantees=[l_shipmode in (SHIP)]\n"
+      "physical_plan": "SortPreservingMergeExec: [l_orderkey@0 ASC NULLS LAST, l_linenumber@1 ASC NULLS LAST], fetch=3\n  SortExec: TopK(fetch=3), expr=[l_orderkey@0 ASC NULLS LAST, l_linenumber@1 ASC NULLS LAST], preserve_partitioning=[true]\n    ProjectionExec: expr=[l_orderkey@0 as l_orderkey, l_linenumber@1 as l_linenumber, l_shipmode@3 as l_shipmode, l_quantity@2 as l_quantity]\n      FilterExec: l_shipmode@3 = SHIP\n        DataSourceExec: file_groups={8 groups: [[<TPCH_TABLES_DIR>/lineitem.parquet:0..2516294], [<TPCH_TABLES_DIR>/lineitem.parquet:2516294..5032588], [<TPCH_TABLES_DIR>/lineitem.parquet:5032588..7548882], [<TPCH_TABLES_DIR>/lineitem.parquet:7548882..10065176], [<TPCH_TABLES_DIR>/lineitem.parquet:10065176..12581470], [<TPCH_TABLES_DIR>/lineitem.parquet:12581470..15097764], [<TPCH_TABLES_DIR>/lineitem.parquet:15097764..17614058], [<TPCH_TABLES_DIR>/lineitem.parquet:17614058..20130345]]}, projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], file_type=parquet, predicate=l_shipmode@14 = SHIP AND DynamicFilter [ empty ], pruning_predicate=l_shipmode_null_count@2 != row_count@3 AND l_shipmode_min@0 <= SHIP AND SHIP <= l_shipmode_max@1, required_guarantees=[l_shipmode in (SHIP)]\n"
     },
     "spans": [
       {
@@ -73,7 +73,7 @@ expression: json_lines
     "span": {
       "datafusion.boundedness": "Bounded",
       "datafusion.emission_type": "Incremental",
-      "datafusion.node": "DataSourceExec: file_groups={8 groups: [[<TPCH_TABLES_DIR>/lineitem.parquet:0..2516294], [<TPCH_TABLES_DIR>/lineitem.parquet:2516294..5032588], [<TPCH_TABLES_DIR>/lineitem.parquet:5032588..7548882], [<TPCH_TABLES_DIR>/lineitem.parquet:7548882..10065176], [<TPCH_TABLES_DIR>/lineitem.parquet:10065176..12581470], ...]}, projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], file_type=parquet, predicate=l_shipmode@3 = SHIP AND DynamicFilter [ l_orderkey@0 < 35 OR l_orderkey@0 = 35 AND l_linenumber@1 < 4 ], pruning_predicate=l_shipmode_null_count@2 != row_count@3 AND l_shipmode_min@0 <= SHIP AND SHIP <= l_shipmode_max@1 AND (l_orderkey_null_count@5 != row_count@3 AND l_orderkey_min@4 < 35 OR l_orderkey_null_count@5 != row_count@3 AND l_orderkey_min@4 <= 35 AND 35 <= l_orderkey_max@6 AND l_linenumber_null_count@8 != row_count@3 AND l_linenumber_min@7 < 4), required_guarantees=[l_shipmode in (SHIP)]",
+      "datafusion.node": "DataSourceExec: file_groups={8 groups: [[<TPCH_TABLES_DIR>/lineitem.parquet:0..2516294], [<TPCH_TABLES_DIR>/lineitem.parquet:2516294..5032588], [<TPCH_TABLES_DIR>/lineitem.parquet:5032588..7548882], [<TPCH_TABLES_DIR>/lineitem.parquet:7548882..10065176], [<TPCH_TABLES_DIR>/lineitem.parquet:10065176..12581470], ...]}, projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], file_type=parquet, predicate=l_shipmode@14 = SHIP AND DynamicFilter [ l_orderkey@0 < 35 OR l_orderkey@0 = 35 AND l_linenumber@3 < 4 ], pruning_predicate=l_shipmode_null_count@2 != row_count@3 AND l_shipmode_min@0 <= SHIP AND SHIP <= l_shipmode_max@1 AND (l_orderkey_null_count@5 != row_count@3 AND l_orderkey_min@4 < 35 OR l_orderkey_null_count@5 != row_count@3 AND l_orderkey_min@4 <= 35 AND 35 <= l_orderkey_max@6 AND l_linenumber_null_count@8 != row_count@3 AND l_linenumber_min@7 < 4), required_guarantees=[l_shipmode in (SHIP)]",
       "datafusion.partitioning": "UnknownPartitioning(8)",
       "env": "production",
       "name": "InstrumentedExec",
@@ -105,33 +105,6 @@ expression: json_lines
       "env": "production",
       "name": "InstrumentedExec",
       "otel.name": "FilterExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "10_topk_lineitem"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "topk_lineitem"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.node": "CoalesceBatchesExec: target_batch_size=8192",
-      "datafusion.partitioning": "UnknownPartitioning(8)",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "CoalesceBatchesExec",
       "region": "us-west"
     },
     "spans": [
