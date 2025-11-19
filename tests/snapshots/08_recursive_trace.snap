@@ -51,7 +51,7 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "create_physical_plan",
-      "physical_plan": "RecursiveQueryExec: name=numbers, is_distinct=false\n  ProjectionExec: expr=[1 as n]\n    PlaceholderRowExec\n  CoalescePartitionsExec\n    ProjectionExec: expr=[n@0 + 1 as numbers.n + Int64(1)]\n      CoalesceBatchesExec: target_batch_size=8192\n        FilterExec: n@0 < 3\n          RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1\n            WorkTableExec: name=numbers\n"
+      "physical_plan": "RecursiveQueryExec: name=numbers, is_distinct=false\n  ProjectionExec: expr=[1 as n]\n    PlaceholderRowExec\n  CoalescePartitionsExec\n    ProjectionExec: expr=[n@0 + 1 as numbers.n + Int64(1)]\n      FilterExec: n@0 < 3\n        RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1\n          WorkTableExec: name=numbers\n"
     },
     "spans": [
       {
@@ -150,42 +150,6 @@ expression: json_lines
       "env": "production",
       "name": "InstrumentedExec",
       "otel.name": "FilterExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "08_recursive"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.node": "CoalesceBatchesExec: target_batch_size=8192",
-      "datafusion.partitioning": "RoundRobinBatch(8)",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "CoalesceBatchesExec",
       "region": "us-west"
     },
     "spans": [
@@ -397,42 +361,6 @@ expression: json_lines
     "span": {
       "datafusion.boundedness": "Bounded",
       "datafusion.emission_type": "Incremental",
-      "datafusion.node": "CoalesceBatchesExec: target_batch_size=8192",
-      "datafusion.partitioning": "RoundRobinBatch(8)",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "CoalesceBatchesExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "08_recursive"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
       "datafusion.node": "ProjectionExec: expr=[n@0 + 1 as numbers.n + Int64(1)]",
       "datafusion.partitioning": "RoundRobinBatch(8)",
       "env": "production",
@@ -582,42 +510,6 @@ expression: json_lines
       "env": "production",
       "name": "InstrumentedExec",
       "otel.name": "FilterExec",
-      "region": "us-west"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "08_recursive"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "datafusion.boundedness": "Bounded",
-        "datafusion.emission_type": "Incremental",
-        "datafusion.partitioning": "UnknownPartitioning(1)",
-        "env": "production",
-        "name": "InstrumentedExec",
-        "otel.name": "RecursiveQueryExec",
-        "region": "us-west"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.boundedness": "Bounded",
-      "datafusion.emission_type": "Incremental",
-      "datafusion.node": "CoalesceBatchesExec: target_batch_size=8192",
-      "datafusion.partitioning": "RoundRobinBatch(8)",
-      "env": "production",
-      "name": "InstrumentedExec",
-      "otel.name": "CoalesceBatchesExec",
       "region": "us-west"
     },
     "spans": [

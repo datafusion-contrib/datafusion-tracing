@@ -34,7 +34,7 @@ homepage = "https://github.com/datafusion-contrib/datafusion-tracing"
 
 [dependencies]
 async-trait = "0.1"
-bytes = "1.10"
+bytes = "1.11"
 futures = { workspace = true }
 object_store = { version = "0.12.4", default-features = false }
 tracing = { workspace = true }
