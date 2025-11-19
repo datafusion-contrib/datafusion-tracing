@@ -29,7 +29,7 @@ use datafusion::{
     config::ConfigOptions,
     error::Result,
     execution::{SendableRecordBatchStream, TaskContext},
-    physical_expr::{Distribution, OrderingRequirements},
+    physical_expr::{Distribution, OrderingRequirements, PhysicalSortExpr},
     physical_plan::{
         DisplayAs, DisplayFormatType, ExecutionPlan, ExecutionPlanProperties,
         PhysicalExpr, PlanProperties,
@@ -40,6 +40,7 @@ use datafusion::{
         },
         metrics::MetricsSet,
         projection::ProjectionExec,
+        sort_pushdown::SortOrderPushdownResult,
         stream::RecordBatchStreamAdapter,
     },
 };
@@ -320,6 +321,25 @@ impl ExecutionPlan for InstrumentedExec {
         Ok(FilterPushdownPropagation {
             filters,
             updated_node,
+        })
+    }
+
+    /// Delegate to the inner plan for sort pushdown and rewrap with an InstrumentedExec.
+    fn try_pushdown_sort(
+        &self,
+        order: &[PhysicalSortExpr],
+    ) -> Result<SortOrderPushdownResult<Arc<dyn ExecutionPlan>>> {
+        let result = self.inner.try_pushdown_sort(order)?;
+        Ok(match result {
+            SortOrderPushdownResult::Exact { inner } => SortOrderPushdownResult::Exact {
+                inner: self.with_new_inner(inner),
+            },
+            SortOrderPushdownResult::Inexact { inner } => {
+                SortOrderPushdownResult::Inexact {
+                    inner: self.with_new_inner(inner),
+                }
+            }
+            SortOrderPushdownResult::Unsupported => SortOrderPushdownResult::Unsupported,
         })
     }
 
