@@ -43,7 +43,7 @@ tracing-futures = { workspace = true }
 unicode-width = "0.2"
 
 [dev-dependencies]
-insta = { version = "1.43" }
+insta = { version = "1.44" }
 tokio = { workspace = true }
 
 [lints]
