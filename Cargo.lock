@@ -1189,12 +1189,14 @@ dependencies = [
 name = "datafusion-tracing"
 version = "52.0.0"
 dependencies = [
+ "async-trait",
  "comfy-table",
  "datafusion",
  "delegate",
  "futures",
  "insta",
  "pin-project",
+ "similar",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -1818,6 +1820,7 @@ checksum = "8bb03732005da905c88227371639bf1ad885cc712789c011c31c5fb3ab3ccf02"
 name = "integration-utils"
 version = "52.0.0"
 dependencies = [
+ "async-trait",
  "datafusion",
  "datafusion-tracing",
  "instrumented-object-store",

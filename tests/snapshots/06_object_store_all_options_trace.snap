@@ -50,6 +50,1258 @@ expression: json_lines
     "level": "INFO",
     "message": "close",
     "span": {
+      "name": "Rule",
+      "otel.name": "resolve_grouping_function"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "analyze_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "type_coercion"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "analyze_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Phase",
+      "otel.name": "analyze_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_unions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "simplify_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "replace_distinct_aggregate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_predicate_subquery"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "scalar_subquery_to_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_lateral_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "extract_equijoin_predicate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_duplicated_expr"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_cross_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_limit"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "propagate_empty_relation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "filter_null_join_keys"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_outer_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_limit"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "single_distinct_aggregation_to_group_by"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_group_by_constant"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "common_sub_expression_eliminate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_projections (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.effective_rules": "optimize_projections",
+      "datafusion.optimizer.max_passes": 3,
+      "datafusion.optimizer.pass": 1,
+      "name": "Phase",
+      "otel.name": "optimize_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_unions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "simplify_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "replace_distinct_aggregate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_predicate_subquery"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "scalar_subquery_to_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_lateral_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "extract_equijoin_predicate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_duplicated_expr"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_cross_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_limit"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "propagate_empty_relation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "filter_null_join_keys"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_outer_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_limit"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "single_distinct_aggregation_to_group_by"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_group_by_constant"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "common_sub_expression_eliminate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_projections"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.optimizer.max_passes": 3,
+      "datafusion.optimizer.pass": 2,
+      "name": "Phase",
+      "otel.name": "optimize_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
       "name": "head",
       "object_store.location": "<TPCH_TABLES_DIR>/nation.parquet",
       "object_store.result.meta": "ObjectMeta { location: Path { raw: \"<TPCH_TABLES_DIR>/nation.parquet\" }, last_modified: 1970-01-01T00:00:00Z, size: 2670, e_tag: Some\("ffffffff-fffffffffffff-fff"\), version: None }",
@@ -65,6 +1317,7 @@ expression: json_lines
         "query_name": "order_nations"
       },
       {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
         "name": "create_physical_plan"
       }
     ],
@@ -76,6 +1329,642 @@ expression: json_lines
     "level": "INFO",
     "message": "close",
     "span": {
+      "name": "Rule",
+      "otel.name": "OutputRequirements (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "aggregate_statistics"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "join_selection"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "LimitedDistinctAggregation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "FilterPushdown"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnforceDistribution"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "CombinePartialFinalAggregate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnforceSorting"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "OptimizeAggregateOrder"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "ProjectionPushdown"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "coalesce_batches"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "OutputRequirements (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "LimitAggregation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "LimitPushPastWindows"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "LimitPushdown"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "ProjectionPushdown"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "PushdownSort"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnsureCooperative"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "FilterPushdown(Post)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "SanityCheckPlan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "Instrument"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.effective_rules": "OutputRequirements, OutputRequirements",
+      "name": "Phase",
+      "otel.name": "optimize_physical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
       "name": "create_physical_plan",
       "physical_plan": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]\n  DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet\n"
     },
@@ -89,7 +1978,7 @@ expression: json_lines
         "query_name": "order_nations"
       }
     ],
-    "target": "integration_utils",
+    "target": "datafusion_tracing::planner",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },

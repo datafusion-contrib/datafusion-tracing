@@ -17,8 +17,8 @@
 //
 // This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
 
-use crate::instrumented::InstrumentedExec;
-use crate::instrumented::SpanCreateFn;
+use crate::instrumented_exec::InstrumentedExec;
+use crate::instrumented_exec::SpanCreateFn;
 use crate::options::InstrumentationOptions;
 use datafusion::common::runtime::{JoinSetTracer, set_join_set_tracer};
 use datafusion::common::tree_node::{Transformed, TransformedResult, TreeNode};

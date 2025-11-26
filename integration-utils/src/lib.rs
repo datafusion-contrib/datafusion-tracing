@@ -36,11 +36,17 @@
 //!
 //! ```rust
 //! use datafusion::prelude::*;
-//! use integration_utils::{init_session, run_traced_query};
+//! use integration_utils::{SessionBuilder, run_traced_query};
 //!
 //! # async fn example() -> datafusion::error::Result<()> {
-//! // Initialize a session with all tracing options enabled
-//! let ctx = init_session(true, true, 5, true).await?;
+//! // Initialize a session with tracing options via builder
+//! let ctx = SessionBuilder::new()
+//!     .record_object_store()
+//!     .record_metrics()
+//!     .preview_limit(5)
+//!     .compact_preview()
+//!     .build()
+//!     .await?;
 //!
 //! // Run a traced query - results and execution details will be logged
 //! run_traced_query(&ctx, "simple_query").await?;
@@ -56,13 +62,14 @@ use datafusion::arrow::util::pretty::pretty_format_batches;
 use datafusion::common::internal_datafusion_err;
 use datafusion::datasource::file_format::parquet::ParquetFormat;
 use datafusion::datasource::listing::ListingOptions;
-use datafusion::physical_plan::{ExecutionPlan, collect, displayable};
+use datafusion::physical_plan::collect;
 use datafusion::{
     error::Result, execution::SessionStateBuilder,
     physical_optimizer::PhysicalOptimizerRule, prelude::*,
 };
 use datafusion_tracing::{
-    InstrumentationOptions, instrument_with_info_spans, pretty_format_compact_batch,
+    InstrumentationOptions, RuleInstrumentationOptions, instrument_rules_with_info_spans,
+    instrument_with_info_spans, pretty_format_compact_batch,
 };
 use instrumented_object_store::instrument_object_store;
 use tracing::{field, info, instrument};
@@ -75,11 +82,13 @@ pub async fn run_traced_query(ctx: &SessionContext, query_name: &str) -> Result<
 
     let query = read_query(query_name)?;
 
-    // Parse the SQL query into a DataFusion dataframe.
+    // Parse SQL and create logical plan.
     let df = parse_sql(ctx, query.as_str()).await?;
 
     // Generate a physical execution plan from the logical plan.
-    let physical_plan = create_physical_plan(df).await?;
+    // All phases are instrumented by instrument_rules_with_info_spans!:
+    // analyzer, logical optimizer, physical plan creation, and physical optimizer.
+    let physical_plan = df.create_physical_plan().await?;
 
     // Execute the physical plan and collect results.
     let results = collect(physical_plan.clone(), ctx.task_ctx()).await?;
@@ -89,41 +98,104 @@ pub async fn run_traced_query(ctx: &SessionContext, query_name: &str) -> Result<
     Ok(())
 }
 
-#[instrument(level = "info")]
-pub async fn init_session(
+/// Builder for creating a test [`SessionContext`] with tracing instrumentation.
+#[derive(Debug, Default, Clone)]
+pub struct SessionBuilder {
     record_object_store: bool,
     record_metrics: bool,
     preview_limit: usize,
     compact_preview: bool,
-) -> Result<SessionContext> {
-    // Configure the session state with instrumentation for query execution.
-    let session_state = SessionStateBuilder::new()
-        .with_default_features()
-        .with_config(SessionConfig::default().with_target_partitions(8)) // Enforce target partitions to ensure consistent test results regardless of the number of CPU cores.
-        .with_physical_optimizer_rule(create_instrumentation_rule(
-            record_metrics,
-            preview_limit,
-            compact_preview,
-        ))
-        .build();
+    plan_diff: bool,
+}
 
-    let ctx = SessionContext::new_with_state(session_state);
+impl SessionBuilder {
+    /// Returns the configured preview limit.
+    pub fn get_preview_limit(&self) -> usize {
+        self.preview_limit
+    }
+}
 
-    // Instrument the local filesystem object store for tracing file access.
-    let local_store = Arc::new(object_store::local::LocalFileSystem::new());
-    let object_store = if record_object_store {
-        instrument_object_store(local_store, "local_fs")
-    } else {
-        local_store
-    };
+impl SessionBuilder {
+    /// Creates a new session builder with default settings.
+    pub fn new() -> Self {
+        Self::default()
+    }
 
-    // Register the instrumented object store for handling file:// URLs.
-    ctx.register_object_store(&Url::parse("file://").unwrap(), object_store);
+    /// Enables object store instrumentation for tracing file access.
+    pub fn record_object_store(mut self) -> Self {
+        self.record_object_store = true;
+        self
+    }
 
-    // Register the tpch tables.
-    register_tpch_tables(&ctx).await?;
+    /// Enables recording execution metrics in spans.
+    pub fn record_metrics(mut self) -> Self {
+        self.record_metrics = true;
+        self
+    }
 
-    Ok(ctx)
+    /// Sets the maximum number of rows to preview in span fields.
+    pub fn preview_limit(mut self, value: usize) -> Self {
+        self.preview_limit = value;
+        self
+    }
+
+    /// Enables compact preview formatting.
+    pub fn compact_preview(mut self) -> Self {
+        self.compact_preview = true;
+        self
+    }
+
+    /// Enables unified diffs of plan changes in rule spans.
+    pub fn plan_diff(mut self) -> Self {
+        self.plan_diff = true;
+        self
+    }
+
+    /// Builds and returns the configured [`SessionContext`].
+    #[instrument(level = "info", skip(self))]
+    pub async fn build(self) -> Result<SessionContext> {
+        // Configure the session state with instrumentation for query execution.
+        let session_state = SessionStateBuilder::new()
+            .with_default_features()
+            .with_config(SessionConfig::default().with_target_partitions(8)) // Enforce target partitions to ensure consistent test results regardless of the number of CPU cores.
+            .with_physical_optimizer_rule(create_instrumentation_rule(
+                self.record_metrics,
+                self.preview_limit,
+                self.compact_preview,
+            ))
+            .build();
+
+        // Instrument all rules (analyzer, logical optimizer, physical optimizer)
+        // Rules are grouped under phase spans (analyze_logical_plan, optimize_logical_plan, optimize_physical_plan)
+        // Physical plan creation tracing is automatically enabled when physical_optimizer is set
+        let rule_options = if self.plan_diff {
+            RuleInstrumentationOptions::full().with_plan_diff()
+        } else {
+            RuleInstrumentationOptions::full()
+        };
+        let session_state = instrument_rules_with_info_spans!(
+            options: rule_options,
+            state: session_state
+        );
+
+        let ctx = SessionContext::new_with_state(session_state);
+
+        // Instrument the local filesystem object store for tracing file access.
+        let local_store = Arc::new(object_store::local::LocalFileSystem::new());
+        let object_store = if self.record_object_store {
+            instrument_object_store(local_store, "local_fs")
+        } else {
+            local_store
+        };
+
+        // Register the instrumented object store for handling file:// URLs.
+        ctx.register_object_store(&Url::parse("file://").unwrap(), object_store);
+
+        // Register the tpch tables.
+        register_tpch_tables(&ctx).await?;
+
+        Ok(ctx)
+    }
 }
 
 /// Creates an instrumentation rule that captures metrics and provides previews of data during execution.
@@ -219,17 +291,4 @@ pub async fn parse_sql(ctx: &SessionContext, sql: &str) -> Result<DataFrame> {
     info!("Logical Plan:\n{}", logical_plan);
 
     Ok(df)
-}
-
-#[instrument(level = "info", skip(df), fields(physical_plan))]
-pub async fn create_physical_plan(df: DataFrame) -> Result<Arc<dyn ExecutionPlan>> {
-    // Create a physical plan from the DataFrame.
-    let physical_plan = df.create_physical_plan().await?;
-
-    // Record the physical plan as part of the current span.
-    let physical_plan_str = displayable(physical_plan.as_ref()).indent(true).to_string();
-    tracing::Span::current().record("physical_plan", physical_plan_str.as_str());
-    info!("Physical Plan:\n{}", physical_plan_str);
-
-    Ok(physical_plan)
 }
