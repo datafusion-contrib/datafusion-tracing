@@ -37,6 +37,7 @@ authors = ["DataDog <info@datadoghq.com>"]
 rust-version = "1.86.0"
 
 [workspace.dependencies]
+async-trait = "0.1"
 datafusion = { git = "https://github.com/apache/datafusion", branch = "branch-52", default-features = false }
 datafusion-tracing = { path = "datafusion-tracing", version = "52.0.0" }
 futures = "0.3"

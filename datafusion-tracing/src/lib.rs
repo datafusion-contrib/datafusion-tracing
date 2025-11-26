@@ -63,7 +63,8 @@
 //!     prelude::*,
 //! };
 //! use datafusion_tracing::{
-//!     instrument_with_info_spans, pretty_format_compact_batch, InstrumentationOptions,
+//!     instrument_rules_with_info_spans, instrument_with_info_spans,
+//!     pretty_format_compact_batch, InstrumentationOptions, RuleInstrumentationOptions,
 //! };
 //! use std::sync::Arc;
 //! use tracing::field;
@@ -73,8 +74,8 @@
 //!     // Initialize tracing subscriber as usual
 //!     // (See examples/otlp.rs for a complete example).
 //!
-//!     // Set up tracing options (you can customize these).
-//!     let options = InstrumentationOptions::builder()
+//!     // Set up execution plan tracing options (you can customize these).
+//!     let exec_options = InstrumentationOptions::builder()
 //!         .record_metrics(true)
 //!         .preview_limit(5)
 //!         .preview_fn(Arc::new(|batch: &RecordBatch| {
@@ -85,7 +86,7 @@
 //!         .build();
 //!
 //!     let instrument_rule = instrument_with_info_spans!(
-//!         options: options,
+//!         options: exec_options,
 //!         env = field::Empty,
 //!         region = field::Empty,
 //!     );
@@ -95,8 +96,19 @@
 //!         .with_physical_optimizer_rule(instrument_rule)
 //!         .build();
 //!
+//!     // Instrument all rules (analyzer, logical optimizer, physical optimizer)
+//!     // Physical plan creation tracing is automatically enabled when physical_optimizer is set
+//!     let rule_options = RuleInstrumentationOptions::full().with_plan_diff();
+//!     let session_state = instrument_rules_with_info_spans!(
+//!         options: rule_options,
+//!         state: session_state
+//!     );
+//!
 //!     let ctx = SessionContext::new_with_state(session_state);
 //!
+//!     // Execute a query - the entire lifecycle is now traced:
+//!     // SQL Parsing -> Logical Plan -> Analyzer Rules -> Optimizer Rules ->
+//!     // Physical Plan Creation -> Physical Optimizer Rules -> Execution
 //!     let results = ctx.sql("SELECT 1").await?.collect().await?;
 //!     println!(
 //!         "Query Results:\n{}",
@@ -110,21 +122,33 @@
 //! A more complete example can be found in the [examples directory](https://github.com/datafusion-contrib/datafusion-tracing/tree/main/examples).
 //!
 
-mod instrument_rule;
-mod instrumented;
-mod instrumented_macros;
+// Execution plan instrumentation (wraps ExecutionPlan nodes with tracing)
+mod exec_instrument_macros;
+mod exec_instrument_rule;
+mod instrumented_exec;
+
+// Rule instrumentation (wraps analyzer/optimizer/physical optimizer rules with tracing)
+mod rule_instrumentation;
+mod rule_instrumentation_macros;
+
+// Shared utilities
 mod metrics;
 mod node;
 mod options;
+mod planner;
 mod preview;
 mod preview_utils;
+mod rule_options;
 mod utils;
 
 // Hide implementation details from documentation.
-// This function is only public because it needs to be accessed by the macros,
-// but it's not intended for direct use by consumers of this crate.
+// These functions are only public because they need to be accessed by the macros,
+// but they're not intended for direct use by consumers of this crate.
 #[doc(hidden)]
-pub use instrument_rule::new_instrument_rule;
+pub use exec_instrument_rule::new_instrument_rule;
+#[doc(hidden)]
+pub use rule_instrumentation::instrument_session_state;
 
 pub use options::InstrumentationOptions;
 pub use preview_utils::pretty_format_compact_batch;
+pub use rule_options::RuleInstrumentationOptions;

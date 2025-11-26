@@ -33,11 +33,13 @@ documentation = "https://docs.rs/datafusion-tracing"
 homepage = "https://github.com/datafusion-contrib/datafusion-tracing"
 
 [dependencies]
+async-trait = { workspace = true }
 comfy-table = { version = "7.2" }
 datafusion = { workspace = true }
 delegate = "0.13"
 futures = { workspace = true }
 pin-project = "1.1"
+similar = { version = "2.7", default-features = false, features = ["text"] }
 tracing = { workspace = true }
 tracing-futures = { workspace = true }
 unicode-width = "0.2"

@@ -43,6 +43,24 @@ pub struct InstrumentationOptions {
     pub custom_fields: HashMap<String, String>,
 }
 
+impl std::fmt::Debug for InstrumentationOptions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("InstrumentationOptions")
+            .field("record_metrics", &self.record_metrics)
+            .field("preview_limit", &self.preview_limit)
+            .field(
+                "preview_fn",
+                &if self.preview_fn.is_some() {
+                    "Some(PreviewFn)"
+                } else {
+                    "None"
+                },
+            )
+            .field("custom_fields", &self.custom_fields)
+            .finish()
+    }
+}
+
 impl InstrumentationOptions {
     /// Creates a new builder for `InstrumentationOptions`.
     pub fn builder() -> InstrumentationOptionsBuilder {
