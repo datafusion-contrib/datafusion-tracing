@@ -50,6 +50,2486 @@ expression: json_lines
     "level": "INFO",
     "message": "close",
     "span": {
+      "name": "Rule",
+      "otel.name": "resolve_grouping_function"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "analyze_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "type_coercion (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "analyze_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.effective_rules": "type_coercion",
+      "name": "Phase",
+      "otel.name": "analyze_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_unions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "simplify_expressions (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "replace_distinct_aggregate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_predicate_subquery"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "scalar_subquery_to_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_lateral_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "extract_equijoin_predicate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_duplicated_expr"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_cross_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_limit"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "propagate_empty_relation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "filter_null_join_keys"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_outer_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_limit (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_filter (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "single_distinct_aggregation_to_group_by"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_group_by_constant"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "common_sub_expression_eliminate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_projections (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.effective_rules": "simplify_expressions, push_down_limit, push_down_filter, optimize_projections",
+      "datafusion.optimizer.max_passes": 3,
+      "datafusion.optimizer.pass": 1,
+      "name": "Phase",
+      "otel.name": "optimize_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_unions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "simplify_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "replace_distinct_aggregate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_predicate_subquery"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "scalar_subquery_to_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_lateral_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "extract_equijoin_predicate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_duplicated_expr"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_cross_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_limit"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "propagate_empty_relation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "filter_null_join_keys"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_outer_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_limit (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "single_distinct_aggregation_to_group_by"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_group_by_constant"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "common_sub_expression_eliminate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_projections"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.effective_rules": "push_down_limit",
+      "datafusion.optimizer.max_passes": 3,
+      "datafusion.optimizer.pass": 2,
+      "name": "Phase",
+      "otel.name": "optimize_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_unions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "simplify_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "replace_distinct_aggregate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_predicate_subquery"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "scalar_subquery_to_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "decorrelate_lateral_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "extract_equijoin_predicate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_duplicated_expr"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_cross_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_limit"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "propagate_empty_relation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "filter_null_join_keys"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_outer_join"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_limit"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "single_distinct_aggregation_to_group_by"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "eliminate_group_by_constant"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "common_sub_expression_eliminate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "optimize_projections"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.optimizer.max_passes": 3,
+      "datafusion.optimizer.pass": 3,
+      "name": "Phase",
+      "otel.name": "optimize_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "OutputRequirements (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "aggregate_statistics"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "join_selection"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "LimitedDistinctAggregation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "FilterPushdown (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnforceDistribution (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "CombinePartialFinalAggregate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnforceSorting (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "OptimizeAggregateOrder"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "ProjectionPushdown"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "coalesce_batches"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "OutputRequirements (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "LimitAggregation"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "LimitPushPastWindows"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "LimitPushdown"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "ProjectionPushdown"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "PushdownSort"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnsureCooperative"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "FilterPushdown(Post) (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "SanityCheckPlan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "Instrument"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.effective_rules": "OutputRequirements, FilterPushdown, EnforceDistribution, EnforceSorting, OutputRequirements, FilterPushdown(Post)",
+      "name": "Phase",
+      "otel.name": "optimize_physical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
+        "name": "create_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
       "name": "create_physical_plan",
       "physical_plan": "SortPreservingMergeExec: [l_orderkey@0 ASC NULLS LAST, l_linenumber@1 ASC NULLS LAST], fetch=3\n  SortExec: TopK(fetch=3), expr=[l_orderkey@0 ASC NULLS LAST, l_linenumber@1 ASC NULLS LAST], preserve_partitioning=[true]\n    ProjectionExec: expr=[l_orderkey@0 as l_orderkey, l_linenumber@1 as l_linenumber, l_shipmode@3 as l_shipmode, l_quantity@2 as l_quantity]\n      FilterExec: l_shipmode@3 = SHIP\n        DataSourceExec: file_groups={8 groups: [[<TPCH_TABLES_DIR>/lineitem.parquet:0..2516294], [<TPCH_TABLES_DIR>/lineitem.parquet:2516294..5032588], [<TPCH_TABLES_DIR>/lineitem.parquet:5032588..7548882], [<TPCH_TABLES_DIR>/lineitem.parquet:7548882..10065176], [<TPCH_TABLES_DIR>/lineitem.parquet:10065176..12581470], [<TPCH_TABLES_DIR>/lineitem.parquet:12581470..15097764], [<TPCH_TABLES_DIR>/lineitem.parquet:15097764..17614058], [<TPCH_TABLES_DIR>/lineitem.parquet:17614058..20130345]]}, projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], file_type=parquet, predicate=l_shipmode@14 = SHIP AND DynamicFilter [ empty ], pruning_predicate=l_shipmode_null_count@2 != row_count@3 AND l_shipmode_min@0 <= SHIP AND SHIP <= l_shipmode_max@1, required_guarantees=[l_shipmode in (SHIP)]\n"
     },
@@ -63,7 +2543,7 @@ expression: json_lines
         "query_name": "topk_lineitem"
       }
     ],
-    "target": "integration_utils",
+    "target": "datafusion_tracing::planner",
     "time.busy": "0.00ms",
     "time.idle": "0.00ms"
   },

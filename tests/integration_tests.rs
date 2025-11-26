@@ -23,7 +23,7 @@ use std::sync::{Arc, Mutex, Once, OnceLock};
 
 use datafusion::error::Result;
 use insta::{assert_json_snapshot, assert_snapshot};
-use integration_utils::{init_session, run_traced_query};
+use integration_utils::{SessionBuilder, run_traced_query};
 use serde_json::Value;
 use tracing::{Instrument, Level};
 use tracing_subscriber::fmt::format::FmtSpan;
@@ -44,14 +44,8 @@ static SUBSCRIBER_INIT: Once = Once::new();
 struct QueryTestCase<'a> {
     /// The SQL query to run.
     sql_query: &'a str,
-    /// Whether to instrument the object store for this test.
-    record_object_store: bool,
-    /// Whether to collect (record) metrics for this test.
-    should_record_metrics: bool,
-    /// Maximum number of rows to preview in logs.
-    row_limit: usize,
-    /// Use compact formatting for the row preview.
-    use_compact_preview: bool,
+    /// Session configuration (metrics, preview, object store, etc.)
+    session: SessionBuilder,
     /// Indices of spans for which preview assertions should be skipped.
     ignored_preview_spans: &'a [usize],
     /// Whether to ignore the full trace in assertions.
@@ -66,25 +60,29 @@ impl<'a> QueryTestCase<'a> {
         }
     }
 
+    // --- Passthrough methods delegating to SessionBuilder ---
+
     fn with_object_store_collection(mut self) -> Self {
-        self.record_object_store = true;
+        self.session = self.session.record_object_store();
         self
     }
 
     fn with_metrics_collection(mut self) -> Self {
-        self.should_record_metrics = true;
+        self.session = self.session.record_metrics();
         self
     }
 
     fn with_row_limit(mut self, limit: usize) -> Self {
-        self.row_limit = limit;
+        self.session = self.session.preview_limit(limit);
         self
     }
 
     fn with_compact_preview(mut self) -> Self {
-        self.use_compact_preview = true;
+        self.session = self.session.compact_preview();
         self
     }
+
+    // --- Test-specific methods ---
 
     fn ignore_preview_spans(mut self, spans: &'a [usize]) -> Self {
         self.ignored_preview_spans = spans;
@@ -203,13 +201,8 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     let log_buffer = init_tracing();
 
     // Initialize the DataFusion session with the requested options.
-    let ctx = init_session(
-        test_case.record_object_store,
-        test_case.should_record_metrics,
-        test_case.row_limit,
-        test_case.use_compact_preview,
-    )
-    .await?;
+    // plan_diff disabled for tests to avoid non-deterministic output
+    let ctx = test_case.session.clone().build().await?;
 
     // Run the SQL query with tracing enabled.
     run_traced_query(&ctx, test_case.sql_query)
@@ -231,7 +224,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     let _insta_guard = insta_settings::settings().bind_to_scope();
 
     // If we have a preview row_limit, do dedicated assertions on the previews.
-    if test_case.row_limit > 0 {
+    if test_case.session.get_preview_limit() > 0 {
         let mut preview_id = 0;
         for json_line in &json_lines {
             if let Some(span_name) = extract_json_field_value(json_line, "otel.name") {

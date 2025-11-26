@@ -73,7 +73,8 @@ use datafusion::{
     prelude::*,
 };
 use datafusion_tracing::{
-    instrument_with_info_spans, pretty_format_compact_batch, InstrumentationOptions,
+    instrument_rules_with_info_spans, instrument_with_info_spans,
+    pretty_format_compact_batch, InstrumentationOptions, RuleInstrumentationOptions,
 };
 use std::sync::Arc;
 use tracing::field;
@@ -83,8 +84,8 @@ async fn main() -> Result<()> {
     // Initialize tracing subscriber as usual
     // (See examples/otlp.rs for a complete example).
 
-    // Set up tracing options (you can customize these).
-    let options = InstrumentationOptions::builder()
+    // Set up execution plan tracing options (you can customize these).
+    let exec_options = InstrumentationOptions::builder()
         .record_metrics(true)
         .preview_limit(5)
         .preview_fn(Arc::new(|batch: &RecordBatch| {
@@ -95,7 +96,7 @@ async fn main() -> Result<()> {
         .build();
 
     let instrument_rule = instrument_with_info_spans!(
-        options: options,
+        options: exec_options,
         env = field::Empty,
         region = field::Empty,
     );
@@ -105,8 +106,19 @@ async fn main() -> Result<()> {
         .with_physical_optimizer_rule(instrument_rule)
         .build();
 
+    // Instrument all rules (analyzer, logical optimizer, physical optimizer)
+    // Physical plan creation tracing is automatically enabled when physical_optimizer is set
+    let rule_options = RuleInstrumentationOptions::full().with_plan_diff();
+    let session_state = instrument_rules_with_info_spans!(
+        options: rule_options,
+        state: session_state
+    );
+
     let ctx = SessionContext::new_with_state(session_state);
 
+    // Execute a query - the entire lifecycle is now traced:
+    // SQL Parsing -> Logical Plan -> Analyzer Rules -> Optimizer Rules ->
+    // Physical Plan Creation -> Physical Optimizer Rules -> Execution
     let results = ctx.sql("SELECT 1").await?.collect().await?;
     println!(
         "Query Results:\n{}",
