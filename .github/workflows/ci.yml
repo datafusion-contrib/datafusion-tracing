@@ -41,7 +41,7 @@ jobs:
 
     - uses: dtolnay/rust-toolchain@stable
 
-    - uses: Swatinem/rust-cache@v2.8.1
+    - uses: Swatinem/rust-cache@v2.8.2
       with:
         cache-all-crates: true # caches Taplo, HawkEye, and cargo-rdme builds too
         env-vars: "CARGO CC CFLAGS CXX CMAKE RUST HAWKEYE TAPLO RDME"
@@ -67,7 +67,7 @@ jobs:
 
     - uses: dtolnay/rust-toolchain@stable
 
-    - uses: Swatinem/rust-cache@v2.8.1
+    - uses: Swatinem/rust-cache@v2.8.2
       with:
         cache-all-crates: true # caches Tpchgen-cli builds too
         env-vars: "CARGO CC CFLAGS CXX CMAKE RUST TPCHGEN"
