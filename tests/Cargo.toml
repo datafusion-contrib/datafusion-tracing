@@ -43,7 +43,7 @@ path = "integration_tests.rs"
 
 [dependencies]
 datafusion = { workspace = true, features = ["parquet", "nested_expressions"] }
-insta = { version = "1.43", features = ["filters", "json"] }
+insta = { version = "1.45", features = ["filters", "json"] }
 integration-utils = { path = "../integration-utils" }
 serde_json = "1.0"
 tokio = { workspace = true, features = ["rt-multi-thread"] }
