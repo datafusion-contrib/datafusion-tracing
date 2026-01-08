@@ -18,7 +18,40 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
 
 use datafusion::physical_plan::{DisplayFormatType, ExecutionPlan};
+use std::cell::Cell;
 use std::fmt;
+
+thread_local! {
+    /// Flag to indicate that we are performing an internal check to identify
+    /// instrumentation nodes. This allows `InstrumentedExec` to reveal its
+    /// type during optimization passes while remaining transparent
+    /// to users.
+    static IS_INTERNAL_OPTIMIZER_CHECK: Cell<bool> = const { Cell::new(false) };
+}
+
+pub(crate) fn is_internal_optimizer_check() -> bool {
+    IS_INTERNAL_OPTIMIZER_CHECK.with(|c| c.get())
+}
+
+/// RAII guard to safely set and reset the internal optimizer check flag.
+pub(crate) struct InternalOptimizerGuard(bool);
+
+impl InternalOptimizerGuard {
+    pub fn new() -> Self {
+        let prev = IS_INTERNAL_OPTIMIZER_CHECK.with(|c| {
+            let prev = c.get();
+            c.set(true);
+            prev
+        });
+        Self(prev)
+    }
+}
+
+impl Drop for InternalOptimizerGuard {
+    fn drop(&mut self) {
+        IS_INTERNAL_OPTIMIZER_CHECK.with(|c| c.set(self.0));
+    }
+}
 
 /// Helper struct for default display formatting of an `ExecutionPlan`.
 pub(crate) struct DefaultDisplay<'a>(pub &'a dyn ExecutionPlan);

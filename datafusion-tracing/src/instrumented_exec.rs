@@ -22,6 +22,7 @@ use crate::{
     node::{NodeRecorder, NodeRecordingStream},
     options::InstrumentationOptions,
     preview::{PreviewFn, PreviewRecorder, PreviewRecordingStream},
+    utils::is_internal_optimizer_check,
 };
 use datafusion::{
     arrow::datatypes::SchemaRef,
@@ -221,16 +222,23 @@ impl InstrumentedExec {
 
         span
     }
+
+    /// Returns true if the plan is an `InstrumentedExec` wrapper.
+    ///
+    /// This relies on the internal optimization context being active in the current thread.
+    pub(crate) fn is_instrumented(plan: &dyn ExecutionPlan) -> bool {
+        plan.as_any().is::<InstrumentedExec>()
+    }
 }
 
-#[warn(clippy::missing_trait_methods)]
 impl ExecutionPlan for InstrumentedExec {
-    // Delegate all ExecutionPlan methods to the inner plan, except for `as_any` and `execute`.
+    // Most ExecutionPlan methods are delegated to the inner plan. Methods that must return a
+    // wrapped plan or provide custom behavior are implemented manually below.
     delegate! {
         to self.inner {
-            fn name(&self) -> &str;
             fn schema(&self) -> SchemaRef;
             fn properties(&self) -> &PlanProperties;
+            fn name(&self) -> &str;
             fn check_invariants(&self, check: InvariantLevel) -> Result<()>;
             fn required_input_distribution(&self) -> Vec<Distribution>;
             fn required_input_ordering(&self) -> Vec<Option<OrderingRequirements>>;
@@ -367,9 +375,19 @@ impl ExecutionPlan for InstrumentedExec {
         Some(self.with_new_inner(new_inner))
     }
 
-    /// Delegate to the inner plan for downcasting.
+    /// Returns the plan as any to allow for downcasting.
+    ///
+    /// During optimization passes, this returns `self` (the `InstrumentedExec`) to
+    /// allow the optimizer to identify already-instrumented nodes.
+    ///
+    /// Otherwise, this delegates to the inner plan to provide "transparent downcasting",
+    /// allowing users to downcast an instrumented node to its original type.
     fn as_any(&self) -> &dyn Any {
-        self.inner.as_any()
+        if is_internal_optimizer_check() {
+            self
+        } else {
+            self.inner.as_any()
+        }
     }
 
     /// Executes the plan for a given partition and context, instrumented with tracing and metrics recording.
