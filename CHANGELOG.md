@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Version numbers follow Apache DataFusion releases for compatibility alignment.
 
+## [52.0.0] - 2026-01-13
+
+### Added
+
+- Add tracing instrumentation for plan creation lifecycle via `TracingQueryPlanner`
+  and rule instrumentation macros (`instrument_rules_with_info_spans!`). Phase spans
+  now group individual rule executions for analyzer, logical optimizer, and physical
+  optimizer, with automatic plan diff capture when rules modify plans
+- Add transparent downcasting through `InstrumentedExec` by delegating `as_any()`
+  to the inner plan. This allows code to inspect underlying execution node types
+  without directly handling the instrumentation wrapper
+
+### Changed
+
+- Update to Apache DataFusion 52.0.0
+- Update OpenTelemetry dependencies to 0.31 and tracing-opentelemetry to 0.32
+- Update Jaeger documentation to reference version 2.14.0
+
 ## [51.0.0] - 2025-11-18
 
 ### Changed
@@ -104,6 +122,7 @@ Initial public release of DataFusion Tracing.
 - Preview formatting utilities (`pretty_format_compact_batch`)
 - Integration with Jaeger, DataDog, and other OpenTelemetry-compatible collectors
 
+[52.0.0]: https://github.com/datafusion-contrib/datafusion-tracing/compare/51.0.0...52.0.0
 [51.0.0]: https://github.com/datafusion-contrib/datafusion-tracing/compare/50.0.2...51.0.0
 [50.0.2]: https://github.com/datafusion-contrib/datafusion-tracing/compare/50.0.1...50.0.2
 [50.0.1]: https://github.com/datafusion-contrib/datafusion-tracing/compare/50.0.0...50.0.1
