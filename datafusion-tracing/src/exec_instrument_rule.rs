@@ -17,9 +17,9 @@
 //
 // This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
 
-use crate::instrumented_exec::InstrumentedExec;
-use crate::instrumented_exec::SpanCreateFn;
+use crate::instrumented_exec::{InstrumentedExec, SpanCreateFn};
 use crate::options::InstrumentationOptions;
+use crate::utils::InternalOptimizerGuard;
 use datafusion::common::runtime::{JoinSetTracer, set_join_set_tracer};
 use datafusion::common::tree_node::{Transformed, TransformedResult, TreeNode};
 use datafusion::{
@@ -29,7 +29,7 @@ use datafusion::{
 use futures::FutureExt;
 use futures::future::BoxFuture;
 use std::any::Any;
-use std::fmt::Debug;
+use std::fmt::{self, Debug};
 use std::sync::Arc;
 use std::sync::Once;
 use tracing::Span;
@@ -57,7 +57,7 @@ struct InstrumentRule {
 }
 
 impl Debug for InstrumentRule {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct(self.name()).finish()
     }
 }
@@ -68,19 +68,27 @@ impl PhysicalOptimizerRule for InstrumentRule {
         plan: Arc<dyn ExecutionPlan>,
         _config: &ConfigOptions,
     ) -> datafusion::error::Result<Arc<dyn ExecutionPlan>> {
-        // Iterate over the plan and wrap each node with InstrumentedExec
-        plan.transform(|plan| {
-            if plan.as_any().downcast_ref::<InstrumentedExec>().is_none() {
-                // Node is not InstrumentedExec; wrap it
-                Ok(Transformed::yes(Arc::new(InstrumentedExec::new(
-                    plan,
-                    self.span_create_fn.clone(),
-                    &self.options,
-                ))))
-            } else {
-                // Node is already InstrumentedExec; do not wrap again
-                Ok(Transformed::no(plan))
+        // Activate the internal optimization context for the duration of this pass.
+        // This allows InstrumentedExec to reveal its type via as_any().
+        //
+        // This guard is safe because PhysicalOptimizerRule::optimize is synchronous
+        // and won't be suspended or moved across threads during execution.
+        let _guard = InternalOptimizerGuard::new();
+
+        // Iterate over the plan using transform_down to ensure all nodes are instrumented,
+        // including any new nodes added by other optimizer rules.
+        plan.transform_down(|plan| {
+            if InstrumentedExec::is_instrumented(plan.as_ref()) {
+                // If the node is already instrumented, we don't want to wrap it again.
+                // We continue to its children to ensure they are also instrumented.
+                return Ok(Transformed::no(plan));
             }
+
+            Ok(Transformed::yes(Arc::new(InstrumentedExec::new(
+                plan,
+                self.span_create_fn.clone(),
+                &self.options,
+            ))))
         })
         .data()
     }
@@ -120,3 +128,40 @@ type BoxedFuture = BoxFuture<'static, BoxedAny>;
 type BoxedClosure = Box<dyn FnOnce() -> BoxedAny + Send>;
 
 static INIT: Once = Once::new();
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::options::InstrumentationOptions;
+    use datafusion::arrow::datatypes::{DataType, Field, Schema};
+    use datafusion::physical_plan::placeholder_row::PlaceholderRowExec;
+    use std::sync::Arc;
+    use tracing::Span;
+
+    #[test]
+    fn test_skip_already_instrumented() -> datafusion::error::Result<()> {
+        let schema = Arc::new(Schema::new(vec![Field::new("a", DataType::Int64, false)]));
+        let plan = Arc::new(PlaceholderRowExec::new(schema));
+
+        let span_create_fn: Arc<SpanCreateFn> = Arc::new(Span::none);
+        let options = InstrumentationOptions::default();
+        let rule = new_instrument_rule(span_create_fn, options);
+
+        // First optimization pass
+        let optimized_once = rule.optimize(plan, &ConfigOptions::default())?;
+
+        // Second optimization pass
+        let optimized_twice =
+            rule.optimize(optimized_once.clone(), &ConfigOptions::default())?;
+
+        // Verify it is still instrumented but NOT wrapped twice.
+        // We check this by ensuring optimized_twice is exactly the same Arc as optimized_once
+        // because transform_down returns Transformed::no(plan) when it skips.
+        assert!(
+            Arc::ptr_eq(&optimized_once, &optimized_twice),
+            "Plan should not be wrapped twice; it should be the same Arc as the first pass"
+        );
+
+        Ok(())
+    }
+}
