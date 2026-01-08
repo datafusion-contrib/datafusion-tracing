@@ -148,7 +148,7 @@ docker run --rm --name jaeger \
   -p 4318:4318 \
   -p 5778:5778 \
   -p 9411:9411 \
-  jaegertracing/jaeger:2.7.0
+  cr.jaegertracing.io/jaegertracing/jaeger:2.14.0
 ```
 
 Once running, you can access the Jaeger UI at http://localhost:16686. For more details, check out their [getting started guide](https://www.jaegertracing.io/docs/latest/getting-started/).
