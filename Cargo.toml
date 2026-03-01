@@ -38,7 +38,7 @@ rust-version = "1.86.0"
 
 [workspace.dependencies]
 async-trait = "0.1"
-datafusion = { version = "52.0.0", default-features = false }
+datafusion = { version = "52.1.0", default-features = false }
 datafusion-tracing = { path = "datafusion-tracing", version = "52.0.0" }
 futures = "0.3"
 instrumented-object-store = { path = "instrumented-object-store", version = "52.0.0" }
