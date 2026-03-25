@@ -693,18 +693,18 @@ impl OptimizerRule for InstrumentedOptimizerRule {
                     // We trust transformed=false (rule says it didn't modify) as an optimization
                     // to skip string comparison. However, we verify when transformed=true because
                     // rules may report false positives (claim modified when actually unchanged).
-                    if transformed.transformed {
-                        if let Some(before) = plan_before {
-                            let before_str = before.format_for_diff();
-                            let after_str = transformed.data.format_for_diff();
-                            detect_and_record_modification(
-                                &before_str,
-                                &after_str,
-                                &span,
-                                self.options.plan_diff,
-                                self.name(),
-                            );
-                        }
+                    if transformed.transformed
+                        && let Some(before) = plan_before
+                    {
+                        let before_str = before.format_for_diff();
+                        let after_str = transformed.data.format_for_diff();
+                        detect_and_record_modification(
+                            &before_str,
+                            &after_str,
+                            &span,
+                            self.options.plan_diff,
+                            self.name(),
+                        );
                     }
                 }
                 Err(e) => {

@@ -122,6 +122,33 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "rewrite_set_comparison"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "optimize_unions"
     },
     "spans": [
@@ -636,6 +663,60 @@ expression: json_lines
     "span": {
       "name": "Rule",
       "otel.name": "common_sub_expression_eliminate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "extract_leaf_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_leaf_projections"
     },
     "spans": [
       {
@@ -713,6 +794,33 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "rewrite_set_comparison"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "optimize_unions"
     },
     "spans": [
@@ -1227,6 +1335,60 @@ expression: json_lines
     "span": {
       "name": "Rule",
       "otel.name": "common_sub_expression_eliminate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "extract_leaf_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_leaf_projections"
     },
     "spans": [
       {
@@ -1565,35 +1727,6 @@ expression: json_lines
     "span": {
       "name": "Rule",
       "otel.name": "ProjectionPushdown (modified)"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "08_recursive"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "coalesce_batches"
     },
     "spans": [
       {

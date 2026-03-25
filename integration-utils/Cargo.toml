@@ -35,6 +35,6 @@ async-trait = { workspace = true }
 datafusion = { workspace = true, features = ["nested_expressions", "parquet", "sql"] }
 datafusion-tracing = { workspace = true }
 instrumented-object-store = { workspace = true }
-object_store = { version = "0.12.1", default-features = false }
+object_store = { version = "0.13.2", default-features = false, features = ["fs"] }
 tracing = { workspace = true }
 url = { version = "2.5" }

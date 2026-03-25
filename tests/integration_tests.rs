@@ -227,19 +227,18 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     if test_case.session.get_preview_limit() > 0 {
         let mut preview_id = 0;
         for json_line in &json_lines {
-            if let Some(span_name) = extract_json_field_value(json_line, "otel.name") {
-                if let Some(preview) =
+            if let Some(span_name) = extract_json_field_value(json_line, "otel.name")
+                && let Some(preview) =
                     extract_json_field_value(json_line, "datafusion.preview")
-                {
-                    // Only assert if we have not been asked to ignore this preview span.
-                    if !test_case.ignored_preview_spans.contains(&preview_id) {
-                        assert_snapshot!(
-                            format!("{test_name}_{:02}_{span_name}", preview_id),
-                            preview
-                        );
-                    }
-                    preview_id += 1;
+            {
+                // Only assert if we have not been asked to ignore this preview span.
+                if !test_case.ignored_preview_spans.contains(&preview_id) {
+                    assert_snapshot!(
+                        format!("{test_name}_{:02}_{span_name}", preview_id),
+                        preview
+                    );
                 }
+                preview_id += 1;
             }
         }
     }
