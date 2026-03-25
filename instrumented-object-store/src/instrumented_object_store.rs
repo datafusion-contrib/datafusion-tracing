@@ -22,9 +22,9 @@ use bytes::Bytes;
 use futures::StreamExt;
 use futures::stream::BoxStream;
 use object_store::{
-    GetOptions, GetResult, ListResult, MultipartUpload, ObjectMeta, ObjectStore,
-    PutMultipartOptions, PutOptions, PutPayload, PutResult, Result, UploadPart,
-    path::Path,
+    CopyOptions, GetOptions, GetResult, ListResult, MultipartUpload, ObjectMeta,
+    ObjectStore, PutMultipartOptions, PutOptions, PutPayload, PutResult, RenameOptions,
+    Result, UploadPart, path::Path,
 };
 use std::fmt::{Display, Formatter};
 use std::ops::Range;
@@ -137,22 +137,6 @@ impl Display for InstrumentedObjectStore {
 #[async_trait]
 #[warn(clippy::missing_trait_methods)]
 impl ObjectStore for InstrumentedObjectStore {
-    /// Save the provided bytes to the specified location with tracing.
-    #[instrument(
-        skip_all,
-        fields(
-            otel.name = format!("{}.put", self.name),
-            object_store.location = %location,
-            object_store.content_length = %payload.content_length(),
-            object_store.result.err = tracing::field::Empty,
-            object_store.result.e_tag = tracing::field::Empty,
-            object_store.result.version = tracing::field::Empty,
-        )
-    )]
-    async fn put(&self, location: &Path, payload: PutPayload) -> Result<PutResult> {
-        instrument_result(self.inner.put(location, payload).await)
-    }
-
     /// Save the provided payload to location with the given options and tracing.
     #[instrument(
         skip_all,
@@ -172,21 +156,6 @@ impl ObjectStore for InstrumentedObjectStore {
         opts: PutOptions,
     ) -> Result<PutResult> {
         instrument_result(self.inner.put_opts(location, payload, opts).await)
-    }
-
-    /// Perform a multipart upload with tracing.
-    #[instrument(
-        skip_all,
-        fields(
-            otel.name = format!("{}.put_multipart", self.name),
-            object_store.location = %location,
-        )
-    )]
-    async fn put_multipart(&self, location: &Path) -> Result<Box<dyn MultipartUpload>> {
-        let result = self.inner.put_multipart(location).await?;
-        Ok(Box::new(InstrumentedMultiPartUpload::new(
-            result, &self.name,
-        )))
     }
 
     /// Perform a multipart upload with options and tracing.
@@ -209,21 +178,6 @@ impl ObjectStore for InstrumentedObjectStore {
         )))
     }
 
-    /// Return the bytes that are stored at the specified location with tracing.
-    #[instrument(
-        skip_all,
-        fields(
-            otel.name = format!("{}.get", self.name),
-            object_store.location = %location,
-            object_store.result.err = tracing::field::Empty,
-            object_store.result.meta = tracing::field::Empty,
-            object_store.result.range = tracing::field::Empty,
-        )
-    )]
-    async fn get(&self, location: &Path) -> Result<GetResult> {
-        instrument_result(self.inner.get(location).await)
-    }
-
     /// Perform a get request with options and tracing.
     #[instrument(
         skip_all,
@@ -238,21 +192,6 @@ impl ObjectStore for InstrumentedObjectStore {
     )]
     async fn get_opts(&self, location: &Path, options: GetOptions) -> Result<GetResult> {
         instrument_result(self.inner.get_opts(location, options).await)
-    }
-
-    /// Return the bytes that are stored at the specified location in the given byte range with tracing.
-    #[instrument(
-        skip_all,
-        fields(
-            otel.name = format!("{}.get_range", self.name),
-            object_store.location = %location,
-            object_store.range = ?range,
-            object_store.result.err = tracing::field::Empty,
-            object_store.result.content_length = tracing::field::Empty,
-        )
-    )]
-    async fn get_range(&self, location: &Path, range: Range<u64>) -> Result<Bytes> {
-        instrument_result(self.inner.get_range(location, range).await)
     }
 
     /// Return the bytes that are stored at the specified location in the given byte ranges with tracing.
@@ -274,44 +213,17 @@ impl ObjectStore for InstrumentedObjectStore {
         instrument_result(self.inner.get_ranges(location, ranges).await)
     }
 
-    /// Return the metadata for the specified location with tracing.
-    #[instrument(
-        skip_all,
-        fields(
-            otel.name = format!("{}.head", self.name),
-            object_store.location = %location,
-            object_store.result.err = tracing::field::Empty,
-            object_store.result.meta = tracing::field::Empty,
-        )
-    )]
-    async fn head(&self, location: &Path) -> Result<ObjectMeta> {
-        instrument_result(self.inner.head(location).await)
-    }
-
-    /// Delete the object at the specified location with tracing.
-    #[instrument(
-        skip_all,
-        fields(
-            otel.name = format!("{}.delete", self.name),
-            object_store.location = %location,
-            object_store.result.err = tracing::field::Empty,
-        )
-    )]
-    async fn delete(&self, location: &Path) -> Result<()> {
-        instrument_result(self.inner.delete(location).await)
-    }
-
     /// Delete all the objects at the specified locations with tracing.
     #[instrument(
         skip_all,
         fields(
-            otel.name = format!("{}.delete", self.name),
+            otel.name = format!("{}.delete_stream", self.name),
         )
     )]
-    fn delete_stream<'a>(
-        &'a self,
-        locations: BoxStream<'a, Result<Path>>,
-    ) -> BoxStream<'a, Result<Path>> {
+    fn delete_stream(
+        &self,
+        locations: BoxStream<'static, Result<Path>>,
+    ) -> BoxStream<'static, Result<Path>> {
         self.inner
             .delete_stream(locations)
             .in_current_span()
@@ -368,56 +280,40 @@ impl ObjectStore for InstrumentedObjectStore {
     #[instrument(
         skip_all,
         fields(
-            otel.name = format!("{}.copy", self.name),
+            otel.name = format!("{}.copy_opts", self.name),
             object_store.from = %from,
             object_store.to = %to,
+            object_store.options = ?options,
             object_store.result.err = tracing::field::Empty,
         )
     )]
-    async fn copy(&self, from: &Path, to: &Path) -> Result<()> {
-        instrument_result(self.inner.copy(from, to).await)
+    async fn copy_opts(
+        &self,
+        from: &Path,
+        to: &Path,
+        options: CopyOptions,
+    ) -> Result<()> {
+        instrument_result(self.inner.copy_opts(from, to, options).await)
     }
 
     /// Move an object from one path to another with tracing.
     #[instrument(
         skip_all,
         fields(
-            otel.name = format!("{}.rename", self.name),
+            otel.name = format!("{}.rename_opts", self.name),
             object_store.from = %from,
             object_store.to = %to,
+            object_store.options = ?options,
             object_store.result.err = tracing::field::Empty,
         )
     )]
-    async fn rename(&self, from: &Path, to: &Path) -> Result<()> {
-        instrument_result(self.inner.rename(from, to).await)
-    }
-
-    /// Copy an object only if the destination does not exist with tracing.
-    #[instrument(
-        skip_all,
-        fields(
-            otel.name = format!("{}.copy_if_not_exists", self.name),
-            object_store.from = %from,
-            object_store.to = %to,
-            object_store.result.err = tracing::field::Empty,
-        )
-    )]
-    async fn copy_if_not_exists(&self, from: &Path, to: &Path) -> Result<()> {
-        instrument_result(self.inner.copy_if_not_exists(from, to).await)
-    }
-
-    /// Move an object only if the destination does not exist with tracing.
-    #[instrument(
-        skip_all,
-        fields(
-            otel.name = format!("{}.rename_if_not_exists", self.name),
-            object_store.from = %from,
-            object_store.to = %to,
-            object_store.result.err = tracing::field::Empty,
-        )
-    )]
-    async fn rename_if_not_exists(&self, from: &Path, to: &Path) -> Result<()> {
-        instrument_result(self.inner.rename_if_not_exists(from, to).await)
+    async fn rename_opts(
+        &self,
+        from: &Path,
+        to: &Path,
+        options: RenameOptions,
+    ) -> Result<()> {
+        instrument_result(self.inner.rename_opts(from, to, options).await)
     }
 }
 

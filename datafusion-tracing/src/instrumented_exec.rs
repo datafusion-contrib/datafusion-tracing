@@ -237,7 +237,7 @@ impl ExecutionPlan for InstrumentedExec {
     delegate! {
         to self.inner {
             fn schema(&self) -> SchemaRef;
-            fn properties(&self) -> &PlanProperties;
+            fn properties(&self) -> &Arc<PlanProperties>;
             fn name(&self) -> &str;
             fn check_invariants(&self, check: InvariantLevel) -> Result<()>;
             fn required_input_distribution(&self) -> Vec<Distribution>;
@@ -246,10 +246,6 @@ impl ExecutionPlan for InstrumentedExec {
             fn benefits_from_input_partitioning(&self) -> Vec<bool>;
             fn children(&self) -> Vec<&Arc<dyn ExecutionPlan>>;
             fn metrics(&self) -> Option<MetricsSet>;
-            // We need to delegate to the inner plan's statistics method to preserve behavior,
-            // even though it's deprecated in favor of partition_statistics
-            #[allow(deprecated)]
-            fn statistics(&self) -> Result<Statistics>;
             fn partition_statistics(&self, partition: Option<usize>) -> Result<Statistics>;
             fn supports_limit_pushdown(&self) -> bool;
             fn fetch(&self) -> Option<usize>;

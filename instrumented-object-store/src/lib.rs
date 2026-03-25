@@ -31,7 +31,7 @@
 //! # Getting Started
 //!
 //! ```rust
-//! # use object_store::{path::Path, ObjectStore};
+//! # use object_store::{path::Path, ObjectStore, ObjectStoreExt};
 //! # use std::sync::Arc;
 //! # use instrumented_object_store::instrument_object_store;
 //! # use datafusion::execution::context::SessionContext;

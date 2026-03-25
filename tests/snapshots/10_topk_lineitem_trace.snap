@@ -123,6 +123,33 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "rewrite_set_comparison"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "optimize_unions"
     },
     "spans": [
@@ -663,6 +690,60 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "extract_leaf_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_leaf_projections"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "optimize_projections (modified)"
     },
     "spans": [
@@ -703,6 +784,33 @@ expression: json_lines
       {
         "name": "run_traced_query",
         "query_name": "topk_lineitem"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "rewrite_set_comparison"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
       }
     ],
     "target": "integration_utils",
@@ -1254,6 +1362,60 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "extract_leaf_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_leaf_projections"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "optimize_projections"
     },
     "spans": [
@@ -1294,6 +1456,33 @@ expression: json_lines
       {
         "name": "run_traced_query",
         "query_name": "topk_lineitem"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "rewrite_set_comparison"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
       }
     ],
     "target": "integration_utils",
@@ -1845,6 +2034,60 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "extract_leaf_expressions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "push_down_leaf_projections"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "10_topk_lineitem"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 3,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "optimize_projections"
     },
     "spans": [
@@ -2157,35 +2400,6 @@ expression: json_lines
     "span": {
       "name": "Rule",
       "otel.name": "ProjectionPushdown"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "10_topk_lineitem"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "topk_lineitem"
-      },
-      {
-        "logical_plan": "Sort: lineitem.l_orderkey ASC NULLS LAST, lineitem.l_linenumber ASC NULLS LAST, fetch=3 [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n  Projection: lineitem.l_orderkey, lineitem.l_linenumber, lineitem.l_shipmode, lineitem.l_quantity [l_orderkey:Int64, l_linenumber:Int32, l_shipmode:Utf8View, l_quantity:Decimal128(15, 2)]\n    Filter: lineitem.l_shipmode = Utf8View(\"SHIP\") [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]\n      TableScan: lineitem projection=[l_orderkey, l_linenumber, l_quantity, l_shipmode], partial_filters=[lineitem.l_shipmode = Utf8View(\"SHIP\")] [l_orderkey:Int64, l_linenumber:Int32, l_quantity:Decimal128(15, 2), l_shipmode:Utf8View]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "coalesce_batches"
     },
     "spans": [
       {
