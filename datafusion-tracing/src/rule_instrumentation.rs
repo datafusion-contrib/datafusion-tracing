@@ -181,6 +181,17 @@ fn record_modified_rule_in_context(rule_name: &str) {
     });
 }
 
+/// Drops the current planning context, closing the active phase span.
+///
+/// Called when a rule returns an error to ensure the phase span is not left
+/// open for the remainder of the session. The context's `_entered` guard is
+/// dropped here, which exits and closes the phase span.
+fn drop_planning_context() {
+    PLANNING_CONTEXT.with(|cell| {
+        cell.borrow_mut().take();
+    });
+}
+
 /// Closes a phase span, recording effective rules and plan diff if enabled.
 ///
 /// The span is closed when `ctx` is dropped at the end of this function,
@@ -409,6 +420,107 @@ impl PhysicalOptimizerRule for PhysicalOptimizerPhaseSentinel {
     }
 }
 
+// ============================================================================
+// Error-cleanup wrappers for phase_only mode
+// ============================================================================
+// When individual rule spans are disabled (PhaseOnly level), rules run unwrapped
+// between the two sentinel rules. If a rule errors, the closing sentinel never
+// runs, leaving the phase span open. These thin wrappers intercept errors and
+// drop PLANNING_CONTEXT so the phase span is always closed on failure.
+
+struct ErrorCleanupAnalyzerRule {
+    inner: Arc<dyn AnalyzerRule + Send + Sync>,
+}
+
+impl Debug for ErrorCleanupAnalyzerRule {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ErrorCleanupAnalyzerRule").finish()
+    }
+}
+
+impl AnalyzerRule for ErrorCleanupAnalyzerRule {
+    fn analyze(&self, plan: LogicalPlan, config: &ConfigOptions) -> Result<LogicalPlan> {
+        let result = self.inner.analyze(plan, config);
+        if result.is_err() {
+            drop_planning_context();
+        }
+        result
+    }
+
+    fn name(&self) -> &str {
+        self.inner.name()
+    }
+}
+
+struct ErrorCleanupOptimizerRule {
+    inner: Arc<dyn OptimizerRule + Send + Sync>,
+}
+
+impl Debug for ErrorCleanupOptimizerRule {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ErrorCleanupOptimizerRule").finish()
+    }
+}
+
+impl OptimizerRule for ErrorCleanupOptimizerRule {
+    fn name(&self) -> &str {
+        self.inner.name()
+    }
+
+    fn apply_order(&self) -> Option<ApplyOrder> {
+        self.inner.apply_order()
+    }
+
+    #[allow(deprecated)]
+    fn supports_rewrite(&self) -> bool {
+        self.inner.supports_rewrite()
+    }
+
+    fn rewrite(
+        &self,
+        plan: LogicalPlan,
+        config: &dyn OptimizerConfig,
+    ) -> Result<Transformed<LogicalPlan>, DataFusionError> {
+        let result = self.inner.rewrite(plan, config);
+        if result.is_err() {
+            drop_planning_context();
+        }
+        result
+    }
+}
+
+struct ErrorCleanupPhysicalOptimizerRule {
+    inner: Arc<dyn PhysicalOptimizerRule + Send + Sync>,
+}
+
+impl Debug for ErrorCleanupPhysicalOptimizerRule {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ErrorCleanupPhysicalOptimizerRule").finish()
+    }
+}
+
+impl PhysicalOptimizerRule for ErrorCleanupPhysicalOptimizerRule {
+    fn optimize(
+        &self,
+        plan: Arc<dyn ExecutionPlan>,
+        config: &ConfigOptions,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        let result = self.inner.optimize(plan, config);
+        if result.is_err() {
+            drop_planning_context();
+        }
+        result
+    }
+
+    fn name(&self) -> &str {
+        self.inner.name()
+    }
+
+    fn schema_check(&self) -> bool {
+        self.inner.schema_check()
+    }
+}
+
 /// Applies an optimizer rule across the tree manually, keeping all work under a single span.
 ///
 /// When a rule specifies `apply_order()` as `Some(TopDown)` or `Some(BottomUp)`, the optimizer
@@ -547,7 +659,7 @@ impl InstrumentedAnalyzerRule {
 impl AnalyzerRule for InstrumentedAnalyzerRule {
     fn analyze(&self, plan: LogicalPlan, config: &ConfigOptions) -> Result<LogicalPlan> {
         let span = (self.span_create_fn)(self.name());
-        let _enter = span.enter();
+        let enter = span.enter();
 
         // Only clone if we need to track modifications and span is active (lazy instrumentation)
         let plan_before = if !span.is_disabled() {
@@ -582,6 +694,13 @@ impl AnalyzerRule for InstrumentedAnalyzerRule {
                     tracing::error!(error = %e, "AnalyzerRule failed");
                 }
             }
+        }
+
+        if result.is_err() {
+            // Exit the rule span before closing the phase span to maintain
+            // proper nesting order: inner spans must exit before outer spans.
+            drop(enter);
+            drop_planning_context();
         }
 
         result
@@ -672,7 +791,7 @@ impl OptimizerRule for InstrumentedOptimizerRule {
     ) -> Result<Transformed<LogicalPlan>, DataFusionError> {
         // Create a single span for the entire rule application
         let span = (self.span_create_fn)(self.name());
-        let _enter = span.enter();
+        let enter = span.enter();
 
         // Clone plan when span is active. We defer string formatting until after we know
         // the rule claimed to modify the plan (transformed=true), avoiding expensive
@@ -711,6 +830,11 @@ impl OptimizerRule for InstrumentedOptimizerRule {
                     tracing::error!(error = %e, "OptimizerRule failed");
                 }
             }
+        }
+
+        if result.is_err() {
+            drop(enter);
+            drop_planning_context();
         }
 
         result
@@ -755,7 +879,7 @@ impl PhysicalOptimizerRule for InstrumentedPhysicalOptimizerRule {
         config: &ConfigOptions,
     ) -> Result<Arc<dyn ExecutionPlan>> {
         let span = (self.span_create_fn)(self.name());
-        let _enter = span.enter();
+        let enter = span.enter();
 
         // Only clone the Arc when span is active. We defer string formatting until
         // after ptr_eq check to avoid expensive formatting when the plan wasn't modified.
@@ -791,6 +915,11 @@ impl PhysicalOptimizerRule for InstrumentedPhysicalOptimizerRule {
                     tracing::error!(error = %e, "PhysicalOptimizerRule failed");
                 }
             }
+        }
+
+        if result.is_err() {
+            drop(enter);
+            drop_planning_context();
         }
 
         result
@@ -877,7 +1006,9 @@ fn instrument_analyzer_rules(
         plan_diff: options.plan_diff,
     }) as Arc<dyn AnalyzerRule + Send + Sync>);
 
-    // Wrap rules with instrumentation (if Full) or pass through (if PhaseOnly)
+    // Wrap rules with instrumentation (if Full) or error-cleanup only (if PhaseOnly).
+    // Even in PhaseOnly mode we wrap to ensure the phase span is closed on error,
+    // since the closing sentinel never runs when a rule returns Err.
     for rule in rules {
         if level.rule_spans_enabled() {
             result.push(Arc::new(InstrumentedAnalyzerRule::new(
@@ -886,7 +1017,8 @@ fn instrument_analyzer_rules(
                 span_create_fn.clone(),
             )) as Arc<dyn AnalyzerRule + Send + Sync>);
         } else {
-            result.push(rule);
+            result.push(Arc::new(ErrorCleanupAnalyzerRule { inner: rule })
+                as Arc<dyn AnalyzerRule + Send + Sync>);
         }
     }
 
@@ -919,7 +1051,7 @@ fn instrument_optimizer_rules(
         plan_diff: options.plan_diff,
     }) as Arc<dyn OptimizerRule + Send + Sync>);
 
-    // Wrap rules with instrumentation (if Full) or pass through (if PhaseOnly)
+    // Wrap rules with instrumentation (if Full) or error-cleanup only (if PhaseOnly).
     for rule in rules {
         if level.rule_spans_enabled() {
             result.push(Arc::new(InstrumentedOptimizerRule::new(
@@ -928,7 +1060,8 @@ fn instrument_optimizer_rules(
                 span_create_fn.clone(),
             )) as Arc<dyn OptimizerRule + Send + Sync>);
         } else {
-            result.push(rule);
+            result.push(Arc::new(ErrorCleanupOptimizerRule { inner: rule })
+                as Arc<dyn OptimizerRule + Send + Sync>);
         }
     }
 
@@ -961,7 +1094,7 @@ fn instrument_physical_optimizer_rules(
         plan_diff: options.plan_diff,
     }) as Arc<dyn PhysicalOptimizerRule + Send + Sync>);
 
-    // Wrap rules with instrumentation (if Full) or pass through (if PhaseOnly)
+    // Wrap rules with instrumentation (if Full) or error-cleanup only (if PhaseOnly).
     for rule in rules {
         if level.rule_spans_enabled() {
             result.push(Arc::new(InstrumentedPhysicalOptimizerRule::new(
@@ -971,7 +1104,8 @@ fn instrument_physical_optimizer_rules(
             ))
                 as Arc<dyn PhysicalOptimizerRule + Send + Sync>);
         } else {
-            result.push(rule);
+            result.push(Arc::new(ErrorCleanupPhysicalOptimizerRule { inner: rule })
+                as Arc<dyn PhysicalOptimizerRule + Send + Sync>);
         }
     }
 
@@ -982,4 +1116,251 @@ fn instrument_physical_optimizer_rules(
     }) as Arc<dyn PhysicalOptimizerRule + Send + Sync>);
 
     result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use datafusion::common::DataFusionError;
+    use datafusion::execution::SessionStateBuilder;
+    use datafusion::prelude::{SessionConfig, SessionContext};
+    use std::fmt;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::{Arc, Mutex};
+    use tracing::Instrument as _;
+    use tracing::field::{Field, Visit};
+    use tracing::{Id, Subscriber};
+    use tracing_subscriber::Layer;
+    use tracing_subscriber::layer::Context;
+    use tracing_subscriber::prelude::*;
+    use tracing_subscriber::registry::LookupSpan;
+
+    // -----------------------------------------------------------------------
+    // Minimal span-event capture layer
+    // -----------------------------------------------------------------------
+
+    struct CapturedName(String);
+
+    #[derive(Clone, Debug)]
+    struct SpanEvent {
+        kind: &'static str, // "open" | "close"
+        name: String,
+        parent: Option<String>,
+    }
+
+    #[derive(Clone, Default)]
+    struct SpanCapture(Arc<Mutex<Vec<SpanEvent>>>);
+
+    impl SpanCapture {
+        fn snapshot(&self) -> Vec<SpanEvent> {
+            self.0.lock().unwrap().clone()
+        }
+    }
+
+    struct OtelNameVisitor(Option<String>);
+    impl Visit for OtelNameVisitor {
+        fn record_str(&mut self, field: &Field, value: &str) {
+            if field.name() == "otel.name" {
+                self.0 = Some(value.to_owned());
+            }
+        }
+        fn record_debug(&mut self, _: &Field, _: &dyn Debug) {}
+    }
+
+    impl<S: Subscriber + for<'s> LookupSpan<'s>> Layer<S> for SpanCapture {
+        fn on_new_span(
+            &self,
+            attrs: &tracing::span::Attributes<'_>,
+            id: &Id,
+            ctx: Context<'_, S>,
+        ) {
+            let mut v = OtelNameVisitor(None);
+            attrs.record(&mut v);
+            let name = v.0.unwrap_or_else(|| attrs.metadata().name().to_owned());
+
+            if let Some(span) = ctx.span(id) {
+                span.extensions_mut().insert(CapturedName(name.clone()));
+            }
+
+            let parent = ctx.span(id).and_then(|span| {
+                span.parent().and_then(|p| {
+                    p.extensions().get::<CapturedName>().map(|n| n.0.clone())
+                })
+            });
+
+            self.0.lock().unwrap().push(SpanEvent {
+                kind: "open",
+                name,
+                parent,
+            });
+        }
+
+        fn on_close(&self, id: Id, ctx: Context<'_, S>) {
+            let name = ctx
+                .span(&id)
+                .and_then(|s| s.extensions().get::<CapturedName>().map(|n| n.0.clone()))
+                .unwrap_or_default();
+            self.0.lock().unwrap().push(SpanEvent {
+                kind: "close",
+                name,
+                parent: None,
+            });
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Failing-once analyzer rule
+    // -----------------------------------------------------------------------
+
+    struct FailOnceAnalyzer(Arc<AtomicBool>);
+
+    impl Debug for FailOnceAnalyzer {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.write_str("FailOnceAnalyzer")
+        }
+    }
+
+    impl AnalyzerRule for FailOnceAnalyzer {
+        fn analyze(&self, plan: LogicalPlan, _: &ConfigOptions) -> Result<LogicalPlan> {
+            if self.0.swap(false, Ordering::SeqCst) {
+                return Err(DataFusionError::Internal(
+                    "intentional analyzer failure".into(),
+                ));
+            }
+            Ok(plan)
+        }
+
+        fn name(&self) -> &str {
+            "fail_once"
+        }
+    }
+
+    fn make_ctx_with_fail_once(options: RuleInstrumentationOptions) -> SessionContext {
+        let state = SessionStateBuilder::new()
+            .with_config(SessionConfig::new())
+            .with_default_features()
+            .with_analyzer_rule(Arc::new(FailOnceAnalyzer(Arc::new(AtomicBool::new(
+                true,
+            )))))
+            .build();
+        let state = crate::instrument_rules_with_trace_spans!(
+            options: options,
+            state: state
+        );
+        SessionContext::new_with_state(state)
+    }
+
+    fn is_planning_context_open() -> bool {
+        PLANNING_CONTEXT.with(|cell| cell.borrow().is_some())
+    }
+
+    fn count(events: &[SpanEvent], kind: &str, name: &str) -> usize {
+        events
+            .iter()
+            .filter(|e| e.kind == kind && e.name == name)
+            .count()
+    }
+
+    // -----------------------------------------------------------------------
+    // Helper: run a query end-to-end (sql + collect), return the first error.
+    // The analyzer runs during collect(), not sql(), so we need both steps.
+    // -----------------------------------------------------------------------
+
+    async fn run_query(ctx: &SessionContext) -> Result<()> {
+        ctx.sql("SELECT 1").await?.collect().await?;
+        Ok(())
+    }
+
+    // -----------------------------------------------------------------------
+    // Tests
+    // -----------------------------------------------------------------------
+
+    /// Regression: phase_only mode must close the phase span when an analyzer
+    /// rule returns an error (the closing sentinel never runs in that case).
+    #[tokio::test]
+    async fn phase_only_closes_phase_span_on_analyzer_error() {
+        let ctx = make_ctx_with_fail_once(RuleInstrumentationOptions::phase_only());
+        let result = run_query(&ctx).await;
+        assert!(result.is_err(), "expected analyzer failure");
+        assert!(
+            !is_planning_context_open(),
+            "phase span must not be left open after analyzer error (phase_only mode)"
+        );
+    }
+
+    /// Regression: full instrumentation mode must also close the phase span on
+    /// analyzer error.
+    #[tokio::test]
+    async fn full_closes_phase_span_on_analyzer_error() {
+        let ctx = make_ctx_with_fail_once(RuleInstrumentationOptions::full());
+        let result = run_query(&ctx).await;
+        assert!(result.is_err(), "expected analyzer failure");
+        assert!(
+            !is_planning_context_open(),
+            "phase span must not be left open after analyzer error (full mode)"
+        );
+    }
+
+    /// Regression: a successful query that follows a failed one must not be
+    /// parented under the stale phase span from the failure, and must leave no
+    /// open spans behind.
+    ///
+    /// The analyzer runs during `collect()`, not `sql()`, so phase spans are
+    /// emitted there. We wrap the successful query in `successful_query` and
+    /// assert it is not parented under `analyze_logical_plan`.
+    #[tokio::test]
+    async fn stale_phase_span_not_parent_of_subsequent_query() {
+        let capture = SpanCapture::default();
+        let subscriber = tracing_subscriber::registry()
+            .with(tracing_subscriber::filter::LevelFilter::TRACE)
+            .with(capture.clone());
+        let _guard = tracing::subscriber::set_default(subscriber);
+
+        let ctx = make_ctx_with_fail_once(RuleInstrumentationOptions::phase_only());
+
+        // First query: fails in the analyzer (during collect)
+        let _ = run_query(&ctx).await;
+
+        let after_failure = capture.snapshot();
+        let opened_after_failure = count(&after_failure, "open", "analyze_logical_plan");
+        let closed_after_failure = count(&after_failure, "close", "analyze_logical_plan");
+        assert_eq!(
+            opened_after_failure, 1,
+            "one phase span opened during failed query"
+        );
+        assert_eq!(
+            closed_after_failure, 1,
+            "phase span must be closed immediately after analyzer error"
+        );
+
+        // Second query: must succeed without being nested under a stale span.
+        // Without the fix, the still-entered analyze_logical_plan guard would
+        // make it the current span, so successful_query would be parented under it.
+        async {
+            ctx.sql("SELECT 1").await.unwrap().collect().await.unwrap();
+        }
+        .instrument(tracing::info_span!("successful_query"))
+        .await;
+
+        let after_success = capture.snapshot();
+
+        // Every opened phase span must have been closed
+        let total_opened = count(&after_success, "open", "analyze_logical_plan");
+        let total_closed = count(&after_success, "close", "analyze_logical_plan");
+        assert_eq!(
+            total_opened, total_closed,
+            "every analyze_logical_plan span must be closed"
+        );
+
+        // The successful_query span must NOT be a child of analyze_logical_plan
+        let successful_query_parent = after_success
+            .iter()
+            .find(|e| e.kind == "open" && e.name == "successful_query")
+            .and_then(|e| e.parent.as_deref());
+        assert_ne!(
+            successful_query_parent,
+            Some("analyze_logical_plan"),
+            "successful_query must not be parented under the stale analyze_logical_plan span"
+        );
+    }
 }

@@ -45,8 +45,10 @@ tracing-futures = { workspace = true }
 unicode-width = "0.2"
 
 [dev-dependencies]
+datafusion = { workspace = true, features = ["sql"] }
 insta = { version = "1.43" }
 tokio = { workspace = true }
+tracing-subscriber = { version = "0.3", features = ["registry"] }
 
 [lints]
 workspace = true
