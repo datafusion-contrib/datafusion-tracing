@@ -1259,6 +1259,129 @@ mod tests {
         PLANNING_CONTEXT.with(|cell| cell.borrow().is_some())
     }
 
+    fn optimizer_pass_count() -> usize {
+        OPTIMIZER_PASS_TRACKER.with(|cell| cell.borrow().pass_count)
+    }
+
+    // -----------------------------------------------------------------------
+    // Failing-once optimizer rule
+    // -----------------------------------------------------------------------
+
+    struct FailOnceOptimizer(Arc<AtomicBool>);
+
+    impl Debug for FailOnceOptimizer {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.write_str("FailOnceOptimizer")
+        }
+    }
+
+    impl OptimizerRule for FailOnceOptimizer {
+        fn rewrite(
+            &self,
+            plan: LogicalPlan,
+            _config: &dyn OptimizerConfig,
+        ) -> Result<Transformed<LogicalPlan>, DataFusionError> {
+            if self.0.swap(false, Ordering::SeqCst) {
+                return Err(DataFusionError::Internal(
+                    "intentional optimizer failure".into(),
+                ));
+            }
+            Ok(Transformed::no(plan))
+        }
+
+        fn name(&self) -> &str {
+            "fail_once_optimizer"
+        }
+    }
+
+    fn make_ctx_with_fail_once_optimizer(
+        options: RuleInstrumentationOptions,
+    ) -> SessionContext {
+        let state = SessionStateBuilder::new()
+            .with_config(SessionConfig::new())
+            .with_default_features()
+            .with_optimizer_rule(Arc::new(FailOnceOptimizer(Arc::new(AtomicBool::new(
+                true,
+            )))))
+            .build();
+        let state = crate::instrument_rules_with_trace_spans!(
+            options: options,
+            state: state
+        );
+        SessionContext::new_with_state(state)
+    }
+
+    fn make_ctx_with_fail_once_optimizer_skip_failed(
+        options: RuleInstrumentationOptions,
+    ) -> SessionContext {
+        let mut config = SessionConfig::new();
+        config.options_mut().optimizer.skip_failed_rules = true;
+        let state = SessionStateBuilder::new()
+            .with_config(config)
+            .with_default_features()
+            .with_optimizer_rule(Arc::new(FailOnceOptimizer(Arc::new(AtomicBool::new(
+                true,
+            )))))
+            .build();
+        let state = crate::instrument_rules_with_trace_spans!(
+            options: options,
+            state: state
+        );
+        SessionContext::new_with_state(state)
+    }
+
+    // -----------------------------------------------------------------------
+    // Failing-once physical optimizer rule
+    // -----------------------------------------------------------------------
+
+    struct FailOncePhysicalOptimizer(Arc<AtomicBool>);
+
+    impl Debug for FailOncePhysicalOptimizer {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.write_str("FailOncePhysicalOptimizer")
+        }
+    }
+
+    impl PhysicalOptimizerRule for FailOncePhysicalOptimizer {
+        fn optimize(
+            &self,
+            plan: Arc<dyn ExecutionPlan>,
+            _config: &ConfigOptions,
+        ) -> Result<Arc<dyn ExecutionPlan>> {
+            if self.0.swap(false, Ordering::SeqCst) {
+                return Err(DataFusionError::Internal(
+                    "intentional physical optimizer failure".into(),
+                ));
+            }
+            Ok(plan)
+        }
+
+        fn name(&self) -> &str {
+            "fail_once_physical_optimizer"
+        }
+
+        fn schema_check(&self) -> bool {
+            false
+        }
+    }
+
+    fn make_ctx_with_fail_once_physical_optimizer(
+        options: RuleInstrumentationOptions,
+    ) -> SessionContext {
+        let state = SessionStateBuilder::new()
+            .with_config(SessionConfig::new())
+            .with_default_features()
+            .with_physical_optimizer_rule(Arc::new(FailOncePhysicalOptimizer(Arc::new(
+                AtomicBool::new(true),
+            ))))
+            .build();
+        let state = crate::instrument_rules_with_trace_spans!(
+            options: options,
+            state: state
+        );
+        SessionContext::new_with_state(state)
+    }
+
     fn count(events: &[SpanEvent], kind: &str, name: &str) -> usize {
         events
             .iter()
@@ -1366,6 +1489,103 @@ mod tests {
             successful_query_parent,
             Some("analyze_logical_plan"),
             "successful_query must not be parented under the stale analyze_logical_plan span"
+        );
+    }
+
+    /// Regression: phase_only mode must close the phase span and reset the
+    /// optimizer pass tracker when an optimizer rule returns a fatal error.
+    #[tokio::test]
+    async fn phase_only_closes_phase_span_on_optimizer_error() {
+        let ctx =
+            make_ctx_with_fail_once_optimizer(RuleInstrumentationOptions::phase_only());
+        let result = run_query(&ctx).await;
+        assert!(result.is_err(), "expected optimizer failure");
+        assert!(
+            !is_planning_context_open(),
+            "phase span must not be left open after optimizer error (phase_only mode)"
+        );
+        assert_eq!(
+            optimizer_pass_count(),
+            0,
+            "optimizer pass tracker must be reset after fatal optimizer error (phase_only mode)"
+        );
+    }
+
+    /// Regression: full instrumentation mode must also close the phase span and
+    /// reset the optimizer pass tracker on a fatal optimizer error.
+    #[tokio::test]
+    async fn full_closes_phase_span_on_optimizer_error() {
+        let ctx = make_ctx_with_fail_once_optimizer(RuleInstrumentationOptions::full());
+        let result = run_query(&ctx).await;
+        assert!(result.is_err(), "expected optimizer failure");
+        assert!(
+            !is_planning_context_open(),
+            "phase span must not be left open after optimizer error (full mode)"
+        );
+        assert_eq!(
+            optimizer_pass_count(),
+            0,
+            "optimizer pass tracker must be reset after fatal optimizer error (full mode)"
+        );
+    }
+
+    /// Regression: phase_only mode must close the phase span and reset the
+    /// optimizer pass tracker when a physical optimizer rule returns a fatal error.
+    #[tokio::test]
+    async fn phase_only_closes_phase_span_on_physical_optimizer_error() {
+        let ctx = make_ctx_with_fail_once_physical_optimizer(
+            RuleInstrumentationOptions::phase_only(),
+        );
+        let result = run_query(&ctx).await;
+        assert!(result.is_err(), "expected physical optimizer failure");
+        assert!(
+            !is_planning_context_open(),
+            "phase span must not be left open after physical optimizer error (phase_only mode)"
+        );
+        assert_eq!(
+            optimizer_pass_count(),
+            0,
+            "optimizer pass tracker must be reset after fatal physical optimizer error (phase_only mode)"
+        );
+    }
+
+    /// Regression: full instrumentation mode must also close the phase span and
+    /// reset the optimizer pass tracker on a fatal physical optimizer error.
+    #[tokio::test]
+    async fn full_closes_phase_span_on_physical_optimizer_error() {
+        let ctx = make_ctx_with_fail_once_physical_optimizer(
+            RuleInstrumentationOptions::full(),
+        );
+        let result = run_query(&ctx).await;
+        assert!(result.is_err(), "expected physical optimizer failure");
+        assert!(
+            !is_planning_context_open(),
+            "phase span must not be left open after physical optimizer error (full mode)"
+        );
+        assert_eq!(
+            optimizer_pass_count(),
+            0,
+            "optimizer pass tracker must be reset after fatal physical optimizer error (full mode)"
+        );
+    }
+
+    /// When `skip_failed_rules` is true, DataFusion skips the failed rule and
+    /// continues running the pipeline. The closing sentinel — not the error
+    /// cleanup path — must be responsible for closing the phase span.
+    /// The query must succeed and leave no open phase spans behind.
+    #[tokio::test]
+    async fn skip_failed_rules_sentinel_closes_phase_span() {
+        let ctx = make_ctx_with_fail_once_optimizer_skip_failed(
+            RuleInstrumentationOptions::phase_only(),
+        );
+        let result = run_query(&ctx).await;
+        assert!(
+            result.is_ok(),
+            "query must succeed when skip_failed_rules is true, got: {result:?}"
+        );
+        assert!(
+            !is_planning_context_open(),
+            "phase span must be closed by the sentinel after skip_failed_rules optimizer error"
         );
     }
 }
