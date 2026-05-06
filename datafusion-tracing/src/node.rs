@@ -43,6 +43,10 @@ impl NodeRecorder {
             span,
         }
     }
+
+    pub(crate) fn span(&self) -> Span {
+        self.span.clone()
+    }
 }
 
 impl Drop for NodeRecorder {
