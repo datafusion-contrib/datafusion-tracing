@@ -50,7 +50,7 @@ use std::{
     any::Any,
     collections::HashMap,
     fmt::{self, Debug},
-    sync::{Arc, OnceLock},
+    sync::{Arc, Mutex, Weak},
 };
 use tracing::{Span, field};
 use tracing_futures::Instrument;
@@ -63,22 +63,20 @@ pub struct InstrumentedExec {
     /// The inner execution plan to delegate execution to.
     inner: Arc<dyn ExecutionPlan>,
 
-    /// Tracing span lazily initialized during execution, shared safely across concurrent partition executions.
-    span: OnceLock<Span>,
-
     record_metrics: bool,
 
-    /// Metrics recorder lazily initialized during execution, shared safely across concurrent partition executions.
-    metrics_recorder: OnceLock<Arc<MetricsRecorder>>,
+    /// Weak reference to the shared node recorder, kept alive only by active execution streams.
+    /// Spans close when the last stream finishes rather than when the plan is dropped.
+    node_recorder: Mutex<Option<Weak<NodeRecorder>>>,
 
-    /// Node recorder lazily initialized during execution, shared safely across concurrent partition executions.
-    node_recorder: OnceLock<Arc<NodeRecorder>>,
+    /// Weak reference to the shared metrics recorder, kept alive only by active execution streams.
+    metrics_recorder: Mutex<Option<Weak<MetricsRecorder>>>,
 
     preview_limit: usize,
     preview_fn: Option<Arc<PreviewFn>>,
 
-    /// Preview recorder lazily initialized during execution, shared safely across concurrent partition executions.
-    preview_recorder: OnceLock<Arc<PreviewRecorder>>,
+    /// Weak reference to the shared preview recorder, kept alive only by active execution streams.
+    preview_recorder: Mutex<Option<Weak<PreviewRecorder>>>,
 
     /// Function to create and initialize tracing spans.
     span_create_fn: Arc<SpanCreateFn>,
@@ -101,13 +99,12 @@ impl InstrumentedExec {
     ) -> InstrumentedExec {
         Self {
             inner,
-            span: OnceLock::new(),
             record_metrics: options.record_metrics,
-            metrics_recorder: OnceLock::new(),
-            node_recorder: OnceLock::new(),
+            metrics_recorder: Mutex::new(None),
+            node_recorder: Mutex::new(None),
             preview_limit: options.preview_limit,
             preview_fn: options.preview_fn.clone(),
-            preview_recorder: OnceLock::new(),
+            preview_recorder: Mutex::new(None),
             span_create_fn,
         }
     }
@@ -129,62 +126,49 @@ impl InstrumentedExec {
         ))
     }
 
-    /// Retrieves the tracing span, initializing it if necessary.
-    fn get_span(&self) -> Span {
-        self.span
-            .get_or_init(|| self.create_populated_span())
-            .clone()
+    /// Returns the shared `NodeRecorder` for this plan, creating one with a fresh span if needed.
+    ///
+    /// The returned `Arc` is the caller's strong reference — the plan only keeps a `Weak`.
+    /// Spans therefore close as soon as all execution streams finish, not when the plan drops.
+    fn get_or_create_node_recorder(&self) -> Arc<NodeRecorder> {
+        let mut guard = self.node_recorder.lock().unwrap();
+        if let Some(arc) = guard.as_ref().and_then(Weak::upgrade) {
+            return arc;
+        }
+        let arc = Arc::new(NodeRecorder::new(
+            self.inner.clone(),
+            self.create_populated_span(),
+        ));
+        *guard = Some(Arc::downgrade(&arc));
+        arc
     }
 
-    /// Wraps the given stream with metrics recording if metrics are available.
-    /// The input span is shared across all partitions,
-    /// and metrics will be aggregated across all partitions before being reported.
-    fn metrics_recording_stream(
-        &self,
-        inner_stream: SendableRecordBatchStream,
-        span: &Span,
-    ) -> SendableRecordBatchStream {
-        if !self.record_metrics {
-            return inner_stream;
+    /// Returns the shared `MetricsRecorder`, creating one with the given span if needed.
+    fn get_or_create_metrics_recorder(&self, span: &Span) -> Arc<MetricsRecorder> {
+        let mut guard = self.metrics_recorder.lock().unwrap();
+        if let Some(arc) = guard.as_ref().and_then(Weak::upgrade) {
+            return arc;
         }
-        let recorder = self
-            .metrics_recorder
-            .get_or_init(|| {
-                Arc::new(MetricsRecorder::new(self.inner.clone(), span.clone()))
-            })
-            .clone();
-        Box::pin(MetricsRecordingStream::new(inner_stream, recorder))
+        let arc = Arc::new(MetricsRecorder::new(self.inner.clone(), span.clone()));
+        *guard = Some(Arc::downgrade(&arc));
+        arc
     }
 
-    /// Wraps the given stream with batch preview recording.
-    /// The input span is shared across all partitions,
-    /// and the preview limit will be applied globally on all partitions before the preview is reported.
-    fn preview_recording_stream(
-        &self,
-        inner_stream: SendableRecordBatchStream,
-        span: &Span,
-        partition: usize,
-    ) -> SendableRecordBatchStream {
-        if self.preview_limit == 0 {
-            return inner_stream;
+    /// Returns the shared `PreviewRecorder`, creating one with the given span if needed.
+    fn get_or_create_preview_recorder(&self, span: &Span) -> Arc<PreviewRecorder> {
+        let mut guard = self.preview_recorder.lock().unwrap();
+        if let Some(arc) = guard.as_ref().and_then(Weak::upgrade) {
+            return arc;
         }
-        let recorder = self
-            .preview_recorder
-            .get_or_init(|| {
-                let partition_count = self.inner.output_partitioning().partition_count();
-                Arc::new(
-                    PreviewRecorder::builder(span.clone(), partition_count)
-                        .limit(self.preview_limit)
-                        .preview_fn(self.preview_fn.clone())
-                        .build(),
-                )
-            })
-            .clone();
-        Box::pin(PreviewRecordingStream::new(
-            inner_stream,
-            recorder,
-            partition,
-        ))
+        let partition_count = self.inner.output_partitioning().partition_count();
+        let arc = Arc::new(
+            PreviewRecorder::builder(span.clone(), partition_count)
+                .limit(self.preview_limit)
+                .preview_fn(self.preview_fn.clone())
+                .build(),
+        );
+        *guard = Some(Arc::downgrade(&arc));
+        arc
     }
 
     /// Wraps the given stream with a completion recorder so fields that are only
@@ -193,13 +177,34 @@ impl InstrumentedExec {
     fn node_recording_stream(
         &self,
         inner_stream: SendableRecordBatchStream,
-        span: &Span,
+        recorder: Arc<NodeRecorder>,
     ) -> SendableRecordBatchStream {
-        let recorder = self
-            .node_recorder
-            .get_or_init(|| Arc::new(NodeRecorder::new(self.inner.clone(), span.clone())))
-            .clone();
         Box::pin(NodeRecordingStream::new(inner_stream, recorder))
+    }
+
+    /// Wraps the given stream with metrics recording.
+    /// Metrics are aggregated across all partitions before being reported.
+    fn metrics_recording_stream(
+        &self,
+        inner_stream: SendableRecordBatchStream,
+        recorder: Arc<MetricsRecorder>,
+    ) -> SendableRecordBatchStream {
+        Box::pin(MetricsRecordingStream::new(inner_stream, recorder))
+    }
+
+    /// Wraps the given stream with batch preview recording.
+    /// The preview limit is applied globally across all partitions before the preview is reported.
+    fn preview_recording_stream(
+        &self,
+        inner_stream: SendableRecordBatchStream,
+        recorder: Arc<PreviewRecorder>,
+        partition: usize,
+    ) -> SendableRecordBatchStream {
+        Box::pin(PreviewRecordingStream::new(
+            inner_stream,
+            recorder,
+            partition,
+        ))
     }
 
     /// Creates a tracing span populated with metadata about the execution plan.
@@ -392,20 +397,37 @@ impl ExecutionPlan for InstrumentedExec {
         partition: usize,
         context: Arc<TaskContext>,
     ) -> Result<SendableRecordBatchStream> {
-        let span = self.get_span();
+        // The node recorder owns the span. We hold only a Weak in the plan so that the
+        // span closes when the last execution stream is dropped, not when the plan is dropped.
+        let node_recorder = self.get_or_create_node_recorder();
+        let span = node_recorder.span();
 
         let inner_stream = span.in_scope(|| self.inner.execute(partition, context))?;
 
         // Wrap the stream with node recording so `datafusion.node` is recorded only after
         // completion, once it is fully qualified.
-        let node_stream = self.node_recording_stream(inner_stream, &span);
+        let node_stream = self.node_recording_stream(inner_stream, node_recorder);
 
         // Wrap the stream with metrics recording capability (only if inner metrics are available).
-        let metrics_stream = self.metrics_recording_stream(node_stream, &span);
+        let metrics_stream = if self.record_metrics {
+            self.metrics_recording_stream(
+                node_stream,
+                self.get_or_create_metrics_recorder(&span),
+            )
+        } else {
+            node_stream
+        };
 
         // Wrap the stream with batch preview recording (only if preview limit is set).
-        let preview_stream =
-            self.preview_recording_stream(metrics_stream, &span, partition);
+        let preview_stream = if self.preview_limit > 0 {
+            self.preview_recording_stream(
+                metrics_stream,
+                self.get_or_create_preview_recorder(&span),
+                partition,
+            )
+        } else {
+            metrics_stream
+        };
 
         Ok(Box::pin(RecordBatchStreamAdapter::new(
             self.inner.schema(),
@@ -419,5 +441,201 @@ impl DisplayAs for InstrumentedExec {
         to self.inner {
             fn fmt_as(&self, format: DisplayFormatType, f: &mut fmt::Formatter<'_>) -> fmt::Result;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use datafusion::execution::SessionStateBuilder;
+    use datafusion::prelude::SessionContext;
+    use futures::StreamExt;
+    use tracing::field::{Field, Visit};
+    use tracing::{Id, Subscriber};
+    use tracing_subscriber::Layer;
+    use tracing_subscriber::layer::Context;
+    use tracing_subscriber::prelude::*;
+    use tracing_subscriber::registry::LookupSpan;
+
+    // -----------------------------------------------------------------------
+    // Minimal span-event capture layer
+    // -----------------------------------------------------------------------
+
+    struct CapturedName(String);
+
+    #[derive(Clone, Default)]
+    struct SpanCapture(Arc<Mutex<Vec<SpanEvent>>>);
+
+    #[derive(Clone)]
+    struct SpanEvent {
+        kind: &'static str,
+        name: String,
+    }
+
+    struct NameVisitor(Option<String>);
+    impl Visit for NameVisitor {
+        fn record_str(&mut self, field: &Field, value: &str) {
+            if field.name() == "otel.name" {
+                self.0 = Some(value.to_owned());
+            }
+        }
+        fn record_debug(&mut self, _: &Field, _: &dyn Debug) {}
+    }
+
+    impl SpanCapture {
+        fn closed(&self, name: &str) -> usize {
+            self.0
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|e| e.kind == "close" && e.name == name)
+                .count()
+        }
+    }
+
+    impl<S: Subscriber + for<'s> LookupSpan<'s>> Layer<S> for SpanCapture {
+        fn on_new_span(
+            &self,
+            attrs: &tracing::span::Attributes<'_>,
+            id: &Id,
+            ctx: Context<'_, S>,
+        ) {
+            let mut v = NameVisitor(None);
+            attrs.record(&mut v);
+            let name = v.0.unwrap_or_else(|| attrs.metadata().name().to_owned());
+            if let Some(span) = ctx.span(id) {
+                span.extensions_mut().insert(CapturedName(name.clone()));
+            }
+            self.0
+                .lock()
+                .unwrap()
+                .push(SpanEvent { kind: "open", name });
+        }
+
+        fn on_close(&self, id: Id, ctx: Context<'_, S>) {
+            let name = ctx
+                .span(&id)
+                .and_then(|s| s.extensions().get::<CapturedName>().map(|n| n.0.clone()))
+                .unwrap_or_default();
+            self.0.lock().unwrap().push(SpanEvent {
+                kind: "close",
+                name,
+            });
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Context helper
+    // -----------------------------------------------------------------------
+
+    async fn make_ctx() -> SessionContext {
+        let rule = crate::instrument_with_info_spans!(options: InstrumentationOptions::default());
+        let state = SessionStateBuilder::new()
+            .with_default_features()
+            .with_physical_optimizer_rule(rule)
+            .build();
+        SessionContext::new_with_state(state)
+    }
+
+    // -----------------------------------------------------------------------
+    // Tests
+    // -----------------------------------------------------------------------
+
+    /// Regression for issue #27: spans must close when the last execution stream
+    /// is consumed, not when the plan is dropped.
+    ///
+    /// Before the fix, `InstrumentedExec` held `OnceLock<Arc<*Recorder>>` and a
+    /// `Span` clone, keeping spans alive until `drop(plan)`. With
+    /// `SimpleSpanProcessor` that caused `drop()` to block for
+    /// `N_nodes × OTLP_latency` seconds.
+    #[tokio::test]
+    async fn span_closes_when_stream_finishes_not_when_plan_drops() {
+        let capture = SpanCapture::default();
+        let _guard = tracing::subscriber::set_default(
+            tracing_subscriber::registry()
+                .with(tracing::level_filters::LevelFilter::INFO)
+                .with(capture.clone()),
+        );
+
+        let ctx = make_ctx().await;
+        let plan = ctx
+            .sql("SELECT 1")
+            .await
+            .unwrap()
+            .create_physical_plan()
+            .await
+            .unwrap();
+        let plan_clone = plan.clone(); // keep plan alive after streams are consumed
+
+        let task_ctx = ctx.task_ctx();
+        for part in 0..plan.properties().partitioning.partition_count() {
+            let mut stream = plan.execute(part, task_ctx.clone()).unwrap();
+            while let Some(b) = stream.next().await {
+                b.unwrap();
+            }
+        }
+        drop(plan);
+
+        // Spans are already closed — they were closed when the streams finished.
+        let closed_after_collect = capture.closed("InstrumentedExec");
+        assert!(
+            closed_after_collect > 0,
+            "InstrumentedExec spans must close when streams finish"
+        );
+
+        // Dropping the extra plan clone must not trigger any new span closures.
+        drop(plan_clone);
+        assert_eq!(
+            capture.closed("InstrumentedExec"),
+            closed_after_collect,
+            "dropping the plan must not close additional spans (regression: issue #27)"
+        );
+    }
+
+    /// Spans must remain open while execution streams are alive, even after the
+    /// plan itself is dropped. Span lifetime tracks stream lifetime.
+    #[tokio::test]
+    async fn span_stays_open_while_stream_alive() {
+        let capture = SpanCapture::default();
+        let _guard = tracing::subscriber::set_default(
+            tracing_subscriber::registry()
+                .with(tracing::level_filters::LevelFilter::INFO)
+                .with(capture.clone()),
+        );
+
+        let ctx = make_ctx().await;
+        let plan = ctx
+            .sql("SELECT 1")
+            .await
+            .unwrap()
+            .create_physical_plan()
+            .await
+            .unwrap();
+
+        let task_ctx = ctx.task_ctx();
+        // Collect all streams before dropping the plan, so the streams (and their
+        // Arc<NodeRecorder>) are alive while the plan Weak is dropped.
+        let streams: Vec<_> = (0..plan.properties().partitioning.partition_count())
+            .map(|p| plan.execute(p, task_ctx.clone()).unwrap())
+            .collect();
+
+        // Drop the plan — only the Weak<NodeRecorder> is released, not the span.
+        drop(plan);
+        assert_eq!(
+            capture.closed("InstrumentedExec"),
+            0,
+            "spans must not close when the plan drops while streams are still alive"
+        );
+
+        // Consuming and dropping the streams releases the Arc<NodeRecorder>.
+        for mut stream in streams {
+            while let Some(b) = stream.next().await {
+                b.unwrap();
+            }
+        }
+        assert!(
+            capture.closed("InstrumentedExec") > 0,
+            "InstrumentedExec spans must close once all streams are consumed"
+        );
     }
 }
