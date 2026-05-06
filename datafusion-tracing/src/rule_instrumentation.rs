@@ -837,7 +837,7 @@ impl OptimizerRule for InstrumentedOptimizerRule {
             }
         }
 
-        if result.is_err() {
+        if result.is_err() && !config.options().optimizer.skip_failed_rules {
             drop(enter);
             drop_planning_context();
         }
