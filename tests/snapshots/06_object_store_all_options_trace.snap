@@ -1,6 +1,5 @@
 ---
 source: tests/integration_tests.rs
-assertion_line: 250
 expression: json_lines
 ---
 [
@@ -2210,6 +2209,15 @@ expression: json_lines
       {
         "name": "run_traced_query",
         "query_name": "order_nations"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortExec",
+        "region": "us-west"
       }
     ],
     "target": "integration_utils",
