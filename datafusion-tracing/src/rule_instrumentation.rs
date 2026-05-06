@@ -487,7 +487,7 @@ impl OptimizerRule for ErrorCleanupOptimizerRule {
         config: &dyn OptimizerConfig,
     ) -> Result<Transformed<LogicalPlan>, DataFusionError> {
         let result = self.inner.rewrite(plan, config);
-        if result.is_err() {
+        if result.is_err() && !config.options().optimizer.skip_failed_rules {
             drop_planning_context();
         }
         result
