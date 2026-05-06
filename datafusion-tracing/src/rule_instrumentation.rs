@@ -181,15 +181,20 @@ fn record_modified_rule_in_context(rule_name: &str) {
     });
 }
 
-/// Drops the current planning context, closing the active phase span.
-///
-/// Called when a rule returns an error to ensure the phase span is not left
-/// open for the remainder of the session. The context's `_entered` guard is
-/// dropped here, which exits and closes the phase span.
+/// Drops the current planning context on a fatal rule error, closing the active
+/// phase span and resetting `OPTIMIZER_PASS_TRACKER` for `Optimizer` and
+/// `PhysicalOptimizer` phases so the next query starts at pass 0.
 fn drop_planning_context() {
-    PLANNING_CONTEXT.with(|cell| {
-        cell.borrow_mut().take();
-    });
+    let ctx = PLANNING_CONTEXT.with(|cell| cell.borrow_mut().take());
+    if let Some(ctx) = ctx {
+        if matches!(
+            ctx.phase,
+            PlanningPhase::Optimizer | PlanningPhase::PhysicalOptimizer
+        ) {
+            OPTIMIZER_PASS_TRACKER.with(|cell| cell.borrow_mut().reset());
+        }
+        drop(ctx);
+    }
 }
 
 /// Closes a phase span, recording effective rules and plan diff if enabled.
