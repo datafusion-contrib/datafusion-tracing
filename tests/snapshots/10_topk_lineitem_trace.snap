@@ -2782,6 +2782,24 @@ expression: json_lines
       {
         "name": "run_traced_query",
         "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortPreservingMergeExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.partitioning": "UnknownPartitioning(8)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortExec(TopK)",
+        "region": "us-west"
       }
     ],
     "target": "integration_utils",
@@ -2809,6 +2827,24 @@ expression: json_lines
       {
         "name": "run_traced_query",
         "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortPreservingMergeExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.partitioning": "UnknownPartitioning(8)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortExec(TopK)",
+        "region": "us-west"
       }
     ],
     "target": "integration_utils",
@@ -2836,6 +2872,24 @@ expression: json_lines
       {
         "name": "run_traced_query",
         "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortPreservingMergeExec",
+        "region": "us-west"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.partitioning": "UnknownPartitioning(8)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortExec(TopK)",
+        "region": "us-west"
       }
     ],
     "target": "integration_utils",
@@ -2863,6 +2917,15 @@ expression: json_lines
       {
         "name": "run_traced_query",
         "query_name": "topk_lineitem"
+      },
+      {
+        "datafusion.boundedness": "Bounded",
+        "datafusion.emission_type": "Final",
+        "datafusion.partitioning": "UnknownPartitioning(1)",
+        "env": "production",
+        "name": "InstrumentedExec",
+        "otel.name": "SortPreservingMergeExec",
+        "region": "us-west"
       }
     ],
     "target": "integration_utils",
