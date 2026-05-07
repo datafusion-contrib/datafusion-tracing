@@ -256,13 +256,100 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
 
     // General assertion on the full trace.
     if !test_case.ignore_full_trace {
+        let full_trace_lines = normalize_full_trace_lines(test_name, &json_lines);
+
         // Redact `datafusion.preview` values as they are often non-deterministic.
         preview_redacted_settings().bind(|| {
-            assert_json_snapshot!(format!("{test_name}_trace"), json_lines);
+            assert_json_snapshot!(format!("{test_name}_trace"), full_trace_lines);
         });
     }
 
     Ok(())
+}
+
+fn normalize_full_trace_lines(test_name: &str, json_lines: &[Value]) -> Vec<Value> {
+    if !test_name.contains("recursive") {
+        return json_lines.to_vec();
+    }
+
+    // Recursive queries may close child execution streams in a different order
+    // across runtimes. Keep the trace contents intact, but make the snapshot
+    // independent of that scheduling detail.
+    let mut normalized_lines = Vec::new();
+    let mut recursive_exec_lines = Vec::new();
+    let mut recursive_exec_insert_at = None;
+
+    for json_line in json_lines {
+        if is_recursive_exec_close(json_line) {
+            recursive_exec_insert_at.get_or_insert(normalized_lines.len());
+            recursive_exec_lines.push(json_line.clone());
+        } else {
+            normalized_lines.push(json_line.clone());
+        }
+    }
+
+    recursive_exec_lines.sort_by_key(recursive_exec_sort_key);
+
+    if let Some(insert_at) = recursive_exec_insert_at {
+        normalized_lines.splice(insert_at..insert_at, recursive_exec_lines);
+    }
+
+    normalized_lines
+}
+
+fn is_recursive_exec_close(json_line: &Value) -> bool {
+    extract_json_field_value(json_line, "name").as_deref() == Some("InstrumentedExec")
+        && json_line["spans"].as_array().is_some_and(|spans| {
+            spans.iter().any(|span| {
+                span.get("otel.name").and_then(Value::as_str)
+                    == Some("RecursiveQueryExec")
+            })
+        })
+}
+
+fn recursive_exec_sort_key(json_line: &Value) -> String {
+    let span_path = json_line["spans"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|span| {
+            [
+                value_to_sort_string(span.get("name")),
+                value_to_sort_string(span.get("otel.name")),
+                value_to_sort_string(span.get("datafusion.node")),
+                value_to_sort_string(span.get("datafusion.partitioning")),
+            ]
+            .join(":")
+        })
+        .collect::<Vec<_>>()
+        .join("/");
+
+    [
+        span_path,
+        span_field_sort_value(json_line, "name"),
+        span_field_sort_value(json_line, "otel.name"),
+        span_field_sort_value(json_line, "datafusion.node"),
+        span_field_sort_value(json_line, "datafusion.partitioning"),
+        span_field_sort_value(json_line, "datafusion.metrics.output_rows"),
+        span_field_sort_value(json_line, "datafusion.metrics.output_batches"),
+        span_field_sort_value(json_line, "datafusion.metrics.output_bytes"),
+    ]
+    .join("|")
+}
+
+fn span_field_sort_value(json_line: &Value, field_name: &str) -> String {
+    value_to_sort_string(json_line["span"].get(field_name))
+}
+
+fn value_to_sort_string(value: Option<&Value>) -> String {
+    value
+        .map(|value| {
+            value
+                .as_str()
+                .map(ToString::to_string)
+                .unwrap_or_else(|| value.to_string())
+        })
+        .unwrap_or_default()
 }
 
 /// Extracts a field's value from the `"span"` object in a JSON line, returning it as an `Option<String>`.
