@@ -50,7 +50,7 @@ use futures::Stream;
 use pin_project::{pin_project, pinned_drop};
 use std::{
     any::Any,
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     fmt::{self, Debug},
     pin::Pin,
     sync::{
@@ -75,11 +75,14 @@ pub struct InstrumentedExec {
     preview_limit: usize,
     preview_fn: Option<Arc<PreviewFn>>,
 
-    /// Shared recorders for the current execution of this plan node.
+    /// Shared recorder groups for active executions of this plan node.
     ///
-    /// The plan keeps these alive only until all partitions have finished, so
-    /// dropping an already-consumed plan does not close spans synchronously.
-    recorders: Arc<Mutex<Option<Arc<ExecutionRecorders>>>>,
+    /// Groups are kept alive only until their streams have finished, so dropping
+    /// an already-consumed plan does not close spans synchronously. Concurrent
+    /// executions that belong to the same task context and touch distinct
+    /// partitions share a group; independent or duplicate executions get a fresh
+    /// group.
+    recorders: Arc<Mutex<Vec<Arc<ExecutionRecorders>>>>,
 
     /// Function to create and initialize tracing spans.
     span_create_fn: Arc<SpanCreateFn>,
@@ -105,7 +108,7 @@ impl InstrumentedExec {
             record_metrics: options.record_metrics,
             preview_limit: options.preview_limit,
             preview_fn: options.preview_fn.clone(),
-            recorders: Arc::new(Mutex::new(None)),
+            recorders: Arc::new(Mutex::new(Vec::new())),
             span_create_fn,
         }
     }
@@ -127,12 +130,23 @@ impl InstrumentedExec {
         ))
     }
 
-    /// Returns the shared recorder group for the current execution of this plan,
-    /// creating one with a fresh span if needed.
-    fn get_or_create_recorders(&self) -> Arc<ExecutionRecorders> {
-        let mut guard = self.recorders.lock().unwrap();
-        if let Some(recorders) = guard.as_ref() {
-            return recorders.clone();
+    /// Returns and reserves the recorder group for this execution stream.
+    ///
+    /// The stream is reserved before calling `inner.execute` so concurrent
+    /// callers cannot observe an idle recorder group and clear or reuse it
+    /// incorrectly.
+    fn reserve_recorders(
+        &self,
+        context: Arc<TaskContext>,
+        partition: usize,
+    ) -> Arc<ExecutionRecorders> {
+        let mut groups = self.recorders.lock().unwrap();
+        for recorders in groups.iter() {
+            if recorders.is_same_context(&context)
+                && recorders.try_reserve_partition(partition)
+            {
+                return recorders.clone();
+            }
         }
 
         let span = self.create_populated_span();
@@ -145,12 +159,14 @@ impl InstrumentedExec {
         });
         let recorders = Arc::new(ExecutionRecorders::new(
             Arc::downgrade(&self.recorders),
+            context,
+            partition,
             NodeRecorder::new(self.inner.clone(), span.clone()),
             self.record_metrics
                 .then(|| MetricsRecorder::new(self.inner.clone(), span.clone())),
             preview_recorder,
         ));
-        *guard = Some(recorders.clone());
+        groups.push(recorders.clone());
         recorders
     }
 
@@ -390,18 +406,17 @@ impl ExecutionPlan for InstrumentedExec {
         partition: usize,
         context: Arc<TaskContext>,
     ) -> Result<SendableRecordBatchStream> {
-        let recorders = self.get_or_create_recorders();
+        let recorders = self.reserve_recorders(context.clone(), partition);
         let span = recorders.span();
 
         let inner_stream = match span.in_scope(|| self.inner.execute(partition, context))
         {
             Ok(stream) => stream,
             Err(error) => {
-                recorders.release_if_idle();
+                recorders.cancel_stream(partition);
                 return Err(error);
             }
         };
-        recorders.start_stream();
 
         // Wrap the stream with node recording so `datafusion.node` is recorded only after
         // completion, once it is fully qualified.
@@ -435,7 +450,9 @@ impl ExecutionPlan for InstrumentedExec {
 }
 
 struct ExecutionRecorders {
-    slot: Weak<Mutex<Option<Arc<ExecutionRecorders>>>>,
+    slot: Weak<Mutex<Vec<Arc<ExecutionRecorders>>>>,
+    context: Arc<TaskContext>,
+    seen_partitions: Mutex<HashSet<usize>>,
     active_streams: AtomicUsize,
     node_recorder: Arc<NodeRecorder>,
     metrics_recorder: Option<Arc<MetricsRecorder>>,
@@ -444,14 +461,18 @@ struct ExecutionRecorders {
 
 impl ExecutionRecorders {
     fn new(
-        slot: Weak<Mutex<Option<Arc<ExecutionRecorders>>>>,
+        slot: Weak<Mutex<Vec<Arc<ExecutionRecorders>>>>,
+        context: Arc<TaskContext>,
+        partition: usize,
         node_recorder: NodeRecorder,
         metrics_recorder: Option<MetricsRecorder>,
         preview_recorder: Option<PreviewRecorder>,
     ) -> Self {
         Self {
             slot,
-            active_streams: AtomicUsize::new(0),
+            context,
+            seen_partitions: Mutex::new(HashSet::from([partition])),
+            active_streams: AtomicUsize::new(1),
             node_recorder: Arc::new(node_recorder),
             metrics_recorder: metrics_recorder.map(Arc::new),
             preview_recorder: preview_recorder.map(Arc::new),
@@ -462,30 +483,39 @@ impl ExecutionRecorders {
         self.node_recorder.span()
     }
 
-    fn start_stream(&self) {
+    fn is_same_context(&self, context: &Arc<TaskContext>) -> bool {
+        Arc::ptr_eq(&self.context, context)
+    }
+
+    fn try_reserve_partition(&self, partition: usize) -> bool {
+        let mut seen_partitions = self.seen_partitions.lock().unwrap();
+        if seen_partitions.contains(&partition) {
+            return false;
+        }
+
+        seen_partitions.insert(partition);
         self.active_streams.fetch_add(1, Ordering::AcqRel);
+        true
     }
 
     fn finish_stream(self: &Arc<Self>) {
-        if self.active_streams.fetch_sub(1, Ordering::AcqRel) == 1 {
-            self.clear_slot_if_current();
-        }
+        self.release_stream(None);
     }
 
-    fn release_if_idle(self: &Arc<Self>) {
-        if self.active_streams.load(Ordering::Acquire) == 0 {
-            self.clear_slot_if_current();
-        }
+    fn cancel_stream(self: &Arc<Self>, partition: usize) {
+        self.release_stream(Some(partition));
     }
 
-    fn clear_slot_if_current(self: &Arc<Self>) {
+    fn release_stream(self: &Arc<Self>, canceled_partition: Option<usize>) {
         if let Some(slot) = self.slot.upgrade() {
-            let mut guard = slot.lock().unwrap();
-            if guard
-                .as_ref()
-                .is_some_and(|recorders| Arc::ptr_eq(recorders, self))
-            {
-                *guard = None;
+            let mut groups = slot.lock().unwrap();
+
+            if let Some(partition) = canceled_partition {
+                self.seen_partitions.lock().unwrap().remove(&partition);
+            }
+
+            if self.active_streams.fetch_sub(1, Ordering::AcqRel) == 1 {
+                groups.retain(|recorders| !Arc::ptr_eq(recorders, self));
             }
         }
     }
@@ -537,9 +567,11 @@ impl DisplayAs for InstrumentedExec {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use datafusion::common::DataFusionError;
     use datafusion::execution::SessionStateBuilder;
     use datafusion::prelude::SessionContext;
     use futures::StreamExt;
+    use std::sync::atomic::AtomicBool;
     use tracing::field::{Field, Visit};
     use tracing::{Id, Subscriber};
     use tracing_subscriber::Layer;
@@ -738,7 +770,7 @@ mod tests {
         );
     }
 
-    fn two_partition_plan() -> InstrumentedExec {
+    fn two_partition_inner() -> Arc<dyn ExecutionPlan> {
         use datafusion::arrow::array::Int64Array;
         use datafusion::arrow::datatypes::{DataType, Field, Schema};
         use datafusion::arrow::record_batch::RecordBatch;
@@ -755,14 +787,87 @@ mod tests {
             vec![Arc::new(Int64Array::from(vec![2]))],
         )
         .unwrap();
-        let inner =
-            TestMemoryExec::try_new_exec(&[vec![batch_1], vec![batch_2]], schema, None)
-                .unwrap();
+        TestMemoryExec::try_new_exec(&[vec![batch_1], vec![batch_2]], schema, None)
+            .unwrap()
+    }
+
+    fn two_partition_plan() -> InstrumentedExec {
         InstrumentedExec::new(
-            inner,
+            two_partition_inner(),
             Arc::new(|| tracing::info_span!("InstrumentedExec")),
             &InstrumentationOptions::default(),
         )
+    }
+
+    struct FailFirstExecute {
+        inner: Arc<dyn ExecutionPlan>,
+        fail_next: AtomicBool,
+    }
+
+    impl FailFirstExecute {
+        fn new(inner: Arc<dyn ExecutionPlan>) -> Self {
+            Self {
+                inner,
+                fail_next: AtomicBool::new(true),
+            }
+        }
+    }
+
+    impl Debug for FailFirstExecute {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.debug_struct("FailFirstExecute")
+                .field("inner", &self.inner)
+                .finish()
+        }
+    }
+
+    impl DisplayAs for FailFirstExecute {
+        fn fmt_as(
+            &self,
+            format: DisplayFormatType,
+            f: &mut fmt::Formatter<'_>,
+        ) -> fmt::Result {
+            self.inner.fmt_as(format, f)
+        }
+    }
+
+    impl ExecutionPlan for FailFirstExecute {
+        fn name(&self) -> &str {
+            self.inner.name()
+        }
+
+        fn as_any(&self) -> &dyn Any {
+            self
+        }
+
+        fn properties(&self) -> &Arc<PlanProperties> {
+            self.inner.properties()
+        }
+
+        fn children(&self) -> Vec<&Arc<dyn ExecutionPlan>> {
+            self.inner.children()
+        }
+
+        fn with_new_children(
+            self: Arc<Self>,
+            children: Vec<Arc<dyn ExecutionPlan>>,
+        ) -> Result<Arc<dyn ExecutionPlan>> {
+            let inner = self.inner.clone().with_new_children(children)?;
+            Ok(Arc::new(FailFirstExecute::new(inner)))
+        }
+
+        fn execute(
+            &self,
+            partition: usize,
+            context: Arc<TaskContext>,
+        ) -> Result<SendableRecordBatchStream> {
+            if self.fail_next.swap(false, Ordering::AcqRel) {
+                return Err(DataFusionError::Internal(
+                    "intentional execute failure".into(),
+                ));
+            }
+            self.inner.execute(partition, context)
+        }
     }
 
     /// Concurrent partition streams from one execution share a recorder group,
@@ -800,6 +905,43 @@ mod tests {
         );
     }
 
+    /// Concurrent executions on different task contexts represent independent
+    /// executions and must not share a span.
+    #[tokio::test]
+    async fn different_task_contexts_get_fresh_spans() {
+        let capture = SpanCapture::default();
+        let _guard = tracing::subscriber::set_default(
+            tracing_subscriber::registry()
+                .with(tracing::level_filters::LevelFilter::INFO)
+                .with(capture.clone()),
+        );
+
+        let plan = two_partition_plan();
+        let task_ctx_1 = Arc::new(TaskContext::default());
+        let task_ctx_2 = Arc::new(TaskContext::default());
+        let streams = vec![
+            plan.execute(0, task_ctx_1).unwrap(),
+            plan.execute(1, task_ctx_2).unwrap(),
+        ];
+
+        for mut stream in streams {
+            while let Some(batch) = stream.next().await {
+                batch.unwrap();
+            }
+        }
+
+        assert_eq!(
+            capture.opened("InstrumentedExec"),
+            2,
+            "different task contexts should create independent spans"
+        );
+        assert_eq!(
+            capture.closed("InstrumentedExec"),
+            2,
+            "each independent context execution should close its own span"
+        );
+    }
+
     /// `ExecutionPlan::execute` may legally be called for only a subset of
     /// partitions. Recorder lifetime must not wait for partitions that were
     /// never executed.
@@ -829,6 +971,45 @@ mod tests {
             capture.closed("InstrumentedExec"),
             1,
             "span should close after the only executed partition stream finishes"
+        );
+    }
+
+    /// Recorder acquisition reserves a stream before calling the inner plan.
+    /// If the inner plan fails to execute, the reservation must be released so
+    /// the failed group is not left active forever.
+    #[tokio::test]
+    async fn execute_error_releases_reserved_recorder_group() {
+        let capture = SpanCapture::default();
+        let _guard = tracing::subscriber::set_default(
+            tracing_subscriber::registry()
+                .with(tracing::level_filters::LevelFilter::INFO)
+                .with(capture.clone()),
+        );
+
+        let plan = InstrumentedExec::new(
+            Arc::new(FailFirstExecute::new(two_partition_inner())),
+            Arc::new(|| tracing::info_span!("InstrumentedExec")),
+            &InstrumentationOptions::default(),
+        );
+        let task_ctx = Arc::new(TaskContext::default());
+
+        assert!(plan.execute(0, task_ctx.clone()).is_err());
+
+        let mut stream = plan.execute(0, task_ctx).unwrap();
+        while let Some(batch) = stream.next().await {
+            batch.unwrap();
+        }
+        drop(stream);
+
+        assert_eq!(
+            capture.opened("InstrumentedExec"),
+            2,
+            "failed execute should close its span and retry should create a fresh one"
+        );
+        assert_eq!(
+            capture.closed("InstrumentedExec"),
+            2,
+            "failed execute must not leave an active recorder group behind"
         );
     }
 
@@ -862,6 +1043,44 @@ mod tests {
             capture.closed("InstrumentedExec"),
             2,
             "each repeated execution should close its own span"
+        );
+    }
+
+    /// Overlapping execution of the same partition is legal. Each active
+    /// duplicate stream should get a separate span so their recorder state does
+    /// not mix.
+    #[tokio::test]
+    async fn overlapping_same_partition_execution_gets_fresh_spans() {
+        let capture = SpanCapture::default();
+        let _guard = tracing::subscriber::set_default(
+            tracing_subscriber::registry()
+                .with(tracing::level_filters::LevelFilter::INFO)
+                .with(capture.clone()),
+        );
+
+        let plan = two_partition_plan();
+        let task_ctx = Arc::new(TaskContext::default());
+        let mut stream_1 = plan.execute(0, task_ctx.clone()).unwrap();
+        let mut stream_2 = plan.execute(0, task_ctx).unwrap();
+
+        while let Some(batch) = stream_1.next().await {
+            batch.unwrap();
+        }
+        while let Some(batch) = stream_2.next().await {
+            batch.unwrap();
+        }
+        drop(stream_1);
+        drop(stream_2);
+
+        assert_eq!(
+            capture.opened("InstrumentedExec"),
+            2,
+            "overlapping duplicate partition streams should create separate spans"
+        );
+        assert_eq!(
+            capture.closed("InstrumentedExec"),
+            2,
+            "each overlapping duplicate stream should close its own span"
         );
     }
 }
