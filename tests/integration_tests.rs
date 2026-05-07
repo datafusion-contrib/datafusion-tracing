@@ -39,6 +39,11 @@ static LOG_BUFFER: OnceLock<Arc<Mutex<Vec<u8>>>> = OnceLock::new();
 // A global "once" to ensure the subscriber is initialized only once.
 static SUBSCRIBER_INIT: Once = Once::new();
 
+// Snapshot assertions read from a process-global tracing subscriber. Run these
+// test cases one at a time so close-event ordering is not affected by other
+// snapshot tests running concurrently.
+static TEST_EXECUTION_LOCK: OnceLock<tokio::sync::Mutex<()>> = OnceLock::new();
+
 /// A struct describing how a particular query test should be run.
 #[derive(Debug, Default)]
 struct QueryTestCase<'a> {
@@ -197,8 +202,14 @@ async fn test_topk_lineitem() -> Result<()> {
 /// Executes the provided [`QueryTestCase`], setting up tracing and verifying
 /// log output according to its parameters.
 async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Result<()> {
+    let _test_guard = TEST_EXECUTION_LOCK
+        .get_or_init(Default::default)
+        .lock()
+        .await;
+
     // Initialize tracing infrastructure and collect a log buffer.
     let log_buffer = init_tracing();
+    log_buffer.lock().unwrap().clear();
 
     // Initialize the DataFusion session with the requested options.
     // plan_diff disabled for tests to avoid non-deterministic output
