@@ -55,6 +55,8 @@ struct QueryTestCase<'a> {
     ignored_preview_spans: &'a [usize],
     /// Whether to ignore the full trace in assertions.
     ignore_full_trace: bool,
+    /// Whether to collapse duplicate recursive execution close events.
+    collapse_recursive_exec_duplicates: bool,
 }
 
 impl<'a> QueryTestCase<'a> {
@@ -96,6 +98,11 @@ impl<'a> QueryTestCase<'a> {
 
     fn ignore_full_trace(mut self) -> Self {
         self.ignore_full_trace = true;
+        self
+    }
+
+    fn collapse_recursive_exec_duplicates(mut self) -> Self {
+        self.collapse_recursive_exec_duplicates = true;
         self
     }
 }
@@ -178,7 +185,11 @@ async fn test_scrabble_all_options() -> Result<()> {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_recursive() -> Result<()> {
-    execute_test_case("08_recursive", &QueryTestCase::new("recursive")).await
+    execute_test_case(
+        "08_recursive",
+        &QueryTestCase::new("recursive").collapse_recursive_exec_duplicates(),
+    )
+    .await
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
@@ -234,7 +245,11 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     // Bind insta settings for snapshot testing.
     let _insta_guard = insta_settings::settings().bind_to_scope();
 
-    let full_trace_lines = normalize_full_trace_lines(test_name, &json_lines);
+    let full_trace_lines = normalize_full_trace_lines(
+        test_name,
+        &json_lines,
+        test_case.collapse_recursive_exec_duplicates,
+    );
 
     // If we have a preview row_limit, do dedicated assertions on the previews.
     if test_case.session.get_preview_limit() > 0 {
@@ -267,7 +282,11 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     Ok(())
 }
 
-fn normalize_full_trace_lines(test_name: &str, json_lines: &[Value]) -> Vec<Value> {
+fn normalize_full_trace_lines(
+    test_name: &str,
+    json_lines: &[Value],
+    collapse_recursive_exec_duplicates: bool,
+) -> Vec<Value> {
     if !test_name.contains("recursive") {
         return json_lines.to_vec();
     }
@@ -289,6 +308,14 @@ fn normalize_full_trace_lines(test_name: &str, json_lines: &[Value]) -> Vec<Valu
     }
 
     recursive_exec_lines.sort_by_key(recursive_exec_sort_key);
+    if collapse_recursive_exec_duplicates {
+        // Without metrics or previews, repeated recursive iterations can emit
+        // indistinguishable close events. Keep asserting the recursive plan
+        // shape, but do not assert scheduler-dependent repeat counts.
+        recursive_exec_lines.dedup_by(|left, right| {
+            recursive_exec_sort_key(left) == recursive_exec_sort_key(right)
+        });
+    }
 
     if let Some(insert_at) = recursive_exec_insert_at {
         normalized_lines.splice(insert_at..insert_at, recursive_exec_lines);
