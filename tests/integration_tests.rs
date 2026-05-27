@@ -234,10 +234,12 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     // Bind insta settings for snapshot testing.
     let _insta_guard = insta_settings::settings().bind_to_scope();
 
+    let full_trace_lines = normalize_full_trace_lines(test_name, &json_lines);
+
     // If we have a preview row_limit, do dedicated assertions on the previews.
     if test_case.session.get_preview_limit() > 0 {
         let mut preview_id = 0;
-        for json_line in &json_lines {
+        for json_line in &full_trace_lines {
             if let Some(span_name) = extract_json_field_value(json_line, "otel.name")
                 && let Some(preview) =
                     extract_json_field_value(json_line, "datafusion.preview")
@@ -256,8 +258,6 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
 
     // General assertion on the full trace.
     if !test_case.ignore_full_trace {
-        let full_trace_lines = normalize_full_trace_lines(test_name, &json_lines);
-
         // Redact `datafusion.preview` values as they are often non-deterministic.
         preview_redacted_settings().bind(|| {
             assert_json_snapshot!(format!("{test_name}_trace"), full_trace_lines);
