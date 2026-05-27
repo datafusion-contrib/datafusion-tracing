@@ -59,7 +59,7 @@ use std::{
     },
     task::{Context, Poll},
 };
-use tracing::{Span, field};
+use tracing::{Id, Span, field};
 use tracing_futures::Instrument;
 
 /// Type alias for a function that creates a tracing span.
@@ -140,9 +140,11 @@ impl InstrumentedExec {
         context: Arc<TaskContext>,
         partition: usize,
     ) -> Arc<ExecutionRecorders> {
+        let parent_span_id = Span::current().id();
+
         let mut groups = self.recorders.lock().unwrap();
         for recorders in groups.iter() {
-            if recorders.is_same_context(&context)
+            if recorders.is_same_execution(parent_span_id.as_ref(), &context)
                 && recorders.try_reserve_partition(partition)
             {
                 return recorders.clone();
@@ -159,6 +161,7 @@ impl InstrumentedExec {
         });
         let recorders = Arc::new(ExecutionRecorders::new(
             Arc::downgrade(&self.recorders),
+            parent_span_id,
             context,
             partition,
             NodeRecorder::new(self.inner.clone(), span.clone()),
@@ -451,6 +454,7 @@ impl ExecutionPlan for InstrumentedExec {
 
 struct ExecutionRecorders {
     slot: Weak<Mutex<Vec<Arc<ExecutionRecorders>>>>,
+    parent_span_id: Option<Id>,
     context: Arc<TaskContext>,
     seen_partitions: Mutex<HashSet<usize>>,
     active_streams: AtomicUsize,
@@ -462,6 +466,7 @@ struct ExecutionRecorders {
 impl ExecutionRecorders {
     fn new(
         slot: Weak<Mutex<Vec<Arc<ExecutionRecorders>>>>,
+        parent_span_id: Option<Id>,
         context: Arc<TaskContext>,
         partition: usize,
         node_recorder: NodeRecorder,
@@ -470,6 +475,7 @@ impl ExecutionRecorders {
     ) -> Self {
         Self {
             slot,
+            parent_span_id,
             context,
             seen_partitions: Mutex::new(HashSet::from([partition])),
             active_streams: AtomicUsize::new(1),
@@ -483,8 +489,16 @@ impl ExecutionRecorders {
         self.node_recorder.span()
     }
 
-    fn is_same_context(&self, context: &Arc<TaskContext>) -> bool {
-        Arc::ptr_eq(&self.context, context)
+    fn is_same_execution(
+        &self,
+        parent_span_id: Option<&Id>,
+        context: &Arc<TaskContext>,
+    ) -> bool {
+        match (&self.parent_span_id, parent_span_id) {
+            (Some(a), Some(b)) => a == b && Arc::ptr_eq(&self.context, context),
+            (None, None) => Arc::ptr_eq(&self.context, context),
+            _ => false,
+        }
     }
 
     fn try_reserve_partition(&self, partition: usize) -> bool {
@@ -1005,6 +1019,45 @@ mod tests {
             capture.closed("InstrumentedExec"),
             2,
             "each independent context execution should close its own span"
+        );
+    }
+
+    /// The current parent span is a stronger execution identity than the task
+    /// context. Concurrent executions with the same task context but different
+    /// parent spans must not share recorder state.
+    #[tokio::test]
+    async fn different_parent_spans_get_fresh_spans() {
+        let capture = SpanCapture::default();
+        let _guard = tracing::subscriber::set_default(
+            tracing_subscriber::registry()
+                .with(tracing::level_filters::LevelFilter::INFO)
+                .with(capture.clone()),
+        );
+
+        let plan = two_partition_plan();
+        let task_ctx = Arc::new(TaskContext::default());
+        let parent_1 = tracing::info_span!("parent_1");
+        let parent_2 = tracing::info_span!("parent_2");
+        let streams = vec![
+            parent_1.in_scope(|| plan.execute(0, task_ctx.clone()).unwrap()),
+            parent_2.in_scope(|| plan.execute(1, task_ctx).unwrap()),
+        ];
+
+        for mut stream in streams {
+            while let Some(batch) = stream.next().await {
+                batch.unwrap();
+            }
+        }
+
+        assert_eq!(
+            capture.opened("InstrumentedExec"),
+            2,
+            "different parent spans should create independent spans"
+        );
+        assert_eq!(
+            capture.closed("InstrumentedExec"),
+            2,
+            "each parent-span execution should close its own span"
         );
     }
 
