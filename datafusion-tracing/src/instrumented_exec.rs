@@ -571,6 +571,7 @@ mod tests {
     use datafusion::execution::SessionStateBuilder;
     use datafusion::prelude::SessionContext;
     use futures::StreamExt;
+    use std::collections::HashMap;
     use std::sync::atomic::AtomicBool;
     use tracing::field::{Field, Visit};
     use tracing::{Id, Subscriber};
@@ -584,6 +585,7 @@ mod tests {
     // -----------------------------------------------------------------------
 
     struct CapturedName(String);
+    struct CapturedFields(HashMap<String, String>);
 
     #[derive(Clone, Default)]
     struct SpanCapture(Arc<Mutex<Vec<SpanEvent>>>);
@@ -592,16 +594,20 @@ mod tests {
     struct SpanEvent {
         kind: &'static str,
         name: String,
+        fields: HashMap<String, String>,
     }
 
-    struct NameVisitor(Option<String>);
-    impl Visit for NameVisitor {
+    #[derive(Default)]
+    struct FieldVisitor(HashMap<String, String>);
+
+    impl Visit for FieldVisitor {
         fn record_str(&mut self, field: &Field, value: &str) {
-            if field.name() == "otel.name" {
-                self.0 = Some(value.to_owned());
-            }
+            self.0.insert(field.name().to_owned(), value.to_owned());
         }
-        fn record_debug(&mut self, _: &Field, _: &dyn Debug) {}
+
+        fn record_debug(&mut self, field: &Field, value: &dyn Debug) {
+            self.0.insert(field.name().to_owned(), format!("{value:?}"));
+        }
     }
 
     impl SpanCapture {
@@ -622,6 +628,16 @@ mod tests {
                 .filter(|e| e.kind == "close" && e.name == name)
                 .count()
         }
+
+        fn closed_field_values(&self, name: &str, field: &str) -> Vec<String> {
+            self.0
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|e| e.kind == "close" && e.name == name)
+                .filter_map(|e| e.fields.get(field).cloned())
+                .collect()
+        }
     }
 
     impl<S: Subscriber + for<'s> LookupSpan<'s>> Layer<S> for SpanCapture {
@@ -631,26 +647,60 @@ mod tests {
             id: &Id,
             ctx: Context<'_, S>,
         ) {
-            let mut v = NameVisitor(None);
-            attrs.record(&mut v);
-            let name = v.0.unwrap_or_else(|| attrs.metadata().name().to_owned());
+            let mut visitor = FieldVisitor::default();
+            attrs.record(&mut visitor);
+            let name = visitor
+                .0
+                .get("otel.name")
+                .cloned()
+                .unwrap_or_else(|| attrs.metadata().name().to_owned());
             if let Some(span) = ctx.span(id) {
-                span.extensions_mut().insert(CapturedName(name.clone()));
+                let mut extensions = span.extensions_mut();
+                extensions.insert(CapturedName(name.clone()));
+                extensions.insert(CapturedFields(visitor.0.clone()));
             }
-            self.0
-                .lock()
-                .unwrap()
-                .push(SpanEvent { kind: "open", name });
+            self.0.lock().unwrap().push(SpanEvent {
+                kind: "open",
+                name,
+                fields: visitor.0,
+            });
+        }
+
+        fn on_record(
+            &self,
+            id: &Id,
+            values: &tracing::span::Record<'_>,
+            ctx: Context<'_, S>,
+        ) {
+            let mut visitor = FieldVisitor::default();
+            values.record(&mut visitor);
+            if let Some(span) = ctx.span(id)
+                && let Some(fields) = span.extensions_mut().get_mut::<CapturedFields>()
+            {
+                fields.0.extend(visitor.0);
+            }
         }
 
         fn on_close(&self, id: Id, ctx: Context<'_, S>) {
-            let name = ctx
+            let (name, fields) = ctx
                 .span(&id)
-                .and_then(|s| s.extensions().get::<CapturedName>().map(|n| n.0.clone()))
+                .map(|span| {
+                    let extensions = span.extensions();
+                    let name = extensions
+                        .get::<CapturedName>()
+                        .map(|n| n.0.clone())
+                        .unwrap_or_default();
+                    let fields = extensions
+                        .get::<CapturedFields>()
+                        .map(|fields| fields.0.clone())
+                        .unwrap_or_default();
+                    (name, fields)
+                })
                 .unwrap_or_default();
             self.0.lock().unwrap().push(SpanEvent {
                 kind: "close",
                 name,
+                fields,
             });
         }
     }
@@ -660,7 +710,11 @@ mod tests {
     // -----------------------------------------------------------------------
 
     async fn make_ctx() -> SessionContext {
-        let rule = crate::instrument_with_info_spans!(options: InstrumentationOptions::default());
+        make_ctx_with_options(InstrumentationOptions::default()).await
+    }
+
+    async fn make_ctx_with_options(options: InstrumentationOptions) -> SessionContext {
+        let rule = crate::instrument_with_info_spans!(options: options);
         let state = SessionStateBuilder::new()
             .with_default_features()
             .with_physical_optimizer_rule(rule)
@@ -792,10 +846,22 @@ mod tests {
     }
 
     fn two_partition_plan() -> InstrumentedExec {
+        two_partition_plan_with_options(&InstrumentationOptions::default())
+    }
+
+    fn two_partition_plan_with_options(
+        options: &InstrumentationOptions,
+    ) -> InstrumentedExec {
         InstrumentedExec::new(
             two_partition_inner(),
-            Arc::new(|| tracing::info_span!("InstrumentedExec")),
-            &InstrumentationOptions::default(),
+            Arc::new(|| {
+                tracing::info_span!(
+                    "InstrumentedExec",
+                    datafusion.preview = field::Empty,
+                    datafusion.metrics.output_rows = field::Empty,
+                )
+            }),
+            options,
         )
     }
 
@@ -1081,6 +1147,96 @@ mod tests {
             capture.closed("InstrumentedExec"),
             2,
             "each overlapping duplicate stream should close its own span"
+        );
+    }
+
+    /// Preview recorders are owned by a recorder group. Independent groups must
+    /// record independent previews instead of sharing preview state.
+    #[tokio::test]
+    async fn previews_do_not_mix_between_independent_recorder_groups() {
+        let capture = SpanCapture::default();
+        let _guard = tracing::subscriber::set_default(
+            tracing_subscriber::registry()
+                .with(tracing::level_filters::LevelFilter::INFO)
+                .with(capture.clone()),
+        );
+
+        let options = InstrumentationOptions::builder().preview_limit(5).build();
+        let plan = two_partition_plan_with_options(&options);
+        let task_ctx_1 = Arc::new(TaskContext::default());
+        let task_ctx_2 = Arc::new(TaskContext::default());
+        let mut stream_1 = plan.execute(0, task_ctx_1).unwrap();
+        let mut stream_2 = plan.execute(1, task_ctx_2).unwrap();
+
+        while let Some(batch) = stream_1.next().await {
+            batch.unwrap();
+        }
+        while let Some(batch) = stream_2.next().await {
+            batch.unwrap();
+        }
+        drop(stream_1);
+        drop(stream_2);
+
+        let previews =
+            capture.closed_field_values("InstrumentedExec", "datafusion.preview");
+        assert_eq!(
+            previews.len(),
+            2,
+            "independent recorder groups should each close with a preview"
+        );
+        assert!(
+            previews.iter().any(|preview| preview.contains("| 1 |")),
+            "one recorder group should preview partition 0"
+        );
+        assert!(
+            previews.iter().any(|preview| preview.contains("| 2 |")),
+            "one recorder group should preview partition 1"
+        );
+        assert!(
+            previews
+                .iter()
+                .all(|preview| !preview.contains("| 1 |\n|---|\n| 2 |")),
+            "independent recorder group previews must not be concatenated"
+        );
+    }
+
+    /// Metrics are still DataFusion's native plan metrics, but they should be
+    /// recorded when the stream-owned recorder group closes.
+    #[tokio::test]
+    async fn metrics_are_recorded_when_stream_group_closes() {
+        let capture = SpanCapture::default();
+        let _guard = tracing::subscriber::set_default(
+            tracing_subscriber::registry()
+                .with(tracing::level_filters::LevelFilter::INFO)
+                .with(capture.clone()),
+        );
+
+        let options = InstrumentationOptions::builder()
+            .record_metrics(true)
+            .build();
+        let ctx = make_ctx_with_options(options).await;
+        let plan = ctx
+            .sql("SELECT 1")
+            .await
+            .unwrap()
+            .create_physical_plan()
+            .await
+            .unwrap();
+        let task_ctx = ctx.task_ctx();
+
+        for partition in 0..plan.properties().partitioning.partition_count() {
+            let mut stream = plan.execute(partition, task_ctx.clone()).unwrap();
+            while let Some(batch) = stream.next().await {
+                batch.unwrap();
+            }
+            drop(stream);
+        }
+
+        let output_rows = capture
+            .closed_field_values("InstrumentedExec", "datafusion.metrics.output_rows");
+        assert!(
+            output_rows.iter().any(|value| value == "1"),
+            "stream group close should record native DataFusion output row metrics"
         );
     }
 }
