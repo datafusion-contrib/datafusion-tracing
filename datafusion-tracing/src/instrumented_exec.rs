@@ -22,7 +22,6 @@ use crate::{
     node::{NodeRecorder, NodeRecordingStream},
     options::InstrumentationOptions,
     preview::{PreviewFn, PreviewRecorder, PreviewRecordingStream},
-    utils::is_internal_optimizer_check,
 };
 use datafusion::{
     arrow::{array::RecordBatch, datatypes::SchemaRef},
@@ -242,9 +241,10 @@ impl InstrumentedExec {
 
     /// Returns true if the plan is an `InstrumentedExec` wrapper.
     ///
-    /// This relies on the internal optimization context being active in the current thread.
+    /// Uses a direct `Any` check because public `ExecutionPlan` downcasts
+    /// delegate to the wrapped plan instead.
     pub(crate) fn is_instrumented(plan: &dyn ExecutionPlan) -> bool {
-        plan.as_any().is::<InstrumentedExec>()
+        (plan as &dyn Any).is::<InstrumentedExec>()
     }
 }
 
@@ -263,7 +263,7 @@ impl ExecutionPlan for InstrumentedExec {
             fn benefits_from_input_partitioning(&self) -> Vec<bool>;
             fn children(&self) -> Vec<&Arc<dyn ExecutionPlan>>;
             fn metrics(&self) -> Option<MetricsSet>;
-            fn partition_statistics(&self, partition: Option<usize>) -> Result<Statistics>;
+            fn partition_statistics(&self, partition: Option<usize>) -> Result<Arc<Statistics>>;
             fn supports_limit_pushdown(&self) -> bool;
             fn fetch(&self) -> Option<usize>;
             fn cardinality_effect(&self) -> CardinalityEffect;
@@ -388,19 +388,10 @@ impl ExecutionPlan for InstrumentedExec {
         Some(self.with_new_inner(new_inner))
     }
 
-    /// Returns the plan as any to allow for downcasting.
-    ///
-    /// During optimization passes, this returns `self` (the `InstrumentedExec`) to
-    /// allow the optimizer to identify already-instrumented nodes.
-    ///
-    /// Otherwise, this delegates to the inner plan to provide "transparent downcasting",
-    /// allowing users to downcast an instrumented node to its original type.
-    fn as_any(&self) -> &dyn Any {
-        if is_internal_optimizer_check() {
-            self
-        } else {
-            self.inner.as_any()
-        }
+    /// Delegate public downcasts to the inner plan so instrumentation stays
+    /// transparent to normal plan inspection.
+    fn downcast_delegate(&self) -> Option<&dyn ExecutionPlan> {
+        Some(self.inner.as_ref())
     }
 
     /// Executes the plan for a given partition and context, instrumented with tracing and metrics recording.
@@ -914,10 +905,6 @@ mod tests {
     impl ExecutionPlan for FailFirstExecute {
         fn name(&self) -> &str {
             self.inner.name()
-        }
-
-        fn as_any(&self) -> &dyn Any {
-            self
         }
 
         fn properties(&self) -> &Arc<PlanProperties> {

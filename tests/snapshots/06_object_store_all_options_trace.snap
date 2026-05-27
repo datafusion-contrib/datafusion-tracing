@@ -176,6 +176,33 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "unions_to_filter"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "simplify_expressions"
     },
     "spans": [
@@ -822,6 +849,33 @@ expression: json_lines
     "span": {
       "name": "Rule",
       "otel.name": "optimize_unions"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "unions_to_filter"
     },
     "spans": [
       {
@@ -1755,6 +1809,35 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "WindowTopN"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "ProjectionPushdown"
     },
     "spans": [
@@ -1871,7 +1954,65 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "HashJoinBuffering"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "LimitPushdown"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "TopKRepartition"
     },
     "spans": [
       {
@@ -1929,7 +2070,7 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
-      "otel.name": "PushdownSort"
+      "otel.name": "PushdownSort (modified)"
     },
     "spans": [
       {
@@ -2073,7 +2214,7 @@ expression: json_lines
     "level": "INFO",
     "message": "close",
     "span": {
-      "datafusion.effective_rules": "OutputRequirements, OutputRequirements",
+      "datafusion.effective_rules": "OutputRequirements, OutputRequirements, PushdownSort",
       "name": "Phase",
       "otel.name": "optimize_physical_plan"
     },
@@ -2101,7 +2242,7 @@ expression: json_lines
     "span": {
       "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
       "name": "create_physical_plan",
-      "physical_plan": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]\n  DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet\n"
+      "physical_plan": "SortExec: expr=[n_name@1 ASC NULLS LAST], preserve_partitioning=[false]\n  DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet, sort_order_for_reorder=[n_name@1 ASC NULLS LAST]\n"
     },
     "spans": [
       {
@@ -2172,12 +2313,17 @@ expression: json_lines
       "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
       "datafusion.metrics.file_open_errors": "0",
       "datafusion.metrics.file_scan_errors": "0",
+      "datafusion.metrics.files_opened": "1",
+      "datafusion.metrics.files_processed": "1",
+      "datafusion.metrics.files_ranges_pruned_statistics": "1 total → 1 matched",
+      "datafusion.metrics.limit_pruned_row_groups": "0 total → 0 matched",
       "datafusion.metrics.metadata_load_time": "0.00ms",
       "datafusion.metrics.num_predicate_creation_errors": "0",
       "datafusion.metrics.output_batches": "1",
       "datafusion.metrics.output_bytes": "3.4 KB",
       "datafusion.metrics.output_rows": "25",
       "datafusion.metrics.page_index_eval_time": "0.00ms",
+      "datafusion.metrics.page_index_pages_pruned": "0 total → 0 matched",
       "datafusion.metrics.page_index_rows_pruned": "0 total → 0 matched",
       "datafusion.metrics.predicate_cache_inner_records": "0",
       "datafusion.metrics.predicate_cache_records": "0",
@@ -2187,13 +2333,14 @@ expression: json_lines
       "datafusion.metrics.row_groups_pruned_bloom_filter": "1 total → 1 matched",
       "datafusion.metrics.row_groups_pruned_statistics": "1 total → 1 matched",
       "datafusion.metrics.row_pushdown_eval_time": "0.00ms",
+      "datafusion.metrics.scan_efficiency_ratio": "64.04% (1.71 K/2.67 K)",
       "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
       "datafusion.metrics.statistics_eval_time": "0.00ms",
       "datafusion.metrics.time_elapsed_opening": "0.00ms",
       "datafusion.metrics.time_elapsed_processing": "0.00ms",
       "datafusion.metrics.time_elapsed_scanning_total": "0.00ms",
       "datafusion.metrics.time_elapsed_scanning_until_data": "0.00ms",
-      "datafusion.node": "DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet",
+      "datafusion.node": "DataSourceExec: file_groups={1 group: [[<TPCH_TABLES_DIR>/nation.parquet]]}, projection=[n_nationkey, n_name, n_regionkey, n_comment], file_type=parquet, sort_order_for_reorder=[n_name@1 ASC NULLS LAST]",
       "datafusion.partitioning": "UnknownPartitioning(1)",
       "datafusion.preview": "<redacted>",
       "env": "production",

@@ -19,7 +19,6 @@
 
 use crate::instrumented_exec::{InstrumentedExec, SpanCreateFn};
 use crate::options::InstrumentationOptions;
-use crate::utils::InternalOptimizerGuard;
 use datafusion::common::runtime::{JoinSetTracer, set_join_set_tracer};
 use datafusion::common::tree_node::{Transformed, TransformedResult, TreeNode};
 use datafusion::{
@@ -68,13 +67,6 @@ impl PhysicalOptimizerRule for InstrumentRule {
         plan: Arc<dyn ExecutionPlan>,
         _config: &ConfigOptions,
     ) -> datafusion::error::Result<Arc<dyn ExecutionPlan>> {
-        // Activate the internal optimization context for the duration of this pass.
-        // This allows InstrumentedExec to reveal its type via as_any().
-        //
-        // This guard is safe because PhysicalOptimizerRule::optimize is synchronous
-        // and won't be suspended or moved across threads during execution.
-        let _guard = InternalOptimizerGuard::new();
-
         // Iterate over the plan using transform_down to ensure all nodes are instrumented,
         // including any new nodes added by other optimizer rules.
         plan.transform_down(|plan| {
@@ -149,6 +141,12 @@ mod tests {
 
         // First optimization pass
         let optimized_once = rule.optimize(plan, &ConfigOptions::default())?;
+
+        // Public downcasts see the wrapped plan, while the instrumentation
+        // rule can still identify its own wrapper internally.
+        assert!(optimized_once.is::<PlaceholderRowExec>());
+        assert!(!optimized_once.is::<InstrumentedExec>());
+        assert!(InstrumentedExec::is_instrumented(optimized_once.as_ref()));
 
         // Second optimization pass
         let optimized_twice =
