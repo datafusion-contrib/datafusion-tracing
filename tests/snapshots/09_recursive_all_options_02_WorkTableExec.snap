@@ -2,8 +2,8 @@
 source: tests/integration_tests.rs
 expression: preview
 ---
-+---+
-| n |
-|===|
-| 1 |
-+---+
++----------------------+
+| numbers.n + Int64(1) |
+|======================|
+| 3                    |
++----------------------+
