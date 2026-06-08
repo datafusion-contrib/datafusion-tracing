@@ -1135,6 +1135,7 @@ mod tests {
     use tracing::Instrument as _;
     use tracing::field::{Field, Visit};
     use tracing::{Id, Subscriber};
+    use tracing_futures::WithSubscriber as _;
     use tracing_subscriber::Layer;
     use tracing_subscriber::layer::Context;
     use tracing_subscriber::prelude::*;
@@ -1442,54 +1443,62 @@ mod tests {
         let subscriber = tracing_subscriber::registry()
             .with(tracing_subscriber::filter::LevelFilter::TRACE)
             .with(capture.clone());
-        let _guard = tracing::subscriber::set_default(subscriber);
 
-        let ctx = make_ctx_with_fail_once(RuleInstrumentationOptions::phase_only());
-
-        // First query: fails in the analyzer (during collect)
-        let _ = run_query(&ctx).await;
-
-        let after_failure = capture.snapshot();
-        let opened_after_failure = count(&after_failure, "open", "analyze_logical_plan");
-        let closed_after_failure = count(&after_failure, "close", "analyze_logical_plan");
-        assert_eq!(
-            opened_after_failure, 1,
-            "one phase span opened during failed query"
-        );
-        assert_eq!(
-            closed_after_failure, 1,
-            "phase span must be closed immediately after analyzer error"
-        );
-
-        // Second query: must succeed without being nested under a stale span.
-        // Without the fix, the still-entered analyze_logical_plan guard would
-        // make it the current span, so successful_query would be parented under it.
+        // Keep the test subscriber attached across async poll boundaries. A
+        // bare `set_default` is thread-local and can miss spans if awaited work
+        // is polled outside that thread-local dispatcher context.
         async {
-            ctx.sql("SELECT 1").await.unwrap().collect().await.unwrap();
+            let ctx = make_ctx_with_fail_once(RuleInstrumentationOptions::phase_only());
+
+            // First query: fails in the analyzer (during collect)
+            let _ = run_query(&ctx).await;
+
+            let after_failure = capture.snapshot();
+            let opened_after_failure =
+                count(&after_failure, "open", "analyze_logical_plan");
+            let closed_after_failure =
+                count(&after_failure, "close", "analyze_logical_plan");
+            assert_eq!(
+                opened_after_failure, 1,
+                "one phase span opened during failed query"
+            );
+            assert_eq!(
+                closed_after_failure, 1,
+                "phase span must be closed immediately after analyzer error"
+            );
+
+            // Second query: must succeed without being nested under a stale span.
+            // Without the fix, the still-entered analyze_logical_plan guard would
+            // make it the current span, so successful_query would be parented under it.
+            async {
+                ctx.sql("SELECT 1").await.unwrap().collect().await.unwrap();
+            }
+            .instrument(tracing::info_span!("successful_query"))
+            .await;
+
+            let after_success = capture.snapshot();
+
+            // Every opened phase span must have been closed
+            let total_opened = count(&after_success, "open", "analyze_logical_plan");
+            let total_closed = count(&after_success, "close", "analyze_logical_plan");
+            assert_eq!(
+                total_opened, total_closed,
+                "every analyze_logical_plan span must be closed"
+            );
+
+            // The successful_query span must NOT be a child of analyze_logical_plan
+            let successful_query_parent = after_success
+                .iter()
+                .find(|e| e.kind == "open" && e.name == "successful_query")
+                .and_then(|e| e.parent.as_deref());
+            assert_ne!(
+                successful_query_parent,
+                Some("analyze_logical_plan"),
+                "successful_query must not be parented under the stale analyze_logical_plan span"
+            );
         }
-        .instrument(tracing::info_span!("successful_query"))
+        .with_subscriber(subscriber)
         .await;
-
-        let after_success = capture.snapshot();
-
-        // Every opened phase span must have been closed
-        let total_opened = count(&after_success, "open", "analyze_logical_plan");
-        let total_closed = count(&after_success, "close", "analyze_logical_plan");
-        assert_eq!(
-            total_opened, total_closed,
-            "every analyze_logical_plan span must be closed"
-        );
-
-        // The successful_query span must NOT be a child of analyze_logical_plan
-        let successful_query_parent = after_success
-            .iter()
-            .find(|e| e.kind == "open" && e.name == "successful_query")
-            .and_then(|e| e.parent.as_deref());
-        assert_ne!(
-            successful_query_parent,
-            Some("analyze_logical_plan"),
-            "successful_query must not be parented under the stale analyze_logical_plan span"
-        );
     }
 
     /// Regression: phase_only mode must close the phase span and reset the

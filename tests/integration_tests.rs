@@ -199,7 +199,8 @@ async fn test_recursive_all_options() -> Result<()> {
         &QueryTestCase::new("recursive")
             .with_metrics_collection()
             .with_row_limit(5)
-            .with_compact_preview(),
+            .with_compact_preview()
+            .collapse_recursive_exec_duplicates(),
     )
     .await
 }
@@ -253,8 +254,13 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
 
     // If we have a preview row_limit, do dedicated assertions on the previews.
     if test_case.session.get_preview_limit() > 0 {
+        let preview_lines = if test_case.collapse_recursive_exec_duplicates {
+            normalize_full_trace_lines(test_name, &json_lines, false)
+        } else {
+            full_trace_lines.clone()
+        };
         let mut preview_id = 0;
-        for json_line in &full_trace_lines {
+        for json_line in &preview_lines {
             if let Some(span_name) = extract_json_field_value(json_line, "otel.name")
                 && let Some(preview) =
                     extract_json_field_value(json_line, "datafusion.preview")
