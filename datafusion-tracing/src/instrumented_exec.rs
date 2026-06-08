@@ -586,9 +586,11 @@ mod tests {
     use datafusion::prelude::SessionContext;
     use futures::StreamExt;
     use std::collections::HashMap;
+    use std::future::Future;
     use std::sync::atomic::AtomicBool;
     use tracing::field::{Field, Visit};
     use tracing::{Id, Subscriber};
+    use tracing_futures::WithSubscriber as _;
     use tracing_subscriber::Layer;
     use tracing_subscriber::layer::Context;
     use tracing_subscriber::prelude::*;
@@ -719,6 +721,19 @@ mod tests {
         }
     }
 
+    async fn with_span_capture<F, Fut>(test: F)
+    where
+        F: FnOnce(SpanCapture) -> Fut,
+        Fut: Future<Output = ()>,
+    {
+        let capture = SpanCapture::default();
+        let subscriber = tracing_subscriber::registry()
+            .with(tracing::level_filters::LevelFilter::INFO)
+            .with(capture.clone());
+
+        test(capture).with_subscriber(subscriber).await;
+    }
+
     // -----------------------------------------------------------------------
     // Context helper
     // -----------------------------------------------------------------------
@@ -749,93 +764,85 @@ mod tests {
     /// `N_nodes × OTLP_latency` seconds.
     #[tokio::test]
     async fn span_closes_when_stream_finishes_not_when_plan_drops() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let ctx = make_ctx().await;
+            let plan = ctx
+                .sql("SELECT 1")
+                .await
+                .unwrap()
+                .create_physical_plan()
+                .await
+                .unwrap();
+            let plan_clone = plan.clone(); // keep plan alive after streams are consumed
 
-        let ctx = make_ctx().await;
-        let plan = ctx
-            .sql("SELECT 1")
-            .await
-            .unwrap()
-            .create_physical_plan()
-            .await
-            .unwrap();
-        let plan_clone = plan.clone(); // keep plan alive after streams are consumed
-
-        let task_ctx = ctx.task_ctx();
-        for part in 0..plan.properties().partitioning.partition_count() {
-            let mut stream = plan.execute(part, task_ctx.clone()).unwrap();
-            while let Some(b) = stream.next().await {
-                b.unwrap();
+            let task_ctx = ctx.task_ctx();
+            for part in 0..plan.properties().partitioning.partition_count() {
+                let mut stream = plan.execute(part, task_ctx.clone()).unwrap();
+                while let Some(b) = stream.next().await {
+                    b.unwrap();
+                }
             }
-        }
-        drop(plan);
+            drop(plan);
 
-        // Spans are already closed — they were closed when the streams finished.
-        let closed_after_collect = capture.closed("InstrumentedExec");
-        assert!(
-            closed_after_collect > 0,
-            "InstrumentedExec spans must close when streams finish"
-        );
+            // Spans are already closed — they were closed when the streams finished.
+            let closed_after_collect = capture.closed("InstrumentedExec");
+            assert!(
+                closed_after_collect > 0,
+                "InstrumentedExec spans must close when streams finish"
+            );
 
-        // Dropping the extra plan clone must not trigger any new span closures.
-        drop(plan_clone);
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            closed_after_collect,
-            "dropping the plan must not close additional spans (regression: issue #27)"
-        );
+            // Dropping the extra plan clone must not trigger any new span closures.
+            drop(plan_clone);
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                closed_after_collect,
+                "dropping the plan must not close additional spans (regression: issue #27)"
+            );
+        })
+        .await;
     }
 
     /// Spans must remain open while execution streams are alive, even after the
     /// plan itself is dropped. Span lifetime tracks stream lifetime.
     #[tokio::test]
     async fn span_stays_open_while_stream_alive() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let ctx = make_ctx().await;
+            let plan = ctx
+                .sql("SELECT 1")
+                .await
+                .unwrap()
+                .create_physical_plan()
+                .await
+                .unwrap();
 
-        let ctx = make_ctx().await;
-        let plan = ctx
-            .sql("SELECT 1")
-            .await
-            .unwrap()
-            .create_physical_plan()
-            .await
-            .unwrap();
+            let task_ctx = ctx.task_ctx();
+            // Collect all streams before dropping the plan, so the streams (and their
+            // Arc<NodeRecorder>) are alive while the plan Weak is dropped.
+            let streams: Vec<_> = (0..plan.properties().partitioning.partition_count())
+                .map(|p| plan.execute(p, task_ctx.clone()).unwrap())
+                .collect();
 
-        let task_ctx = ctx.task_ctx();
-        // Collect all streams before dropping the plan, so the streams (and their
-        // Arc<NodeRecorder>) are alive while the plan Weak is dropped.
-        let streams: Vec<_> = (0..plan.properties().partitioning.partition_count())
-            .map(|p| plan.execute(p, task_ctx.clone()).unwrap())
-            .collect();
+            // Drop the plan — only the Weak<NodeRecorder> is released, not the span.
+            drop(plan);
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                0,
+                "spans must not close when the plan drops while streams are still alive"
+            );
 
-        // Drop the plan — only the Weak<NodeRecorder> is released, not the span.
-        drop(plan);
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            0,
-            "spans must not close when the plan drops while streams are still alive"
-        );
-
-        // Consuming and dropping the streams releases the Arc<NodeRecorder>.
-        for mut stream in streams {
-            while let Some(b) = stream.next().await {
-                b.unwrap();
+            // Consuming and dropping the streams releases the Arc<NodeRecorder>.
+            for mut stream in streams {
+                while let Some(b) = stream.next().await {
+                    b.unwrap();
+                }
             }
-        }
-        assert!(
-            capture.closed("InstrumentedExec") > 0,
-            "InstrumentedExec spans must close once all streams are consumed"
-        );
+            assert!(
+                capture.closed("InstrumentedExec") > 0,
+                "InstrumentedExec spans must close once all streams are consumed"
+            );
+        })
+        .await;
     }
 
     fn two_partition_inner() -> Arc<dyn ExecutionPlan> {
@@ -954,72 +961,64 @@ mod tests {
     /// preserving aggregation while those streams are active.
     #[tokio::test]
     async fn concurrent_partitions_share_one_span() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let plan = two_partition_plan();
+            let task_ctx = Arc::new(TaskContext::default());
+            let streams: Vec<_> = (0..2)
+                .map(|part| plan.execute(part, task_ctx.clone()).unwrap())
+                .collect();
 
-        let plan = two_partition_plan();
-        let task_ctx = Arc::new(TaskContext::default());
-        let streams: Vec<_> = (0..2)
-            .map(|part| plan.execute(part, task_ctx.clone()).unwrap())
-            .collect();
-
-        for mut stream in streams {
-            while let Some(batch) = stream.next().await {
-                batch.unwrap();
+            for mut stream in streams {
+                while let Some(batch) = stream.next().await {
+                    batch.unwrap();
+                }
             }
-        }
 
-        assert_eq!(
-            capture.opened("InstrumentedExec"),
-            1,
-            "concurrent partition streams should share one span"
-        );
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            1,
-            "shared span should close when the active stream group finishes"
-        );
+            assert_eq!(
+                capture.opened("InstrumentedExec"),
+                1,
+                "concurrent partition streams should share one span"
+            );
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                1,
+                "shared span should close when the active stream group finishes"
+            );
+        })
+        .await;
     }
 
     /// Concurrent executions on different task contexts represent independent
     /// executions and must not share a span.
     #[tokio::test]
     async fn different_task_contexts_get_fresh_spans() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let plan = two_partition_plan();
+            let task_ctx_1 = Arc::new(TaskContext::default());
+            let task_ctx_2 = Arc::new(TaskContext::default());
+            let streams = vec![
+                plan.execute(0, task_ctx_1).unwrap(),
+                plan.execute(1, task_ctx_2).unwrap(),
+            ];
 
-        let plan = two_partition_plan();
-        let task_ctx_1 = Arc::new(TaskContext::default());
-        let task_ctx_2 = Arc::new(TaskContext::default());
-        let streams = vec![
-            plan.execute(0, task_ctx_1).unwrap(),
-            plan.execute(1, task_ctx_2).unwrap(),
-        ];
-
-        for mut stream in streams {
-            while let Some(batch) = stream.next().await {
-                batch.unwrap();
+            for mut stream in streams {
+                while let Some(batch) = stream.next().await {
+                    batch.unwrap();
+                }
             }
-        }
 
-        assert_eq!(
-            capture.opened("InstrumentedExec"),
-            2,
-            "different task contexts should create independent spans"
-        );
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            2,
-            "each independent context execution should close its own span"
-        );
+            assert_eq!(
+                capture.opened("InstrumentedExec"),
+                2,
+                "different task contexts should create independent spans"
+            );
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                2,
+                "each independent context execution should close its own span"
+            );
+        })
+        .await;
     }
 
     /// The current parent span is a stronger execution identity than the task
@@ -1027,38 +1026,34 @@ mod tests {
     /// parent spans must not share recorder state.
     #[tokio::test]
     async fn different_parent_spans_get_fresh_spans() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let plan = two_partition_plan();
+            let task_ctx = Arc::new(TaskContext::default());
+            let parent_1 = tracing::info_span!("parent_1");
+            let parent_2 = tracing::info_span!("parent_2");
+            let streams = vec![
+                parent_1.in_scope(|| plan.execute(0, task_ctx.clone()).unwrap()),
+                parent_2.in_scope(|| plan.execute(1, task_ctx).unwrap()),
+            ];
 
-        let plan = two_partition_plan();
-        let task_ctx = Arc::new(TaskContext::default());
-        let parent_1 = tracing::info_span!("parent_1");
-        let parent_2 = tracing::info_span!("parent_2");
-        let streams = vec![
-            parent_1.in_scope(|| plan.execute(0, task_ctx.clone()).unwrap()),
-            parent_2.in_scope(|| plan.execute(1, task_ctx).unwrap()),
-        ];
-
-        for mut stream in streams {
-            while let Some(batch) = stream.next().await {
-                batch.unwrap();
+            for mut stream in streams {
+                while let Some(batch) = stream.next().await {
+                    batch.unwrap();
+                }
             }
-        }
 
-        assert_eq!(
-            capture.opened("InstrumentedExec"),
-            2,
-            "different parent spans should create independent spans"
-        );
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            2,
-            "each parent-span execution should close its own span"
-        );
+            assert_eq!(
+                capture.opened("InstrumentedExec"),
+                2,
+                "different parent spans should create independent spans"
+            );
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                2,
+                "each parent-span execution should close its own span"
+            );
+        })
+        .await;
     }
 
     /// `ExecutionPlan::execute` may legally be called for only a subset of
@@ -1066,31 +1061,27 @@ mod tests {
     /// never executed.
     #[tokio::test]
     async fn partial_partition_execution_closes_span() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let plan = two_partition_plan();
+            let task_ctx = Arc::new(TaskContext::default());
+            let mut stream = plan.execute(0, task_ctx).unwrap();
+            while let Some(batch) = stream.next().await {
+                batch.unwrap();
+            }
+            drop(stream);
 
-        let plan = two_partition_plan();
-        let task_ctx = Arc::new(TaskContext::default());
-        let mut stream = plan.execute(0, task_ctx).unwrap();
-        while let Some(batch) = stream.next().await {
-            batch.unwrap();
-        }
-        drop(stream);
-
-        assert_eq!(
-            capture.opened("InstrumentedExec"),
-            1,
-            "same plan node should create one span across sequential partitions"
-        );
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            1,
-            "span should close after the only executed partition stream finishes"
-        );
+            assert_eq!(
+                capture.opened("InstrumentedExec"),
+                1,
+                "same plan node should create one span across sequential partitions"
+            );
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                1,
+                "span should close after the only executed partition stream finishes"
+            );
+        })
+        .await;
     }
 
     /// Recorder acquisition reserves a stream before calling the inner plan.
@@ -1098,38 +1089,34 @@ mod tests {
     /// the failed group is not left active forever.
     #[tokio::test]
     async fn execute_error_releases_reserved_recorder_group() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let plan = InstrumentedExec::new(
+                Arc::new(FailFirstExecute::new(two_partition_inner())),
+                Arc::new(|| tracing::info_span!("InstrumentedExec")),
+                &InstrumentationOptions::default(),
+            );
+            let task_ctx = Arc::new(TaskContext::default());
 
-        let plan = InstrumentedExec::new(
-            Arc::new(FailFirstExecute::new(two_partition_inner())),
-            Arc::new(|| tracing::info_span!("InstrumentedExec")),
-            &InstrumentationOptions::default(),
-        );
-        let task_ctx = Arc::new(TaskContext::default());
+            assert!(plan.execute(0, task_ctx.clone()).is_err());
 
-        assert!(plan.execute(0, task_ctx.clone()).is_err());
+            let mut stream = plan.execute(0, task_ctx).unwrap();
+            while let Some(batch) = stream.next().await {
+                batch.unwrap();
+            }
+            drop(stream);
 
-        let mut stream = plan.execute(0, task_ctx).unwrap();
-        while let Some(batch) = stream.next().await {
-            batch.unwrap();
-        }
-        drop(stream);
-
-        assert_eq!(
-            capture.opened("InstrumentedExec"),
-            2,
-            "failed execute should close its span and retry should create a fresh one"
-        );
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            2,
-            "failed execute must not leave an active recorder group behind"
-        );
+            assert_eq!(
+                capture.opened("InstrumentedExec"),
+                2,
+                "failed execute should close its span and retry should create a fresh one"
+            );
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                2,
+                "failed execute must not leave an active recorder group behind"
+            );
+        })
+        .await;
     }
 
     /// Repeated execution of the same partition is legal. Each independent
@@ -1137,32 +1124,28 @@ mod tests {
     /// stale completion state.
     #[tokio::test]
     async fn repeated_same_partition_execution_gets_fresh_span() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
-
-        let plan = two_partition_plan();
-        let task_ctx = Arc::new(TaskContext::default());
-        for _ in 0..2 {
-            let mut stream = plan.execute(0, task_ctx.clone()).unwrap();
-            while let Some(batch) = stream.next().await {
-                batch.unwrap();
+        with_span_capture(|capture| async move {
+            let plan = two_partition_plan();
+            let task_ctx = Arc::new(TaskContext::default());
+            for _ in 0..2 {
+                let mut stream = plan.execute(0, task_ctx.clone()).unwrap();
+                while let Some(batch) = stream.next().await {
+                    batch.unwrap();
+                }
             }
-        }
 
-        assert_eq!(
-            capture.opened("InstrumentedExec"),
-            2,
-            "separate stream groups should create separate spans"
-        );
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            2,
-            "each repeated execution should close its own span"
-        );
+            assert_eq!(
+                capture.opened("InstrumentedExec"),
+                2,
+                "separate stream groups should create separate spans"
+            );
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                2,
+                "each repeated execution should close its own span"
+            );
+        })
+        .await;
     }
 
     /// Overlapping execution of the same partition is legal. Each active
@@ -1170,126 +1153,116 @@ mod tests {
     /// not mix.
     #[tokio::test]
     async fn overlapping_same_partition_execution_gets_fresh_spans() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let plan = two_partition_plan();
+            let task_ctx = Arc::new(TaskContext::default());
+            let mut stream_1 = plan.execute(0, task_ctx.clone()).unwrap();
+            let mut stream_2 = plan.execute(0, task_ctx).unwrap();
 
-        let plan = two_partition_plan();
-        let task_ctx = Arc::new(TaskContext::default());
-        let mut stream_1 = plan.execute(0, task_ctx.clone()).unwrap();
-        let mut stream_2 = plan.execute(0, task_ctx).unwrap();
+            while let Some(batch) = stream_1.next().await {
+                batch.unwrap();
+            }
+            while let Some(batch) = stream_2.next().await {
+                batch.unwrap();
+            }
+            drop(stream_1);
+            drop(stream_2);
 
-        while let Some(batch) = stream_1.next().await {
-            batch.unwrap();
-        }
-        while let Some(batch) = stream_2.next().await {
-            batch.unwrap();
-        }
-        drop(stream_1);
-        drop(stream_2);
-
-        assert_eq!(
-            capture.opened("InstrumentedExec"),
-            2,
-            "overlapping duplicate partition streams should create separate spans"
-        );
-        assert_eq!(
-            capture.closed("InstrumentedExec"),
-            2,
-            "each overlapping duplicate stream should close its own span"
-        );
+            assert_eq!(
+                capture.opened("InstrumentedExec"),
+                2,
+                "overlapping duplicate partition streams should create separate spans"
+            );
+            assert_eq!(
+                capture.closed("InstrumentedExec"),
+                2,
+                "each overlapping duplicate stream should close its own span"
+            );
+        })
+        .await;
     }
 
     /// Preview recorders are owned by a recorder group. Independent groups must
     /// record independent previews instead of sharing preview state.
     #[tokio::test]
     async fn previews_do_not_mix_between_independent_recorder_groups() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let options = InstrumentationOptions::builder().preview_limit(5).build();
+            let plan = two_partition_plan_with_options(&options);
+            let task_ctx_1 = Arc::new(TaskContext::default());
+            let task_ctx_2 = Arc::new(TaskContext::default());
+            let mut stream_1 = plan.execute(0, task_ctx_1).unwrap();
+            let mut stream_2 = plan.execute(1, task_ctx_2).unwrap();
 
-        let options = InstrumentationOptions::builder().preview_limit(5).build();
-        let plan = two_partition_plan_with_options(&options);
-        let task_ctx_1 = Arc::new(TaskContext::default());
-        let task_ctx_2 = Arc::new(TaskContext::default());
-        let mut stream_1 = plan.execute(0, task_ctx_1).unwrap();
-        let mut stream_2 = plan.execute(1, task_ctx_2).unwrap();
+            while let Some(batch) = stream_1.next().await {
+                batch.unwrap();
+            }
+            while let Some(batch) = stream_2.next().await {
+                batch.unwrap();
+            }
+            drop(stream_1);
+            drop(stream_2);
 
-        while let Some(batch) = stream_1.next().await {
-            batch.unwrap();
-        }
-        while let Some(batch) = stream_2.next().await {
-            batch.unwrap();
-        }
-        drop(stream_1);
-        drop(stream_2);
-
-        let previews =
-            capture.closed_field_values("InstrumentedExec", "datafusion.preview");
-        assert_eq!(
-            previews.len(),
-            2,
-            "independent recorder groups should each close with a preview"
-        );
-        assert!(
-            previews.iter().any(|preview| preview.contains("| 1 |")),
-            "one recorder group should preview partition 0"
-        );
-        assert!(
-            previews.iter().any(|preview| preview.contains("| 2 |")),
-            "one recorder group should preview partition 1"
-        );
-        assert!(
-            previews
-                .iter()
-                .all(|preview| !preview.contains("| 1 |\n|---|\n| 2 |")),
-            "independent recorder group previews must not be concatenated"
-        );
+            let previews =
+                capture.closed_field_values("InstrumentedExec", "datafusion.preview");
+            assert_eq!(
+                previews.len(),
+                2,
+                "independent recorder groups should each close with a preview"
+            );
+            assert!(
+                previews.iter().any(|preview| preview.contains("| 1 |")),
+                "one recorder group should preview partition 0"
+            );
+            assert!(
+                previews.iter().any(|preview| preview.contains("| 2 |")),
+                "one recorder group should preview partition 1"
+            );
+            assert!(
+                previews
+                    .iter()
+                    .all(|preview| !preview.contains("| 1 |\n|---|\n| 2 |")),
+                "independent recorder group previews must not be concatenated"
+            );
+        })
+        .await;
     }
 
     /// Metrics are still DataFusion's native plan metrics, but they should be
     /// recorded when the stream-owned recorder group closes.
     #[tokio::test]
     async fn metrics_are_recorded_when_stream_group_closes() {
-        let capture = SpanCapture::default();
-        let _guard = tracing::subscriber::set_default(
-            tracing_subscriber::registry()
-                .with(tracing::level_filters::LevelFilter::INFO)
-                .with(capture.clone()),
-        );
+        with_span_capture(|capture| async move {
+            let options = InstrumentationOptions::builder()
+                .record_metrics(true)
+                .build();
+            let ctx = make_ctx_with_options(options).await;
+            let plan = ctx
+                .sql("SELECT 1")
+                .await
+                .unwrap()
+                .create_physical_plan()
+                .await
+                .unwrap();
+            let task_ctx = ctx.task_ctx();
 
-        let options = InstrumentationOptions::builder()
-            .record_metrics(true)
-            .build();
-        let ctx = make_ctx_with_options(options).await;
-        let plan = ctx
-            .sql("SELECT 1")
-            .await
-            .unwrap()
-            .create_physical_plan()
-            .await
-            .unwrap();
-        let task_ctx = ctx.task_ctx();
-
-        for partition in 0..plan.properties().partitioning.partition_count() {
-            let mut stream = plan.execute(partition, task_ctx.clone()).unwrap();
-            while let Some(batch) = stream.next().await {
-                batch.unwrap();
+            for partition in 0..plan.properties().partitioning.partition_count() {
+                let mut stream = plan.execute(partition, task_ctx.clone()).unwrap();
+                while let Some(batch) = stream.next().await {
+                    batch.unwrap();
+                }
+                drop(stream);
             }
-            drop(stream);
-        }
 
-        let output_rows = capture
-            .closed_field_values("InstrumentedExec", "datafusion.metrics.output_rows");
-        assert!(
-            output_rows.iter().any(|value| value == "1"),
-            "stream group close should record native DataFusion output row metrics"
-        );
+            let output_rows = capture.closed_field_values(
+                "InstrumentedExec",
+                "datafusion.metrics.output_rows",
+            );
+            assert!(
+                output_rows.iter().any(|value| value == "1"),
+                "stream group close should record native DataFusion output row metrics"
+            );
+        })
+        .await;
     }
 }
