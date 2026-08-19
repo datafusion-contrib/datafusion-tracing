@@ -965,7 +965,36 @@ expression: full_trace_lines
     "message": "close",
     "span": {
       "name": "Rule",
-      "otel.name": "EnforceDistribution"
+      "otel.name": "WindowTopN"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "02_basic_metrics"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "select_one"
+      },
+      {
+        "logical_plan": "Projection: Int64(1) [Int64(1):Int64]\n  EmptyRelation: rows=1 []",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnsureRequirements"
     },
     "spans": [
       {
@@ -1023,65 +1052,7 @@ expression: full_trace_lines
     "message": "close",
     "span": {
       "name": "Rule",
-      "otel.name": "EnforceSorting"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "02_basic_metrics"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "select_one"
-      },
-      {
-        "logical_plan": "Projection: Int64(1) [Int64(1):Int64]\n  EmptyRelation: rows=1 []",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
       "otel.name": "OptimizeAggregateOrder"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "02_basic_metrics"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "select_one"
-      },
-      {
-        "logical_plan": "Projection: Int64(1) [Int64(1):Int64]\n  EmptyRelation: rows=1 []",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "WindowTopN"
     },
     "spans": [
       {

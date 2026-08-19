@@ -28,7 +28,7 @@ expression: full_trace_lines
     "level": "INFO",
     "message": "close",
     "span": {
-      "logical_plan": "Projection: numbers.n [n:Int64]\n  SubqueryAlias: numbers [n:Int64]\n    Projection: n AS n [n:Int64]\n      RecursiveQuery: is_distinct=false [n:Int64]\n        Projection: Int64(1) AS n [n:Int64]\n          EmptyRelation: rows=1 []\n        Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n          Filter: numbers.n < Int64(3) [n:Int64]\n            TableScan: numbers [n:Int64]",
+      "logical_plan": "Projection: numbers.n [n:Int64;N]\n  SubqueryAlias: numbers [n:Int64;N]\n    RecursiveQuery: is_distinct=false [n:Int64;N]\n      Projection: n AS n [n:Int64]\n        Projection: Int64(1) AS n [n:Int64]\n          EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n        Filter: numbers.n < Int64(3) [n:Int64;N]\n          TableScan: numbers [n:Int64;N]",
       "name": "parse_sql",
       "sql": "WITH RECURSIVE numbers(n) AS (\n    SELECT 1 AS n\n    UNION ALL\n    SELECT n + 1 FROM numbers WHERE n < 3\n) SELECT n FROM numbers"
     },
@@ -1531,7 +1531,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1560,7 +1560,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1589,7 +1589,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1618,7 +1618,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1647,123 +1647,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "EnforceDistribution (modified)"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "CombinePartialFinalAggregate"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "EnforceSorting"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "OptimizeAggregateOrder"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "09_recursive_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1792,7 +1676,94 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnsureRequirements (modified)"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "CombinePartialFinalAggregate"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "OptimizeAggregateOrder"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "09_recursive_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1821,7 +1792,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1850,7 +1821,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1879,7 +1850,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1908,7 +1879,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1937,7 +1908,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1966,7 +1937,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -1995,7 +1966,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -2024,7 +1995,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -2053,7 +2024,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -2082,7 +2053,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -2111,7 +2082,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -2140,7 +2111,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -2169,7 +2140,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       },
       {
@@ -2185,7 +2156,7 @@ expression: full_trace_lines
     "level": "INFO",
     "message": "close",
     "span": {
-      "datafusion.effective_rules": "OutputRequirements, EnforceDistribution, ProjectionPushdown, OutputRequirements",
+      "datafusion.effective_rules": "OutputRequirements, EnsureRequirements, ProjectionPushdown, OutputRequirements",
       "name": "Phase",
       "otel.name": "optimize_physical_plan"
     },
@@ -2199,7 +2170,7 @@ expression: full_trace_lines
         "query_name": "recursive"
       },
       {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
         "name": "create_physical_plan"
       }
     ],
@@ -2211,9 +2182,9 @@ expression: full_trace_lines
     "level": "INFO",
     "message": "close",
     "span": {
-      "logical_plan": "SubqueryAlias: numbers [n:Int64]\n  Projection: n AS n [n:Int64]\n    RecursiveQuery: is_distinct=false [n:Int64]\n      Projection: Int64(1) AS n [n:Int64]\n        EmptyRelation: rows=1 []\n      Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64]\n        Filter: numbers.n < Int64(3) [n:Int64]\n          TableScan: numbers projection=[n] [n:Int64]",
+      "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
       "name": "create_physical_plan",
-      "physical_plan": "RecursiveQueryExec: name=numbers, is_distinct=false\n  ProjectionExec: expr=[1 as n]\n    PlaceholderRowExec\n  CoalescePartitionsExec\n    ProjectionExec: expr=[n@0 + 1 as n]\n      FilterExec: n@0 < 3\n        RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1\n          WorkTableExec: name=numbers\n"
+      "physical_plan": "RecursiveQueryExec: name=numbers, is_distinct=false\n  ProjectionExec: expr=[CAST(1 AS Int64) as n]\n    PlaceholderRowExec\n  CoalescePartitionsExec\n    ProjectionExec: expr=[n@0 + 1 as n]\n      FilterExec: n@0 < 3\n        RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1\n          WorkTableExec: name=numbers\n"
     },
     "spans": [
       {
@@ -2747,7 +2718,7 @@ expression: full_trace_lines
       "datafusion.metrics.output_bytes": "8.0 B",
       "datafusion.metrics.output_rows": "1",
       "datafusion.metrics.start_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.node": "ProjectionExec: expr=[1 as n]",
+      "datafusion.node": "ProjectionExec: expr=[CAST(1 AS Int64) as n]",
       "datafusion.partitioning": "UnknownPartitioning(1)",
       "datafusion.preview": "<redacted>",
       "env": "production",

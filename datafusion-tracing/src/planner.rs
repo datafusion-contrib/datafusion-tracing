@@ -18,6 +18,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
 
 use async_trait::async_trait;
+use datafusion::catalog::Session;
 use datafusion::common::Result;
 use datafusion::execution::SessionStateBuilder;
 use datafusion::execution::context::{QueryPlanner, SessionState};
@@ -80,7 +81,7 @@ impl QueryPlanner for TracingQueryPlanner {
     async fn create_physical_plan(
         &self,
         logical_plan: &LogicalPlan,
-        session_state: &SessionState,
+        session_state: &dyn Session,
     ) -> Result<Arc<dyn ExecutionPlan>> {
         let span = span_at_level!(
             self.level,
