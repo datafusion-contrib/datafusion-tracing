@@ -20,7 +20,7 @@ updates:
       prefix: "chore"
       include: "scope"
   
-  # Note: The hardcoded hawkeye_version and taplo_version in .github/workflows/ci.yml
+  # Note: The hardcoded Taplo and cargo-rdme versions in .github/workflows/ci.yml
   # cannot be automatically updated by Dependabot and will need manual updates.
 
   # Rust dependencies in Cargo.toml files
