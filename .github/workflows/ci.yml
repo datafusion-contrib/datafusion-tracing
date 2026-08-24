@@ -23,6 +23,7 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
+  HAWKEYE_VERSION: "7.0.0"
   TAPLO_VERSION:  "0.8.1"
   RDME_VERSION:  "1.4.8"
   TPCHGEN_VERSION: "2.0.0"
@@ -48,7 +49,7 @@ jobs:
     - name: Install dev tools (cached after first run)
       run: |
         cargo install --locked taplo-cli@${{ env.TAPLO_VERSION }}
-        cargo install --locked hawkeye
+        cargo install --locked hawkeye@${{ env.HAWKEYE_VERSION }}
         cargo install --locked cargo-rdme@${{ env.RDME_VERSION }}
 
     - run: ./ci/scripts/hawkeye_fmt.sh      # license headers
