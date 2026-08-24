@@ -415,6 +415,17 @@ impl ExecutionPlan for InstrumentedExec {
         )
     }
 
+    #[allow(deprecated)]
+    fn with_new_children_and_same_properties(
+        self: Arc<Self>,
+        children: Vec<Arc<dyn ExecutionPlan>>,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        self.replace_children(
+            children,
+            ReplaceChildrenOptions::new(ChildrenPropertiesMode::Keep),
+        )
+    }
+
     /// Delegate to the inner plan for resetting state and rewrap with an InstrumentedExec.
     fn reset_state(self: Arc<Self>) -> Result<Arc<dyn ExecutionPlan>> {
         let new_inner = self.inner.clone().reset_state()?;
@@ -987,6 +998,17 @@ mod tests {
             self.replace_children(
                 children,
                 ReplaceChildrenOptions::new(ChildrenPropertiesMode::Recompute),
+            )
+        }
+
+        #[allow(deprecated)]
+        fn with_new_children_and_same_properties(
+            self: Arc<Self>,
+            children: Vec<Arc<dyn ExecutionPlan>>,
+        ) -> Result<Arc<dyn ExecutionPlan>> {
+            self.replace_children(
+                children,
+                ReplaceChildrenOptions::new(ChildrenPropertiesMode::Keep),
             )
         }
 
