@@ -306,6 +306,17 @@ impl ExecutionPlan for InstrumentedExec {
         }
     }
 
+    /// Delegate order-preservation requirements to the inner plan and rewrap with
+    /// an InstrumentedExec.
+    fn with_preserve_order(
+        &self,
+        preserve_order: bool,
+    ) -> Option<Arc<dyn ExecutionPlan>> {
+        self.inner
+            .with_preserve_order(preserve_order)
+            .map(|new_inner| self.with_new_inner(new_inner))
+    }
+
     /// Delegate to the inner plan for swapping with a projection and rewrap with an InstrumentedExec.
     fn try_swapping_with_projection(
         &self,
