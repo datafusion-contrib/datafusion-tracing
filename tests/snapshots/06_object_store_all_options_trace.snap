@@ -1,6 +1,6 @@
 ---
 source: tests/integration_tests.rs
-expression: json_lines
+expression: full_trace_lines
 ---
 [
   {
@@ -1693,7 +1693,36 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
-      "otel.name": "EnforceDistribution"
+      "otel.name": "WindowTopN"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "06_object_store_all_options"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "order_nations"
+      },
+      {
+        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EnsureRequirements"
     },
     "spans": [
       {
@@ -1751,65 +1780,7 @@ expression: json_lines
     "message": "close",
     "span": {
       "name": "Rule",
-      "otel.name": "EnforceSorting"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "06_object_store_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "order_nations"
-      },
-      {
-        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
       "otel.name": "OptimizeAggregateOrder"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "06_object_store_all_options"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "order_nations"
-      },
-      {
-        "logical_plan": "Sort: nation.n_name ASC NULLS LAST [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]\n  TableScan: nation projection=[n_nationkey, n_name, n_regionkey, n_comment] [n_nationkey:Int64, n_name:Utf8View, n_regionkey:Int64, n_comment:Utf8View]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "WindowTopN"
     },
     "spans": [
       {
@@ -2379,8 +2350,8 @@ expression: json_lines
       "datafusion.emission_type": "Final",
       "datafusion.metrics.elapsed_compute": "0.00ms",
       "datafusion.metrics.end_timestamp": "1970-01-01 00:00:00 UTC",
-      "datafusion.metrics.output_batches": "0",
-      "datafusion.metrics.output_bytes": "0.0 B",
+      "datafusion.metrics.output_batches": "1",
+      "datafusion.metrics.output_bytes": "3.4 KB",
       "datafusion.metrics.output_rows": "25",
       "datafusion.metrics.spill_count": "0",
       "datafusion.metrics.spilled_bytes": "0.0 B",

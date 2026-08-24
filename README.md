@@ -59,8 +59,8 @@ Include DataFusion Tracing in your project's `Cargo.toml`:
 
 ```toml
 [dependencies]
-datafusion = "54.0.0"
-datafusion-tracing = "54.0.0"
+datafusion = "55.0.0"
+datafusion-tracing = "55.0.0"
 ```
 
 ### Quick Start Example
@@ -186,7 +186,7 @@ builder.with_physical_optimizer_rules(vec![..., instrument_rule])
 
 Instrumentation is designed to be mostly invisible: with the rule registered last, other optimizer rules typically never see `InstrumentedExec` at all. The wrapper itself is intentionally private so downstream code cannot depend on its internals; the supported surface is the optimizer rule and the standard `ExecutionPlan` trait.
 
-Instrumented plans preserve the usual `ExecutionPlan` introspection behavior: callers can inspect wrapped node types without depending on `InstrumentedExec`. Any new nodes created via `ExecutionPlan` methods (such as `with_new_children()` or `repartitioned()`) are still automatically re-wrapped so they remain instrumented.
+Instrumented plans preserve the usual `ExecutionPlan` introspection behavior: callers can inspect wrapped node types without depending on `InstrumentedExec`. Any new nodes created via `ExecutionPlan` methods (such as `replace_children()` or `repartitioned()`) are still automatically re-wrapped so they remain instrumented.
 
 ## Repository Structure
 

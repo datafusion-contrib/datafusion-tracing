@@ -25,14 +25,15 @@ use crate::{
 };
 use datafusion::{
     arrow::{array::RecordBatch, datatypes::SchemaRef},
-    common::Statistics,
+    common::{Statistics, tree_node::TreeNodeRecursion},
     config::ConfigOptions,
     error::Result,
     execution::{RecordBatchStream, SendableRecordBatchStream, TaskContext},
     physical_expr::{Distribution, OrderingRequirements, PhysicalSortExpr},
     physical_plan::{
-        DisplayAs, DisplayFormatType, ExecutionPlan, ExecutionPlanProperties,
-        PhysicalExpr, PlanProperties,
+        ChildStats, ChildrenPropertiesMode, DisplayAs, DisplayFormatType, ExecutionPlan,
+        ExecutionPlanProperties, InputDistributionRequirements, PhysicalExpr,
+        PlanProperties, ReplaceChildrenOptions, StatisticsArgs,
         execution_plan::{CardinalityEffect, InvariantLevel},
         filter_pushdown::{
             ChildPushdownResult, FilterDescription, FilterPushdownPhase,
@@ -258,13 +259,19 @@ impl ExecutionPlan for InstrumentedExec {
             fn properties(&self) -> &Arc<PlanProperties>;
             fn name(&self) -> &str;
             fn check_invariants(&self, check: InvariantLevel) -> Result<()>;
-            fn required_input_distribution(&self) -> Vec<Distribution>;
+            fn dynamic_expressions_produced(&self) -> Vec<Arc<dyn PhysicalExpr>>;
+            fn input_distribution_requirements(&self) -> InputDistributionRequirements;
             fn required_input_ordering(&self) -> Vec<Option<OrderingRequirements>>;
             fn maintains_input_order(&self) -> Vec<bool>;
             fn benefits_from_input_partitioning(&self) -> Vec<bool>;
             fn children(&self) -> Vec<&Arc<dyn ExecutionPlan>>;
             fn metrics(&self) -> Option<MetricsSet>;
-            fn partition_statistics(&self, partition: Option<usize>) -> Result<Arc<Statistics>>;
+            fn statistics_from_inputs(
+                &self,
+                input_stats: &[Arc<Statistics>],
+                args: &StatisticsArgs,
+            ) -> Result<Arc<Statistics>>;
+            fn child_stats_requests(&self, partition: Option<usize>) -> Vec<ChildStats>;
             fn supports_limit_pushdown(&self) -> bool;
             fn fetch(&self) -> Option<usize>;
             fn cardinality_effect(&self) -> CardinalityEffect;
@@ -274,11 +281,23 @@ impl ExecutionPlan for InstrumentedExec {
                 parent_filters: Vec<Arc<dyn PhysicalExpr>>,
                 config: &ConfigOptions,
             ) -> Result<FilterDescription>;
+            #[allow(deprecated)]
+            fn required_input_distribution(&self) -> Vec<Distribution>;
+            #[allow(deprecated)]
+            fn partition_statistics(&self, partition: Option<usize>) -> Result<Arc<Statistics>>;
         }
     }
 
     fn static_name() -> &'static str {
         "InstrumentedExec"
+    }
+
+    /// Delegate expression traversal to the wrapped execution plan.
+    fn apply_expressions(
+        &self,
+        f: &mut dyn FnMut(&Arc<dyn PhysicalExpr>) -> Result<TreeNodeRecursion>,
+    ) -> Result<TreeNodeRecursion> {
+        self.inner.apply_expressions(f)
     }
 
     /// Delegate to the inner plan for repartitioning and rewrap with an InstrumentedExec.
@@ -376,13 +395,35 @@ impl ExecutionPlan for InstrumentedExec {
         })
     }
 
-    /// Delegate to the inner plan for creating new children and rewrap with an InstrumentedExec.
+    /// Delegate child replacement to the inner plan and preserve instrumentation.
+    fn replace_children(
+        self: Arc<Self>,
+        children: Vec<Arc<dyn ExecutionPlan>>,
+        options: ReplaceChildrenOptions,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        let new_inner = self.inner.clone().replace_children(children, options)?;
+        Ok(self.with_new_inner(new_inner))
+    }
+
     fn with_new_children(
         self: Arc<Self>,
         children: Vec<Arc<dyn ExecutionPlan>>,
     ) -> Result<Arc<dyn ExecutionPlan>> {
-        let new_inner = self.inner.clone().with_new_children(children)?;
-        Ok(self.with_new_inner(new_inner))
+        self.replace_children(
+            children,
+            ReplaceChildrenOptions::new(ChildrenPropertiesMode::Recompute),
+        )
+    }
+
+    #[allow(deprecated)]
+    fn with_new_children_and_same_properties(
+        self: Arc<Self>,
+        children: Vec<Arc<dyn ExecutionPlan>>,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        self.replace_children(
+            children,
+            ReplaceChildrenOptions::new(ChildrenPropertiesMode::Keep),
+        )
     }
 
     /// Delegate to the inner plan for resetting state and rewrap with an InstrumentedExec.
@@ -934,12 +975,41 @@ mod tests {
             self.inner.children()
         }
 
+        fn apply_expressions(
+            &self,
+            f: &mut dyn FnMut(&Arc<dyn PhysicalExpr>) -> Result<TreeNodeRecursion>,
+        ) -> Result<TreeNodeRecursion> {
+            self.inner.apply_expressions(f)
+        }
+
+        fn replace_children(
+            self: Arc<Self>,
+            children: Vec<Arc<dyn ExecutionPlan>>,
+            options: ReplaceChildrenOptions,
+        ) -> Result<Arc<dyn ExecutionPlan>> {
+            let inner = self.inner.clone().replace_children(children, options)?;
+            Ok(Arc::new(FailFirstExecute::new(inner)))
+        }
+
         fn with_new_children(
             self: Arc<Self>,
             children: Vec<Arc<dyn ExecutionPlan>>,
         ) -> Result<Arc<dyn ExecutionPlan>> {
-            let inner = self.inner.clone().with_new_children(children)?;
-            Ok(Arc::new(FailFirstExecute::new(inner)))
+            self.replace_children(
+                children,
+                ReplaceChildrenOptions::new(ChildrenPropertiesMode::Recompute),
+            )
+        }
+
+        #[allow(deprecated)]
+        fn with_new_children_and_same_properties(
+            self: Arc<Self>,
+            children: Vec<Arc<dyn ExecutionPlan>>,
+        ) -> Result<Arc<dyn ExecutionPlan>> {
+            self.replace_children(
+                children,
+                ReplaceChildrenOptions::new(ChildrenPropertiesMode::Keep),
+            )
         }
 
         fn execute(
