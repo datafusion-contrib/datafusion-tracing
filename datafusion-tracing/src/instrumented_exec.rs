@@ -248,6 +248,7 @@ impl InstrumentedExec {
     }
 }
 
+#[warn(clippy::missing_trait_methods)]
 impl ExecutionPlan for InstrumentedExec {
     // Most ExecutionPlan methods are delegated to the inner plan. Methods that must return a
     // wrapped plan or provide custom behavior are implemented manually below.
