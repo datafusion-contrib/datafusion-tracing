@@ -23,7 +23,7 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
-  HAWKEYE_VERSION: "7.0.0"
+  HAWKEYE_VERSION: "7.0.1"
   TAPLO_VERSION:  "0.8.1"
   RDME_VERSION:  "1.4.8"
   TPCHGEN_VERSION: "2.0.0"
