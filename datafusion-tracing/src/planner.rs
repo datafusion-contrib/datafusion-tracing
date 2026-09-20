@@ -20,8 +20,7 @@
 use async_trait::async_trait;
 use datafusion::catalog::Session;
 use datafusion::common::Result;
-use datafusion::execution::SessionStateBuilder;
-use datafusion::execution::context::{QueryPlanner, SessionState};
+use datafusion::execution::context::QueryPlanner;
 use datafusion::logical_expr::LogicalPlan;
 use datafusion::physical_plan::{ExecutionPlan, displayable};
 use std::sync::Arc;
@@ -54,25 +53,9 @@ pub(crate) struct TracingQueryPlanner {
 }
 
 impl TracingQueryPlanner {
-    /// Create a new `TracingQueryPlanner` that wraps the provided inner planner at a specific level.
-    fn new_with_level(inner: Arc<dyn QueryPlanner + Send + Sync>, level: Level) -> Self {
+    /// Wrap the session's query planner with tracing at the specified level.
+    pub(crate) fn new(inner: Arc<dyn QueryPlanner + Send + Sync>, level: Level) -> Self {
         Self { inner, level }
-    }
-
-    /// Wraps the query planner of an existing `SessionState` with tracing instrumentation at a specific level.
-    ///
-    /// This preserves any custom `QueryPlanner` that may already be configured in the state,
-    /// ensuring that tracing is added as a layer on top of existing functionality.
-    pub(crate) fn instrument_state_with_level(
-        state: SessionState,
-        level: Level,
-    ) -> SessionState {
-        let current_planner = state.query_planner().clone();
-        let wrapped_planner = Arc::new(Self::new_with_level(current_planner, level));
-
-        SessionStateBuilder::from(state)
-            .with_query_planner(wrapped_planner)
-            .build()
     }
 }
 

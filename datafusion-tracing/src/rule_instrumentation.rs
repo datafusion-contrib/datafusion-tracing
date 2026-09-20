@@ -977,19 +977,20 @@ pub fn instrument_session_state(
     );
 
     // Rebuild SessionState with instrumented rules
+    let planner = Arc::clone(state.query_planner());
     let mut builder = SessionStateBuilder::from(state)
         .with_optimizer_rules(optimizers)
         .with_physical_optimizer_rules(physical_optimizers);
     // Keep the existing analyzer's function rewrites.
     builder.analyzer().get_or_insert_default().rules = analyzers;
-    let state = builder.build();
 
     // Automatically instrument the query planner when physical optimizer is enabled
     if options.physical_optimizer.phase_span_enabled() {
-        TracingQueryPlanner::instrument_state_with_level(state, span_level)
-    } else {
-        state
+        builder = builder
+            .with_query_planner(Arc::new(TracingQueryPlanner::new(planner, span_level)));
     }
+
+    builder.build()
 }
 
 /// Instruments analyzer rules with phase sentinel and optional rule-level spans.
