@@ -977,18 +977,20 @@ pub fn instrument_session_state(
     );
 
     // Rebuild SessionState with instrumented rules
-    let state = SessionStateBuilder::from(state)
-        .with_analyzer_rules(analyzers)
+    let planner = Arc::clone(state.query_planner());
+    let mut builder = SessionStateBuilder::from(state)
         .with_optimizer_rules(optimizers)
-        .with_physical_optimizer_rules(physical_optimizers)
-        .build();
+        .with_physical_optimizer_rules(physical_optimizers);
+    // Keep the existing analyzer's function rewrites.
+    builder.analyzer().get_or_insert_default().rules = analyzers;
 
     // Automatically instrument the query planner when physical optimizer is enabled
     if options.physical_optimizer.phase_span_enabled() {
-        TracingQueryPlanner::instrument_state_with_level(state, span_level)
-    } else {
-        state
+        builder = builder
+            .with_query_planner(Arc::new(TracingQueryPlanner::new(planner, span_level)));
     }
+
+    builder.build()
 }
 
 /// Instruments analyzer rules with phase sentinel and optional rule-level spans.
@@ -1126,8 +1128,10 @@ fn instrument_physical_optimizer_rules(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use datafusion::common::DataFusionError;
+    use datafusion::common::{DFSchema, DataFusionError};
     use datafusion::execution::SessionStateBuilder;
+    use datafusion::logical_expr::Expr;
+    use datafusion::logical_expr::expr_rewriter::FunctionRewrite;
     use datafusion::prelude::{SessionConfig, SessionContext};
     use std::fmt;
     use std::sync::atomic::{AtomicBool, Ordering};
@@ -1398,6 +1402,40 @@ mod tests {
     async fn run_query(ctx: &SessionContext) -> Result<()> {
         ctx.sql("SELECT 1").await?.collect().await?;
         Ok(())
+    }
+
+    #[derive(Debug)]
+    struct NoOpFunctionRewrite;
+
+    impl FunctionRewrite for NoOpFunctionRewrite {
+        fn name(&self) -> &str {
+            "retained_function_rewrite"
+        }
+
+        fn rewrite(
+            &self,
+            expr: Expr,
+            _: &DFSchema,
+            _: &ConfigOptions,
+        ) -> Result<Transformed<Expr>> {
+            Ok(Transformed::no(expr))
+        }
+    }
+
+    #[test]
+    fn instrumentation_preserves_analyzer_function_rewrites() {
+        let mut builder = SessionStateBuilder::new();
+        builder
+            .analyzer()
+            .get_or_insert_default()
+            .add_function_rewrite(Arc::new(NoOpFunctionRewrite));
+
+        let state = crate::instrument_rules_with_info_spans!(
+            options: RuleInstrumentationOptions::full(),
+            state: builder.build()
+        );
+
+        assert_eq!(state.analyzer().function_rewrites.len(), 1);
     }
 
     // -----------------------------------------------------------------------
