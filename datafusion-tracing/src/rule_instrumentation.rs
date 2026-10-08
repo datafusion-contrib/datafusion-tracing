@@ -27,7 +27,7 @@ use datafusion::execution::session_state::SessionStateBuilder;
 use datafusion::logical_expr::LogicalPlan;
 use datafusion::optimizer::analyzer::AnalyzerRule;
 use datafusion::optimizer::optimizer::{ApplyOrder, OptimizerConfig, OptimizerRule};
-use datafusion::physical_optimizer::PhysicalOptimizerRule;
+use datafusion::physical_optimizer::{PhysicalOptimizerContext, PhysicalOptimizerRule};
 use datafusion::physical_plan::{ExecutionPlan, displayable};
 use similar::{ChangeTag, TextDiff};
 use std::cell::RefCell;
@@ -504,17 +504,35 @@ impl Debug for ErrorCleanupPhysicalOptimizerRule {
     }
 }
 
+impl ErrorCleanupPhysicalOptimizerRule {
+    fn optimize_with(
+        &self,
+        plan: Arc<dyn ExecutionPlan>,
+        optimize: impl FnOnce(Arc<dyn ExecutionPlan>) -> Result<Arc<dyn ExecutionPlan>>,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        let result = optimize(plan);
+        if result.is_err() {
+            drop_planning_context();
+        }
+        result
+    }
+}
+
 impl PhysicalOptimizerRule for ErrorCleanupPhysicalOptimizerRule {
     fn optimize(
         &self,
         plan: Arc<dyn ExecutionPlan>,
         config: &ConfigOptions,
     ) -> Result<Arc<dyn ExecutionPlan>> {
-        let result = self.inner.optimize(plan, config);
-        if result.is_err() {
-            drop_planning_context();
-        }
-        result
+        self.optimize_with(plan, |plan| self.inner.optimize(plan, config))
+    }
+
+    fn optimize_with_context(
+        &self,
+        plan: Arc<dyn ExecutionPlan>,
+        context: &dyn PhysicalOptimizerContext,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        self.optimize_with(plan, |plan| self.inner.optimize_with_context(plan, context))
     }
 
     fn name(&self) -> &str {
@@ -875,13 +893,12 @@ impl InstrumentedPhysicalOptimizerRule {
             span_create_fn,
         }
     }
-}
 
-impl PhysicalOptimizerRule for InstrumentedPhysicalOptimizerRule {
-    fn optimize(
+    // Keep span lifetime and error cleanup identical for both optimizer entry points.
+    fn optimize_with(
         &self,
         plan: Arc<dyn ExecutionPlan>,
-        config: &ConfigOptions,
+        optimize: impl FnOnce(Arc<dyn ExecutionPlan>) -> Result<Arc<dyn ExecutionPlan>>,
     ) -> Result<Arc<dyn ExecutionPlan>> {
         let span = (self.span_create_fn)(self.name());
         let enter = span.enter();
@@ -896,7 +913,7 @@ impl PhysicalOptimizerRule for InstrumentedPhysicalOptimizerRule {
             None
         };
 
-        let result = self.inner.optimize(plan, config);
+        let result = optimize(plan);
 
         // Modification detection - plan_clone is Some iff span is enabled
         if let Some(old_plan) = plan_clone {
@@ -928,6 +945,24 @@ impl PhysicalOptimizerRule for InstrumentedPhysicalOptimizerRule {
         }
 
         result
+    }
+}
+
+impl PhysicalOptimizerRule for InstrumentedPhysicalOptimizerRule {
+    fn optimize(
+        &self,
+        plan: Arc<dyn ExecutionPlan>,
+        config: &ConfigOptions,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        self.optimize_with(plan, |plan| self.inner.optimize(plan, config))
+    }
+
+    fn optimize_with_context(
+        &self,
+        plan: Arc<dyn ExecutionPlan>,
+        context: &dyn PhysicalOptimizerContext,
+    ) -> Result<Arc<dyn ExecutionPlan>> {
+        self.optimize_with(plan, |plan| self.inner.optimize_with_context(plan, context))
     }
 
     fn name(&self) -> &str {
@@ -1128,13 +1163,18 @@ fn instrument_physical_optimizer_rules(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use datafusion::common::{DFSchema, DataFusionError};
+    use datafusion::common::stats::Precision;
+    use datafusion::common::{DFSchema, DataFusionError, Statistics, internal_err};
     use datafusion::execution::SessionStateBuilder;
     use datafusion::logical_expr::Expr;
     use datafusion::logical_expr::expr_rewriter::FunctionRewrite;
+    use datafusion::physical_optimizer::PhysicalOptimizerContext;
+    use datafusion::physical_plan::operator_statistics::{
+        ExtendedStatistics, StatisticsProvider, StatisticsRegistry, StatisticsResult,
+    };
     use datafusion::prelude::{SessionConfig, SessionContext};
     use std::fmt;
-    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
     use std::sync::{Arc, Mutex};
     use tracing::Instrument as _;
     use tracing::field::{Field, Visit};
@@ -1385,6 +1425,162 @@ mod tests {
             state: state
         );
         SessionContext::new_with_state(state)
+    }
+
+    #[derive(Debug)]
+    struct CountingStatisticsProvider {
+        calls: Arc<AtomicUsize>,
+        fail_next: AtomicBool,
+    }
+
+    impl StatisticsProvider for CountingStatisticsProvider {
+        fn compute_statistics(
+            &self,
+            plan: &dyn ExecutionPlan,
+            _: &[ExtendedStatistics],
+        ) -> Result<StatisticsResult> {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            if self.fail_next.swap(false, Ordering::SeqCst) {
+                return internal_err!("intentional statistics failure");
+            }
+            let mut stats = Statistics::new_unknown(plan.schema().as_ref());
+            stats.num_rows = Precision::Exact(42);
+            Ok(StatisticsResult::Computed(ExtendedStatistics::new(stats)))
+        }
+    }
+
+    #[derive(Debug)]
+    struct ReadStatisticsRegistry;
+
+    impl PhysicalOptimizerRule for ReadStatisticsRegistry {
+        fn optimize(
+            &self,
+            _: Arc<dyn ExecutionPlan>,
+            _: &ConfigOptions,
+        ) -> Result<Arc<dyn ExecutionPlan>> {
+            internal_err!("optimizer context was not forwarded")
+        }
+
+        fn optimize_with_context(
+            &self,
+            plan: Arc<dyn ExecutionPlan>,
+            context: &dyn PhysicalOptimizerContext,
+        ) -> Result<Arc<dyn ExecutionPlan>> {
+            assert!(context.config_options().optimizer.use_statistics_registry);
+            let registry = context.statistics_registry().expect("registered provider");
+            let stats = registry.compute_base(plan.as_ref())?;
+            assert_eq!(stats.num_rows, Precision::Exact(42));
+            Ok(plan)
+        }
+
+        fn name(&self) -> &str {
+            "read_statistics_registry"
+        }
+
+        fn schema_check(&self) -> bool {
+            true
+        }
+    }
+
+    fn make_ctx_with_statistics_registry(
+        options: RuleInstrumentationOptions,
+        calls: Arc<AtomicUsize>,
+        fail_next: bool,
+    ) -> SessionContext {
+        let mut config = SessionConfig::new();
+        config.options_mut().optimizer.use_statistics_registry = true;
+        let state = SessionStateBuilder::new()
+            .with_config(config)
+            .with_default_features()
+            .with_statistics_registry(StatisticsRegistry::with_providers(vec![Arc::new(
+                CountingStatisticsProvider {
+                    calls,
+                    fail_next: AtomicBool::new(fail_next),
+                },
+            )]))
+            .with_physical_optimizer_rules(vec![Arc::new(ReadStatisticsRegistry)])
+            .build();
+        let state =
+            crate::instrument_rules_with_trace_spans!(options: options, state: state);
+        SessionContext::new_with_state(state)
+    }
+
+    async fn assert_statistics_registry_forwarded(options: RuleInstrumentationOptions) {
+        let capture = SpanCapture::default();
+        let subscriber = tracing_subscriber::registry().with(capture.clone());
+        let rule_spans = usize::from(options.physical_optimizer.rule_spans_enabled());
+        async {
+            let calls = Arc::new(AtomicUsize::new(0));
+            let ctx =
+                make_ctx_with_statistics_registry(options, Arc::clone(&calls), false);
+            let batches = ctx.sql("SELECT 1").await.unwrap().collect().await.unwrap();
+            assert_eq!(batches.iter().map(|b| b.num_rows()).sum::<usize>(), 1);
+            assert!(calls.load(Ordering::SeqCst) > 0);
+            let events = capture.snapshot();
+            assert_eq!(count(&events, "open", "optimize_physical_plan"), 1);
+            assert_eq!(count(&events, "close", "optimize_physical_plan"), 1);
+            assert_eq!(
+                count(&events, "open", "read_statistics_registry"),
+                rule_spans
+            );
+            assert_eq!(
+                count(&events, "close", "read_statistics_registry"),
+                rule_spans
+            );
+        }
+        .with_subscriber(subscriber)
+        .await;
+    }
+
+    #[tokio::test]
+    async fn phase_only_forwards_statistics_registry() {
+        assert_statistics_registry_forwarded(RuleInstrumentationOptions::phase_only())
+            .await;
+    }
+
+    #[tokio::test]
+    async fn full_forwards_statistics_registry() {
+        assert_statistics_registry_forwarded(RuleInstrumentationOptions::full()).await;
+    }
+
+    async fn assert_statistics_registry_error_cleanup(
+        options: RuleInstrumentationOptions,
+    ) {
+        let capture = SpanCapture::default();
+        let subscriber = tracing_subscriber::registry().with(capture.clone());
+        async {
+            let calls = Arc::new(AtomicUsize::new(0));
+            let ctx =
+                make_ctx_with_statistics_registry(options, Arc::clone(&calls), true);
+            let error = run_query(&ctx).await.unwrap_err();
+            assert!(error.to_string().contains("intentional statistics failure"));
+            assert!(!is_planning_context_open());
+            assert_eq!(optimizer_pass_count(), 0);
+            assert_eq!(
+                count(&capture.snapshot(), "close", "optimize_physical_plan"),
+                1
+            );
+
+            run_query(&ctx).await.unwrap();
+            assert!(calls.load(Ordering::SeqCst) > 1);
+            assert!(!is_planning_context_open());
+            let events = capture.snapshot();
+            assert_eq!(count(&events, "open", "optimize_physical_plan"), 2);
+            assert_eq!(count(&events, "close", "optimize_physical_plan"), 2);
+        }
+        .with_subscriber(subscriber)
+        .await;
+    }
+
+    #[tokio::test]
+    async fn phase_only_closes_phase_span_on_statistics_registry_error() {
+        assert_statistics_registry_error_cleanup(RuleInstrumentationOptions::phase_only()).await;
+    }
+
+    #[tokio::test]
+    async fn full_closes_phase_span_on_statistics_registry_error() {
+        assert_statistics_registry_error_cleanup(RuleInstrumentationOptions::full())
+            .await;
     }
 
     fn count(events: &[SpanEvent], kind: &str, name: &str) -> usize {
