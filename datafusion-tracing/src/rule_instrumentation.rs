@@ -518,6 +518,7 @@ impl ErrorCleanupPhysicalOptimizerRule {
     }
 }
 
+#[warn(clippy::missing_trait_methods)]
 impl PhysicalOptimizerRule for ErrorCleanupPhysicalOptimizerRule {
     fn optimize(
         &self,
@@ -948,6 +949,7 @@ impl InstrumentedPhysicalOptimizerRule {
     }
 }
 
+#[warn(clippy::missing_trait_methods)]
 impl PhysicalOptimizerRule for InstrumentedPhysicalOptimizerRule {
     fn optimize(
         &self,
