@@ -43,6 +43,7 @@ path = "integration_tests.rs"
 
 [dependencies]
 datafusion = { workspace = true, features = ["parquet", "nested_expressions"] }
+datafusion-tracing = { workspace = true }
 insta = { version = "1.43", features = ["filters", "json"] }
 integration-utils = { path = "../integration-utils" }
 serde_json = "1.0"

@@ -19,9 +19,23 @@
 
 mod test_utils;
 
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, Once, OnceLock};
 
+use datafusion::arrow::array::{ArrayRef, Int64Array};
+use datafusion::arrow::record_batch::RecordBatch;
+use datafusion::common::Statistics;
+use datafusion::common::stats::Precision;
+use datafusion::common::tree_node::{TreeNode, TreeNodeRecursion};
 use datafusion::error::Result;
+use datafusion::execution::SessionStateBuilder;
+use datafusion::physical_plan::joins::{HashJoinExec, PartitionMode};
+use datafusion::physical_plan::operator_statistics::{
+    ExtendedStatistics, StatisticsProvider, StatisticsRegistry, StatisticsResult,
+};
+use datafusion::physical_plan::{ExecutionPlan, collect};
+use datafusion::prelude::{SessionConfig, SessionContext};
+use datafusion_tracing::{RuleInstrumentationOptions, instrument_rules_with_info_spans};
 use insta::{assert_json_snapshot, assert_snapshot};
 use integration_utils::{SessionBuilder, run_traced_query};
 use serde_json::Value;
@@ -213,6 +227,151 @@ async fn test_topk_lineitem() -> Result<()> {
     execute_test_case("10_topk_lineitem", &QueryTestCase::new("topk_lineitem")).await
 }
 
+/// Estimates both join inputs above the collection thresholds, unlike the tiny
+/// tables' built-in statistics. Losing this provider changes the join mode.
+#[derive(Debug)]
+struct LargeJoinInputStatistics {
+    calls: Arc<AtomicUsize>,
+}
+
+impl StatisticsProvider for LargeJoinInputStatistics {
+    fn compute_statistics(
+        &self,
+        plan: &dyn ExecutionPlan,
+        _: &[ExtendedStatistics],
+    ) -> Result<StatisticsResult> {
+        self.calls.fetch_add(1, Ordering::SeqCst);
+        let mut statistics = Statistics::new_unknown(plan.schema().as_ref());
+        statistics.num_rows = Precision::Inexact(1_000);
+        // JoinSelection considers byte size before row count.
+        statistics.total_byte_size = Precision::Inexact(8_192);
+        Ok(StatisticsResult::Computed(ExtendedStatistics::new(
+            statistics,
+        )))
+    }
+}
+
+async fn statistics_registry_join_mode(
+    options: Option<RuleInstrumentationOptions>,
+    calls: Option<Arc<AtomicUsize>>,
+) -> Result<PartitionMode> {
+    let mut config = SessionConfig::new().with_target_partitions(2);
+    let optimizer = &mut config.options_mut().optimizer;
+    optimizer.use_statistics_registry = true;
+    optimizer.hash_join_single_partition_threshold = 1_024;
+    optimizer.hash_join_single_partition_threshold_rows = 10;
+    let mut builder = SessionStateBuilder::new()
+        .with_config(config)
+        .with_default_features();
+    if let Some(calls) = calls {
+        builder =
+            builder.with_statistics_registry(StatisticsRegistry::with_providers(vec![
+                Arc::new(LargeJoinInputStatistics { calls }),
+            ]));
+    }
+    let state = builder.build();
+    let state = if let Some(options) = options {
+        instrument_rules_with_info_spans!(options: options, state: state)
+    } else {
+        state
+    };
+    let ctx = SessionContext::new_with_state(state);
+    for (table, values) in [
+        ("left_table", vec![1, 2, 3]),
+        ("right_table", vec![2, 3, 4]),
+    ] {
+        ctx.register_batch(
+            table,
+            RecordBatch::try_from_iter([(
+                "id",
+                Arc::new(Int64Array::from(values)) as ArrayRef,
+            )])?,
+        )?;
+    }
+    let plan = ctx
+        .sql("SELECT l.id FROM left_table l JOIN right_table r ON l.id = r.id")
+        .await?
+        .create_physical_plan()
+        .await?;
+    let mut modes = Vec::new();
+    plan.apply(|node| {
+        if let Some(join) = node.downcast_ref::<HashJoinExec>() {
+            modes.push(*join.partition_mode());
+        }
+        Ok(TreeNodeRecursion::Continue)
+    })?;
+    assert_eq!(modes.len(), 1, "expected one native HashJoinExec");
+    let batches = collect(plan, ctx.task_ctx()).await?;
+    assert_eq!(
+        batches.iter().map(|batch| batch.num_rows()).sum::<usize>(),
+        2
+    );
+    Ok(modes[0])
+}
+
+async fn assert_statistics_registry_join_selection(
+    test_name: &str,
+    options: RuleInstrumentationOptions,
+) -> Result<()> {
+    let _test_guard = TEST_EXECUTION_LOCK
+        .get_or_init(Default::default)
+        .lock()
+        .await;
+    let log_buffer = init_tracing();
+    log_buffer.lock().unwrap().clear();
+
+    // Prove that falling back to built-in statistics would change the plan.
+    assert_eq!(
+        statistics_registry_join_mode(None, None).await?,
+        PartitionMode::CollectLeft
+    );
+    // Keep the default optimizer pipeline, including the real JoinSelection.
+    // Independent counters ensure baseline calls cannot mask lost forwarding.
+    for instrumentation in [None, Some(options)] {
+        let calls = Arc::new(AtomicUsize::new(0));
+        let capture_trace = instrumentation.is_some();
+        let query =
+            statistics_registry_join_mode(instrumentation, Some(Arc::clone(&calls)));
+        // Snapshot the traced query; the controls keep their focused assertions.
+        let mode = if capture_trace {
+            query
+                .instrument(tracing::info_span!("test", test_name = %test_name))
+                .await?
+        } else {
+            query.await?
+        };
+        assert_eq!(mode, PartitionMode::Partitioned);
+        assert!(
+            calls.load(Ordering::SeqCst) > 0,
+            "JoinSelection must consult the custom provider"
+        );
+    }
+    let _insta_guard = insta_settings::settings().bind_to_scope();
+    assert_json_snapshot!(
+        format!("{test_name}_trace"),
+        captured_trace_lines(log_buffer, test_name)
+    );
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn test_phase_only_preserves_statistics_registry_join_selection() -> Result<()> {
+    assert_statistics_registry_join_selection(
+        "11_statistics_registry_phase_only",
+        RuleInstrumentationOptions::phase_only(),
+    )
+    .await
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn test_full_preserves_statistics_registry_join_selection() -> Result<()> {
+    assert_statistics_registry_join_selection(
+        "12_statistics_registry_full",
+        RuleInstrumentationOptions::full(),
+    )
+    .await
+}
+
 /// Executes the provided [`QueryTestCase`], setting up tracing and verifying
 /// log output according to its parameters.
 async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Result<()> {
@@ -234,16 +393,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
         .instrument(tracing::info_span!("test", test_name = %test_name))
         .await?;
 
-    // Clone the log buffer to avoid holding the lock while processing.
-    let logs = log_buffer.lock().unwrap().clone();
-    let log_str = String::from_utf8_lossy(&logs);
-
-    // Convert each log line to JSON, filtering by this test case name.
-    let json_lines = log_str
-        .lines()
-        .map(|line| serde_json::from_str(line).expect("Failed to parse JSON line"))
-        .filter(|json_line| extract_test_name(json_line) == *test_name)
-        .collect::<Vec<Value>>();
+    let json_lines = captured_trace_lines(log_buffer, test_name);
 
     // Bind insta settings for snapshot testing.
     let _insta_guard = insta_settings::settings().bind_to_scope();
@@ -288,6 +438,16 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     }
 
     Ok(())
+}
+
+fn captured_trace_lines(log_buffer: &Arc<Mutex<Vec<u8>>>, test_name: &str) -> Vec<Value> {
+    // Clone the buffer to avoid holding the lock while parsing and filtering.
+    let logs = log_buffer.lock().unwrap().clone();
+    String::from_utf8_lossy(&logs)
+        .lines()
+        .map(|line| serde_json::from_str(line).expect("Failed to parse JSON line"))
+        .filter(|json_line| extract_test_name(json_line) == test_name)
+        .collect()
 }
 
 fn normalize_full_trace_lines(
