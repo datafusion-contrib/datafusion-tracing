@@ -1,0 +1,100 @@
+---
+source: tests/integration_tests.rs
+expression: "captured_trace_lines(log_buffer, test_name)"
+---
+[
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Phase",
+      "otel.name": "analyze_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "11_statistics_registry_phase_only"
+      }
+    ],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.optimizer.max_passes": 3,
+      "datafusion.optimizer.pass": 1,
+      "name": "Phase",
+      "otel.name": "optimize_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "11_statistics_registry_phase_only"
+      }
+    ],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "datafusion.optimizer.max_passes": 3,
+      "datafusion.optimizer.pass": 2,
+      "name": "Phase",
+      "otel.name": "optimize_logical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "11_statistics_registry_phase_only"
+      }
+    ],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Phase",
+      "otel.name": "optimize_physical_plan"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "11_statistics_registry_phase_only"
+      },
+      {
+        "logical_plan": "Projection: l.id [id:Int64]\n  Inner Join: l.id = r.id [id:Int64, id:Int64]\n    SubqueryAlias: l [id:Int64]\n      TableScan: left_table projection=[id] [id:Int64]\n    SubqueryAlias: r [id:Int64]\n      TableScan: right_table projection=[id] [id:Int64]",
+        "name": "create_physical_plan"
+      }
+    ],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "logical_plan": "Projection: l.id [id:Int64]\n  Inner Join: l.id = r.id [id:Int64, id:Int64]\n    SubqueryAlias: l [id:Int64]\n      TableScan: left_table projection=[id] [id:Int64]\n    SubqueryAlias: r [id:Int64]\n      TableScan: right_table projection=[id] [id:Int64]",
+      "name": "create_physical_plan",
+      "physical_plan": "HashJoinExec: mode=Partitioned, join_type=Inner, on=[(id@0, id@0)], projection=[id@0]\n  DataSourceExec: partitions=1, partition_sizes=[1]\n  DataSourceExec: partitions=1, partition_sizes=[1]\n"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "11_statistics_registry_phase_only"
+      }
+    ],
+    "target": "datafusion_tracing::planner",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  }
+]
