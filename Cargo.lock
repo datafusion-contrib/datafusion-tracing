@@ -1194,7 +1194,7 @@ dependencies = [
 
 [[package]]
 name = "datafusion-tracing"
-version = "55.0.0"
+version = "55.0.1"
 dependencies = [
  "async-trait",
  "comfy-table",
@@ -1213,7 +1213,7 @@ dependencies = [
 
 [[package]]
 name = "datafusion-tracing-examples"
-version = "55.0.0"
+version = "55.0.1"
 dependencies = [
  "datafusion",
  "integration-utils",
@@ -1228,7 +1228,7 @@ dependencies = [
 
 [[package]]
 name = "datafusion-tracing-tests"
-version = "55.0.0"
+version = "55.0.1"
 dependencies = [
  "datafusion",
  "datafusion-tracing",
@@ -1826,7 +1826,7 @@ dependencies = [
 
 [[package]]
 name = "instrumented-object-store"
-version = "55.0.0"
+version = "55.0.1"
 dependencies = [
  "async-trait",
  "bytes",
@@ -1840,7 +1840,7 @@ dependencies = [
 
 [[package]]
 name = "integration-utils"
-version = "55.0.0"
+version = "55.0.1"
 dependencies = [
  "async-trait",
  "datafusion",
