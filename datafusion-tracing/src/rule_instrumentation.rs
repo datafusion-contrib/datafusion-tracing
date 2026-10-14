@@ -1165,12 +1165,14 @@ fn instrument_physical_optimizer_rules(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use datafusion::arrow::datatypes::Schema;
     use datafusion::common::stats::Precision;
     use datafusion::common::{DFSchema, DataFusionError, Statistics, internal_err};
     use datafusion::execution::SessionStateBuilder;
     use datafusion::logical_expr::Expr;
     use datafusion::logical_expr::expr_rewriter::FunctionRewrite;
     use datafusion::physical_optimizer::PhysicalOptimizerContext;
+    use datafusion::physical_plan::empty::EmptyExec;
     use datafusion::physical_plan::operator_statistics::{
         ExtendedStatistics, StatisticsProvider, StatisticsRegistry, StatisticsResult,
     };
@@ -1484,6 +1486,36 @@ mod tests {
         }
     }
 
+    fn assert_legacy_optimize_forwarded(rule: &dyn PhysicalOptimizerRule) {
+        let plan = Arc::new(EmptyExec::new(Arc::new(Schema::empty())));
+        // Preserve the inner rule's legacy behavior even when it also overrides
+        // optimize_with_context; redirecting through a config-only context differs.
+        let error = rule.optimize(plan, &ConfigOptions::default()).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("optimizer context was not forwarded")
+        );
+    }
+
+    #[test]
+    fn error_cleanup_physical_optimizer_forwards_legacy_optimize() {
+        let rule = ErrorCleanupPhysicalOptimizerRule {
+            inner: Arc::new(ReadStatisticsRegistry),
+        };
+        assert_legacy_optimize_forwarded(&rule);
+    }
+
+    #[test]
+    fn instrumented_physical_optimizer_forwards_legacy_optimize() {
+        let rule = InstrumentedPhysicalOptimizerRule::new(
+            Arc::new(ReadStatisticsRegistry),
+            RuleInstrumentationOptions::full(),
+            Arc::new(|_| Span::none()),
+        );
+        assert_legacy_optimize_forwarded(&rule);
+    }
+
     fn make_ctx_with_statistics_registry(
         options: RuleInstrumentationOptions,
         calls: Arc<AtomicUsize>,
@@ -1550,6 +1582,7 @@ mod tests {
     ) {
         let capture = SpanCapture::default();
         let subscriber = tracing_subscriber::registry().with(capture.clone());
+        let rule_spans = usize::from(options.physical_optimizer.rule_spans_enabled());
         async {
             let calls = Arc::new(AtomicUsize::new(0));
             let ctx =
@@ -1558,9 +1591,16 @@ mod tests {
             assert!(error.to_string().contains("intentional statistics failure"));
             assert!(!is_planning_context_open());
             assert_eq!(optimizer_pass_count(), 0);
+            let events = capture.snapshot();
+            assert_eq!(count(&events, "open", "optimize_physical_plan"), 1);
+            assert_eq!(count(&events, "close", "optimize_physical_plan"), 1);
             assert_eq!(
-                count(&capture.snapshot(), "close", "optimize_physical_plan"),
-                1
+                count(&events, "open", "read_statistics_registry"),
+                rule_spans
+            );
+            assert_eq!(
+                count(&events, "close", "read_statistics_registry"),
+                rule_spans
             );
 
             run_query(&ctx).await.unwrap();
@@ -1569,6 +1609,14 @@ mod tests {
             let events = capture.snapshot();
             assert_eq!(count(&events, "open", "optimize_physical_plan"), 2);
             assert_eq!(count(&events, "close", "optimize_physical_plan"), 2);
+            assert_eq!(
+                count(&events, "open", "read_statistics_registry"),
+                2 * rule_spans
+            );
+            assert_eq!(
+                count(&events, "close", "read_statistics_registry"),
+                2 * rule_spans
+            );
         }
         .with_subscriber(subscriber)
         .await;
