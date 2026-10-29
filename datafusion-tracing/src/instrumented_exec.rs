@@ -19,6 +19,7 @@
 
 use crate::{
     metrics::{MetricsRecorder, MetricsRecordingStream},
+    metrics_export::{ExecutionMetric, PlanMetrics},
     node::{NodeRecorder, NodeRecordingStream},
     options::InstrumentationOptions,
     preview::{PreviewFn, PreviewRecorder, PreviewRecordingStream},
@@ -71,6 +72,7 @@ pub struct InstrumentedExec {
     inner: Arc<dyn ExecutionPlan>,
 
     record_metrics: bool,
+    export_metrics: Option<Arc<PlanMetrics>>,
 
     preview_limit: usize,
     preview_fn: Option<Arc<PreviewFn>>,
@@ -104,6 +106,10 @@ impl InstrumentedExec {
         options: &InstrumentationOptions,
     ) -> InstrumentedExec {
         Self {
+            export_metrics: options
+                .metrics_exporter
+                .as_ref()
+                .map(|exporter| exporter.track(inner.clone())),
             inner,
             record_metrics: options.record_metrics,
             preview_limit: options.preview_limit,
@@ -123,6 +129,10 @@ impl InstrumentedExec {
             self.span_create_fn.clone(),
             &InstrumentationOptions {
                 record_metrics: self.record_metrics,
+                metrics_exporter: self
+                    .export_metrics
+                    .as_ref()
+                    .map(|metrics| metrics.exporter()),
                 preview_limit: self.preview_limit,
                 preview_fn: self.preview_fn.clone(),
                 custom_fields: HashMap::new(), // custom fields are not used by `InstrumentedExec`, only by the higher-level `instrument_with_spans` macro family
@@ -137,21 +147,24 @@ impl InstrumentedExec {
     /// incorrectly.
     fn reserve_recorders(
         &self,
-        context: Arc<TaskContext>,
+        context: &Arc<TaskContext>,
         partition: usize,
-    ) -> Arc<ExecutionRecorders> {
+    ) -> Option<Arc<ExecutionRecorders>> {
         let parent_span_id = Span::current().id();
 
         let mut groups = self.recorders.lock().unwrap();
         for recorders in groups.iter() {
-            if recorders.is_same_execution(parent_span_id.as_ref(), &context)
+            if recorders.is_same_execution(parent_span_id.as_ref(), context)
                 && recorders.try_reserve_partition(partition)
             {
-                return recorders.clone();
+                return Some(recorders.clone());
             }
         }
 
         let span = self.create_populated_span();
+        if span.is_disabled() && !self.record_metrics && self.preview_limit == 0 {
+            return None;
+        }
         let preview_recorder = (self.preview_limit > 0).then(|| {
             let partition_count = self.inner.output_partitioning().partition_count();
             PreviewRecorder::builder(span.clone(), partition_count)
@@ -162,7 +175,7 @@ impl InstrumentedExec {
         let recorders = Arc::new(ExecutionRecorders::new(
             Arc::downgrade(&self.recorders),
             parent_span_id,
-            context,
+            context.clone(),
             partition,
             NodeRecorder::new(self.inner.clone(), span.clone()),
             self.record_metrics
@@ -170,7 +183,7 @@ impl InstrumentedExec {
             preview_recorder,
         ));
         groups.push(recorders.clone());
-        recorders
+        Some(recorders)
     }
 
     /// Wraps the given stream so recorder state for this partition is released
@@ -180,7 +193,11 @@ impl InstrumentedExec {
         inner_stream: SendableRecordBatchStream,
         recorders: Arc<ExecutionRecorders>,
     ) -> SendableRecordBatchStream {
-        Box::pin(ExecutionRecordingStream::new(inner_stream, recorders))
+        Box::pin(ExecutionRecordingStream::new(
+            inner_stream,
+            Some(recorders),
+            self.export_metrics.clone(),
+        ))
     }
 
     /// Wraps the given stream with a completion recorder so fields that are only
@@ -222,6 +239,9 @@ impl InstrumentedExec {
     /// Creates a tracing span populated with metadata about the execution plan.
     fn create_populated_span(&self) -> Span {
         let span = self.span_create_fn.as_ref()();
+        if span.is_disabled() {
+            return span;
+        }
 
         span.record("otel.name", field::display(self.inner.name()));
         span.record(
@@ -453,16 +473,47 @@ impl ExecutionPlan for InstrumentedExec {
         partition: usize,
         context: Arc<TaskContext>,
     ) -> Result<SendableRecordBatchStream> {
-        let recorders = self.reserve_recorders(context.clone(), partition);
-        let span = recorders.span();
+        if let Some(metrics) = &self.export_metrics {
+            metrics.add(ExecutionMetric::StreamsStarted);
+        }
+        let recorders = self.reserve_recorders(&context, partition);
+        let span = recorders
+            .as_ref()
+            .map(|recorders| recorders.span())
+            .unwrap_or_else(Span::none);
 
         let inner_stream = match span.in_scope(|| self.inner.execute(partition, context))
         {
             Ok(stream) => stream,
             Err(error) => {
-                recorders.cancel_stream(partition);
+                if let Some(metrics) = &self.export_metrics {
+                    metrics.add(ExecutionMetric::StreamsFailed);
+                }
+                if let Some(recorders) = &recorders {
+                    recorders.cancel_stream(partition);
+                }
                 return Err(error);
             }
+        };
+
+        let Some(recorders) = recorders else {
+            // With no active operator span, preview, or span metrics, omit the
+            // tracing recorder groups and stream layers. Keep export ownership
+            // and sticky outcomes when a metrics exporter is configured.
+            if self.export_metrics.is_some() {
+                return Ok(Box::pin(RecordBatchStreamAdapter::new(
+                    self.inner.schema(),
+                    ExecutionRecordingStream::new(
+                        inner_stream,
+                        None,
+                        self.export_metrics.clone(),
+                    ),
+                )));
+            }
+            return Ok(Box::pin(RecordBatchStreamAdapter::new(
+                self.inner.schema(),
+                inner_stream,
+            )));
         };
 
         // Wrap the stream with node recording so `datafusion.node` is recorded only after
@@ -583,12 +634,23 @@ impl ExecutionRecorders {
 struct ExecutionRecordingStream {
     #[pin]
     inner: SendableRecordBatchStream,
-    recorders: Arc<ExecutionRecorders>,
+    recorders: Option<Arc<ExecutionRecorders>>,
+    export_metrics: Option<Arc<PlanMetrics>>,
+    outcome: Option<ExecutionMetric>,
 }
 
 impl ExecutionRecordingStream {
-    fn new(inner: SendableRecordBatchStream, recorders: Arc<ExecutionRecorders>) -> Self {
-        Self { inner, recorders }
+    fn new(
+        inner: SendableRecordBatchStream,
+        recorders: Option<Arc<ExecutionRecorders>>,
+        export_metrics: Option<Arc<PlanMetrics>>,
+    ) -> Self {
+        Self {
+            inner,
+            recorders,
+            export_metrics,
+            outcome: None,
+        }
     }
 }
 
@@ -596,7 +658,22 @@ impl Stream for ExecutionRecordingStream {
     type Item = Result<RecordBatch>;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        self.project().inner.poll_next(cx)
+        let this = self.project();
+        let result = this.inner.poll_next(cx);
+        if this.outcome.is_none()
+            && let Some(metrics) = this.export_metrics
+        {
+            let outcome = match &result {
+                Poll::Ready(None) => Some(ExecutionMetric::StreamsCompleted),
+                Poll::Ready(Some(Err(_))) => Some(ExecutionMetric::StreamsFailed),
+                _ => None,
+            };
+            if let Some(outcome) = outcome {
+                *this.outcome = Some(outcome);
+                metrics.add(outcome);
+            }
+        }
+        result
     }
 }
 
@@ -604,7 +681,14 @@ impl Stream for ExecutionRecordingStream {
 impl PinnedDrop for ExecutionRecordingStream {
     fn drop(self: Pin<&mut Self>) {
         let this = self.project();
-        this.recorders.finish_stream();
+        if this.outcome.is_none()
+            && let Some(metrics) = this.export_metrics
+        {
+            metrics.add(ExecutionMetric::StreamsCancelled);
+        }
+        if let Some(recorders) = this.recorders {
+            recorders.finish_stream();
+        }
     }
 }
 
@@ -714,6 +798,22 @@ mod tests {
                 .get("otel.name")
                 .cloned()
                 .unwrap_or_else(|| attrs.metadata().name().to_owned());
+            let parent = if let Some(parent) = attrs.parent() {
+                ctx.span(parent)
+            } else if attrs.is_contextual() {
+                ctx.lookup_current()
+            } else {
+                None
+            };
+            let parent_name = parent
+                .and_then(|parent| {
+                    parent
+                        .extensions()
+                        .get::<CapturedName>()
+                        .map(|name| name.0.clone())
+                })
+                .unwrap_or_else(|| "<root>".to_owned());
+            visitor.0.insert("__test.parent".to_owned(), parent_name);
             if let Some(span) = ctx.span(id) {
                 let mut extensions = span.extensions_mut();
                 extensions.insert(CapturedName(name.clone()));
@@ -933,6 +1033,7 @@ mod tests {
     struct FailFirstExecute {
         inner: Arc<dyn ExecutionPlan>,
         fail_next: AtomicBool,
+        trace_inner: bool,
     }
 
     impl FailFirstExecute {
@@ -940,6 +1041,7 @@ mod tests {
             Self {
                 inner,
                 fail_next: AtomicBool::new(true),
+                trace_inner: false,
             }
         }
     }
@@ -1022,8 +1124,145 @@ mod tests {
                     "intentional execute failure".into(),
                 ));
             }
+            if self.trace_inner {
+                let setup = tracing::info_span!("inner_setup");
+                let stream = setup.in_scope(|| self.inner.execute(partition, context))?;
+                let schema = stream.schema();
+                let stream = stream.map(|item| {
+                    let _entered = tracing::info_span!("inner_poll").entered();
+                    item
+                });
+                return Ok(Box::pin(RecordBatchStreamAdapter::new(schema, stream)));
+            }
             self.inner.execute(partition, context)
         }
+    }
+
+    #[tokio::test]
+    async fn disabled_spans_do_not_allocate_recorder_groups_with_or_without_export() {
+        for export_enabled in [false, true] {
+            let exporter =
+                export_enabled.then(crate::metrics_export::MetricsExporter::new);
+            let options = match &exporter {
+                Some(exporter) => InstrumentationOptions::builder()
+                    .metrics_exporter(exporter.clone())
+                    .build(),
+                None => InstrumentationOptions::default(),
+            };
+            // The fixture's default metrics() is None, while TestMemoryExec's
+            // metrics() intentionally panics. Keep the fixture around the source.
+            let inner = Arc::new(FailFirstExecute::new(two_partition_inner()));
+            inner.fail_next.store(false, Ordering::Release);
+            let weak_inner = Arc::downgrade(&inner);
+            let plan = InstrumentedExec::new(inner, Arc::new(Span::none), &options);
+            let mut stream = plan.execute(0, Arc::new(TaskContext::default())).unwrap();
+            assert!(plan.recorders.lock().unwrap().is_empty());
+            drop(plan);
+
+            let mut rows = 0;
+            while let Some(batch) = stream.next().await {
+                rows += batch.unwrap().num_rows();
+            }
+            drop(stream);
+            assert_eq!(rows, 1);
+            assert!(weak_inner.upgrade().is_none());
+            if let Some(exporter) = exporter {
+                let snapshot = exporter.snapshot();
+                assert_eq!(snapshot.len(), 1);
+                assert_eq!(snapshot[0].value(ExecutionMetric::StreamsStarted), 1);
+                assert_eq!(snapshot[0].value(ExecutionMetric::StreamsCompleted), 1);
+                assert_eq!(snapshot[0].value(ExecutionMetric::StreamsCancelled), 0);
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn disabled_span_still_runs_an_explicit_preview_callback() {
+        let previews = Arc::new(AtomicUsize::new(0));
+        let callback_previews = previews.clone();
+        let options = InstrumentationOptions::builder()
+            .preview_limit(1)
+            .preview_fn(Arc::new(move |batch| {
+                assert_eq!(batch.num_rows(), 1);
+                callback_previews.fetch_add(1, Ordering::Relaxed);
+                Ok("preview".to_owned())
+            }))
+            .build();
+        let plan =
+            InstrumentedExec::new(two_partition_inner(), Arc::new(Span::none), &options);
+        let mut stream = plan.execute(0, Arc::new(TaskContext::default())).unwrap();
+        assert_eq!(plan.recorders.lock().unwrap().len(), 1);
+        while let Some(batch) = stream.next().await {
+            batch.unwrap();
+        }
+        drop(stream);
+        assert_eq!(previews.load(Ordering::Relaxed), 1);
+        assert!(plan.recorders.lock().unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn filtered_operator_spans_preserve_parent_context_during_setup_and_polling() {
+        let capture = SpanCapture::default();
+        // A global filter makes these spans disabled. Per-layer filtering can
+        // retain a registry span for other layers, so it need not use the fast path.
+        let subscriber = tracing_subscriber::registry().with(capture.clone()).with(
+            tracing_subscriber::filter::filter_fn(|metadata| {
+                metadata.name() != "InstrumentedExec"
+            }),
+        );
+        let assertions_capture = capture.clone();
+        async move {
+            for export_enabled in [false, true] {
+                let exporter =
+                    export_enabled.then(crate::metrics_export::MetricsExporter::new);
+                let options = match &exporter {
+                    Some(exporter) => InstrumentationOptions::builder()
+                        .metrics_exporter(exporter.clone())
+                        .build(),
+                    None => InstrumentationOptions::default(),
+                };
+                let mut inner = FailFirstExecute::new(two_partition_inner());
+                inner.fail_next.store(false, Ordering::Release);
+                inner.trace_inner = true;
+                let plan = InstrumentedExec::new(
+                    Arc::new(inner),
+                    Arc::new(|| tracing::info_span!("InstrumentedExec")),
+                    &options,
+                );
+                async {
+                    let mut stream =
+                        plan.execute(0, Arc::new(TaskContext::default())).unwrap();
+                    assert!(plan.recorders.lock().unwrap().is_empty());
+                    // The subscriber and application parent must be restored on
+                    // every future poll, not just while constructing the stream.
+                    tokio::task::yield_now().await;
+                    while let Some(batch) = stream.next().await {
+                        batch.unwrap();
+                    }
+                    drop(stream);
+                }
+                .instrument(tracing::info_span!("application"))
+                .await;
+                if let Some(exporter) = exporter {
+                    assert_eq!(
+                        exporter.snapshot()[0].value(ExecutionMetric::StreamsCompleted),
+                        1
+                    );
+                }
+            }
+        }
+        .with_subscriber(subscriber)
+        .await;
+        assert_eq!(assertions_capture.opened("InstrumentedExec"), 0);
+        assert_eq!(
+            assertions_capture.closed_field_values("inner_setup", "__test.parent"),
+            vec!["application", "application"]
+        );
+        assert_eq!(
+            assertions_capture.closed_field_values("inner_poll", "__test.parent"),
+            vec!["application", "application"]
+        );
+        assert_eq!(assertions_capture.closed("application"), 2);
     }
 
     /// Concurrent partition streams from one execution share a recorder group,
@@ -1331,6 +1570,84 @@ mod tests {
                 output_rows.iter().any(|value| value == "1"),
                 "stream group close should record native DataFusion output row metrics"
             );
+        })
+        .await;
+    }
+
+    #[tokio::test]
+    async fn metrics_export_and_span_fields_can_be_enabled_together() {
+        with_span_capture(|capture| async move {
+            let exporter = crate::metrics_export::MetricsExporter::new();
+            let options = InstrumentationOptions::builder()
+                .record_metrics(true)
+                .metrics_exporter(exporter.clone())
+                .build();
+            let ctx = make_ctx_with_options(options).await;
+            ctx.sql("SELECT 1").await.unwrap().collect().await.unwrap();
+            assert!(
+                capture
+                    .closed_field_values(
+                        "InstrumentedExec",
+                        "datafusion.metrics.output_rows",
+                    )
+                    .iter()
+                    .any(|value| value == "1")
+            );
+            assert!(
+                exporter
+                    .snapshot()
+                    .iter()
+                    .any(|operator| { operator.value(ExecutionMetric::OutputRows) == 1 })
+            );
+        })
+        .await;
+    }
+
+    #[tokio::test]
+    async fn exporting_deltas_preserves_native_span_snapshots_and_span_lifetimes() {
+        with_span_capture(|capture| async move {
+            let exporter = crate::metrics_export::MetricsExporter::new();
+            let options = InstrumentationOptions::builder()
+                .record_metrics(true)
+                .metrics_exporter(exporter.clone())
+                .build();
+            let ctx = make_ctx_with_options(options).await;
+            let plan = ctx
+                .sql("SELECT 1")
+                .await
+                .unwrap()
+                .create_physical_plan()
+                .await
+                .unwrap();
+            let retained_plan = plan.clone();
+            let context = ctx.task_ctx();
+            for _ in 0..2 {
+                let mut stream = plan.execute(0, context.clone()).unwrap();
+                while let Some(batch) = stream.next().await {
+                    batch.unwrap();
+                }
+            }
+            // Issue #27: holding plans must not keep completed spans open.
+            let closed = capture.closed("InstrumentedExec");
+            assert!(closed >= 2);
+            // PR #54 retained native span snapshots; exporter deltas must neither
+            // rewrite those snapshots nor reset the underlying plan's metrics.
+            assert_eq!(
+                capture.closed_field_values(
+                    "InstrumentedExec",
+                    "datafusion.metrics.output_rows",
+                ),
+                vec!["1", "2"]
+            );
+            assert!(
+                exporter
+                    .snapshot()
+                    .iter()
+                    .any(|operator| { operator.value(ExecutionMetric::OutputRows) == 2 })
+            );
+            drop(plan);
+            drop(retained_plan);
+            assert_eq!(capture.closed("InstrumentedExec"), closed);
         })
         .await;
     }

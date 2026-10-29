@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Version numbers follow Apache DataFusion releases for compatibility alignment.
 
+## [Unreleased]
+
+### Added
+
+- Export cumulative operator metrics independently of tracing through typed
+  snapshots, application-provided sinks, optional `metrics` recorders,
+  OpenTelemetry meters, and a `prometheus-client` pull collector
+- Track partition stream completion, failure, and cancellation with bounded
+  operator labels and shared native counter checkpoints
+
+### Changed
+
+- `InstrumentationOptions` struct literals need the new `metrics_exporter` field
+  (use `None` to disable export), or `..Default::default()`. Builder-based setup
+  remains source compatible.
+
 ## [55.0.1] - 2026-10-14
 
 ### Fixed

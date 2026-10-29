@@ -131,6 +131,30 @@ async fn main() -> Result<()> {
 
 A more complete example can be found in the [examples directory](https://github.com/datafusion-contrib/datafusion-tracing/tree/main/examples).
 
+### Exporting execution metrics
+
+[`metrics_export::MetricsExporter`] collects cumulative operator counters
+independently of tracing spans. It supports typed snapshots, custom
+[`metrics_export::MetricsSink`] implementations, an optional Rust `metrics`
+recorder adapter (`metrics` feature), an optional OpenTelemetry meter adapter
+(`opentelemetry` feature), and an optional `prometheus-client` pull collector
+(`prometheus` feature).
+
+```rust
+use datafusion_tracing::{InstrumentationOptions, metrics_export::MetricsExporter};
+
+let exporter = MetricsExporter::new();
+let options = InstrumentationOptions::builder()
+    .metrics_exporter(exporter.clone())
+    .build();
+// Pass options to the instrumentation rule used by your sessions.
+// After executing queries, inspect typed cumulative values:
+let snapshot = exporter.snapshot();
+```
+
+See the [metrics export guide](https://github.com/datafusion-contrib/datafusion-tracing/blob/main/datafusion-tracing/docs/metrics-export.md)
+for backend setup, reporting schedules, metric definitions, and lifecycle guarantees.
+
 <!-- cargo-rdme end -->
 
 ## Setting Up a Collector

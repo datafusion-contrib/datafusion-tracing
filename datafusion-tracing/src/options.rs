@@ -17,6 +17,7 @@
 //
 // This product includes software developed at Datadog (https://www.datadoghq.com/) Copyright 2025 Datadog, Inc.
 
+use crate::metrics_export::MetricsExporter;
 use crate::preview::PreviewFn;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -24,8 +25,12 @@ use std::sync::Arc;
 /// Configuration options for instrumented execution plans.
 #[derive(Clone, Default)]
 pub struct InstrumentationOptions {
-    /// Whether to record metrics during execution.
+    /// Whether to record native execution metrics as tracing span fields.
     pub record_metrics: bool,
+
+    /// Optional backend-independent export of execution counters.
+    /// This is independent of `record_metrics`, which controls span fields.
+    pub metrics_exporter: Option<MetricsExporter>,
 
     /// Maximum number of rows to preview per span.
     ///
@@ -47,6 +52,7 @@ impl std::fmt::Debug for InstrumentationOptions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("InstrumentationOptions")
             .field("record_metrics", &self.record_metrics)
+            .field("metrics_exporter", &self.metrics_exporter)
             .field("preview_limit", &self.preview_limit)
             .field(
                 "preview_fn",
@@ -72,13 +78,24 @@ impl InstrumentationOptions {
 #[derive(Default)]
 pub struct InstrumentationOptionsBuilder {
     record_metrics: bool,
+    metrics_exporter: Option<MetricsExporter>,
     preview_limit: usize,
     preview_fn: Option<Arc<PreviewFn>>,
     custom_fields: HashMap<String, String>,
 }
 
 impl InstrumentationOptionsBuilder {
-    /// Sets whether to record metrics during execution.
+    /// Export cumulative execution counters through the supplied collector.
+    ///
+    /// Share the exporter across sessions to aggregate their metrics. Call
+    /// `collect()` before exposing sink metrics, or use `snapshot()` for typed
+    /// values. No tracing subscriber is required.
+    pub fn metrics_exporter(mut self, exporter: MetricsExporter) -> Self {
+        self.metrics_exporter = Some(exporter);
+        self
+    }
+
+    /// Sets whether to record native execution metrics as tracing span fields.
     pub fn record_metrics(mut self, record: bool) -> Self {
         self.record_metrics = record;
         self
@@ -117,6 +134,7 @@ impl InstrumentationOptionsBuilder {
     pub fn build(self) -> InstrumentationOptions {
         InstrumentationOptions {
             record_metrics: self.record_metrics,
+            metrics_exporter: self.metrics_exporter,
             preview_limit: self.preview_limit,
             preview_fn: self.preview_fn,
             custom_fields: self.custom_fields,

@@ -28,7 +28,8 @@
 /// # Instrumentation Options
 ///
 /// The instrumentation options are specified via the [`crate::InstrumentationOptions`] struct, which includes:
-/// - `record_metrics`: Enable or disable recording of DataFusion execution metrics.
+/// - `record_metrics`: Enable or disable recording of DataFusion execution metrics in span fields.
+/// - `metrics_exporter`: Export cumulative execution counters independently of tracing spans.
 /// - `preview_limit`: Set the number of rows to preview per span (set to `0` to disable).
 /// - `preview_fn`: Provide an optional callback for formatting previewed batches.
 ///   If unspecified, [`datafusion::arrow::util::pretty::pretty_format_batches`] will be used.

@@ -32,13 +32,29 @@ rust-version = { workspace = true }
 documentation = "https://docs.rs/datafusion-tracing"
 homepage = "https://github.com/datafusion-contrib/datafusion-tracing"
 
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+default = []
+metrics = ["dep:metrics"]
+opentelemetry = ["dep:opentelemetry"]
+prometheus = ["dep:prometheus-client"]
+
+[[example]]
+name = "metrics_prometheus"
+required-features = ["prometheus"]
+
 [dependencies]
 async-trait = { workspace = true }
 comfy-table = { version = "7.2" }
 datafusion = { workspace = true }
 delegate = "0.13"
 futures = { workspace = true }
+metrics = { version = "0.24", optional = true }
+opentelemetry = { version = "0.31", default-features = false, features = ["metrics"], optional = true }
 pin-project = "1.1"
+prometheus-client = { version = "0.25", optional = true }
 similar = { version = "2.7", default-features = false, features = ["text"] }
 tracing = { workspace = true }
 tracing-futures = { workspace = true }
@@ -47,7 +63,8 @@ unicode-width = "0.2"
 [dev-dependencies]
 datafusion = { workspace = true, features = ["sql"] }
 insta = { version = "1.43" }
-tokio = { workspace = true }
+opentelemetry_sdk = { version = "0.31", default-features = false, features = ["metrics"] }
+tokio = { workspace = true, features = ["macros", "rt"] }
 tracing-subscriber = { version = "0.3", features = ["registry"] }
 
 [lints]
