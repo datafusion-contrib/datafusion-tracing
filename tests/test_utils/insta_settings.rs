@@ -35,11 +35,11 @@ pub fn settings() -> Settings {
         "1970-01-01T00:00:00Z",
     );
 
-    // Replace e-tags like e_tag: Some(\"3632ae8a-631df76d066c5-b7d\")
-    // with e_tag: Some(\"ffffffff-fffffffffffff-fff\").
+    // Normalize the hex payload of local filesystem e-tags while preserving the
+    // surrounding JSON escapes, including object_store 0.14's quoted e-tags.
     settings.add_filter(
-        r#"e_tag: Some\(\\"([0-9a-fA-F-]+)\\"\)"#,
-        r#"e_tag: Some\("ffffffff-fffffffffffff-fff"\)"#,
+        r#"(e_tag: Some\([\\"]+)[0-9a-fA-F-]+([\\"]+\))"#,
+        "${1}ffffffff-fffffffffffff-fff${2}",
     );
 
     // Replace durations like 1.18ms or 523µs
@@ -70,4 +70,29 @@ pub fn preview_redacted_settings() -> Settings {
     );
 
     settings
+}
+
+#[cfg(test)]
+mod tests {
+    use super::settings;
+
+    #[test]
+    fn local_etags_preserve_json_quoting() {
+        settings().bind(|| {
+            insta::assert_json_snapshot!(
+                [
+                    r#"e_tag: Some("3632ae8a-631df76d066c5-b7d")"#,
+                    r#"e_tag: Some("\"2524fa-65eedfe780c5a-a6e\"")"#,
+                    "unrelated: 3632ae8a-631df76d066c5-b7d",
+                ],
+                @r###"
+            [
+              "e_tag: Some(\"ffffffff-fffffffffffff-fff\")",
+              "e_tag: Some(\"\\\"ffffffff-fffffffffffff-fff\\\"\")",
+              "unrelated: 3632ae8a-631df76d066c5-b7d"
+            ]
+            "###
+            );
+        });
+    }
 }

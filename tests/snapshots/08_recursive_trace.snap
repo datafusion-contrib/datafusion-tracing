@@ -635,6 +635,33 @@ expression: full_trace_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "eliminate_aggregate_distinct"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "single_distinct_aggregation_to_group_by"
     },
     "spans": [
@@ -1334,6 +1361,33 @@ expression: full_trace_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "eliminate_aggregate_distinct"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "single_distinct_aggregation_to_group_by"
     },
     "spans": [
@@ -1549,6 +1603,35 @@ expression: full_trace_lines
     "span": {
       "name": "Rule",
       "otel.name": "aggregate_statistics"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "08_recursive"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "recursive"
+      },
+      {
+        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EliminateConstantJoin"
     },
     "spans": [
       {
@@ -2099,35 +2182,6 @@ expression: full_trace_lines
     "message": "close",
     "span": {
       "name": "Rule",
-      "otel.name": "SanityCheckPlan"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "08_recursive"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "recursive"
-      },
-      {
-        "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
       "otel.name": "Instrument"
     },
     "spans": [
@@ -2184,7 +2238,7 @@ expression: full_trace_lines
     "span": {
       "logical_plan": "SubqueryAlias: numbers [n:Int64;N]\n  RecursiveQuery: is_distinct=false [n:Int64;N]\n    Projection: Int64(1) AS n [n:Int64]\n      EmptyRelation: rows=1 []\n    Projection: numbers.n + Int64(1) [numbers.n + Int64(1):Int64;N]\n      Filter: numbers.n < Int64(3) [n:Int64;N]\n        TableScan: numbers projection=[n] [n:Int64;N]",
       "name": "create_physical_plan",
-      "physical_plan": "RecursiveQueryExec: name=numbers, is_distinct=false\n  ProjectionExec: expr=[CAST(1 AS Int64) as n]\n    PlaceholderRowExec\n  CoalescePartitionsExec\n    ProjectionExec: expr=[n@0 + 1 as n]\n      FilterExec: n@0 < 3\n        RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1\n          WorkTableExec: name=numbers\n"
+      "physical_plan": "RecursiveQueryExec: name=numbers, is_distinct=false\n  ProjectionExec: expr=[CAST(1 AS Int64;N) as n]\n    PlaceholderRowExec\n  CoalescePartitionsExec\n    ProjectionExec: expr=[n@0 + 1 as n]\n      FilterExec: n@0 < 3\n        RepartitionExec: partitioning=RoundRobinBatch(8), input_partitions=1\n          WorkTableExec: name=numbers\n"
     },
     "spans": [
       {
@@ -2521,7 +2575,7 @@ expression: full_trace_lines
     "span": {
       "datafusion.boundedness": "Bounded",
       "datafusion.emission_type": "Incremental",
-      "datafusion.node": "ProjectionExec: expr=[CAST(1 AS Int64) as n]",
+      "datafusion.node": "ProjectionExec: expr=[CAST(1 AS Int64;N) as n]",
       "datafusion.partitioning": "UnknownPartitioning(1)",
       "env": "production",
       "name": "InstrumentedExec",

@@ -635,6 +635,33 @@ expression: full_trace_lines
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "eliminate_aggregate_distinct"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "04_basic_compact_preview"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "select_one"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "single_distinct_aggregation_to_group_by"
     },
     "spans": [
@@ -850,6 +877,35 @@ expression: full_trace_lines
     "span": {
       "name": "Rule",
       "otel.name": "aggregate_statistics"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "04_basic_compact_preview"
+      },
+      {
+        "name": "run_traced_query",
+        "query_name": "select_one"
+      },
+      {
+        "logical_plan": "Projection: Int64(1) [Int64(1):Int64]\n  EmptyRelation: rows=1 []",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_utils",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
+      "otel.name": "EliminateConstantJoin"
     },
     "spans": [
       {
@@ -1372,35 +1428,6 @@ expression: full_trace_lines
     "span": {
       "name": "Rule",
       "otel.name": "FilterPushdown(Post)"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "04_basic_compact_preview"
-      },
-      {
-        "name": "run_traced_query",
-        "query_name": "select_one"
-      },
-      {
-        "logical_plan": "Projection: Int64(1) [Int64(1):Int64]\n  EmptyRelation: rows=1 []",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_utils",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "name": "Rule",
-      "otel.name": "SanityCheckPlan"
     },
     "spans": [
       {

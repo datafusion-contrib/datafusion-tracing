@@ -85,7 +85,7 @@ expression: "captured_trace_lines(log_buffer, test_name)"
     "span": {
       "logical_plan": "Projection: l.id [id:Int64]\n  Inner Join: l.id = r.id [id:Int64, id:Int64]\n    SubqueryAlias: l [id:Int64]\n      TableScan: left_table projection=[id] [id:Int64]\n    SubqueryAlias: r [id:Int64]\n      TableScan: right_table projection=[id] [id:Int64]",
       "name": "create_physical_plan",
-      "physical_plan": "HashJoinExec: mode=Partitioned, join_type=Inner, on=[(id@0, id@0)], projection=[id@0]\n  DataSourceExec: partitions=1, partition_sizes=[1]\n  DataSourceExec: partitions=1, partition_sizes=[1]\n"
+      "physical_plan": "HashJoinExec: mode=Partitioned, join_type=Inner, on=[(id@0, id@0)], projection=[id@0]\n  RepartitionExec: partitioning=Hash([id@0], 2), input_partitions=1\n    DataSourceExec: partitions=1, partition_sizes=[1]\n  RepartitionExec: partitioning=Hash([id@0], 2), input_partitions=1\n    DataSourceExec: partitions=1, partition_sizes=[1]\n"
     },
     "spans": [
       {

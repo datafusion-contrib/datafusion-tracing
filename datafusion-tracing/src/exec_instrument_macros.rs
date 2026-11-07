@@ -94,11 +94,11 @@
 ///     ! -path '*/tests/*' \
 ///     ! -path '*/benches/*' \
 ///     ! -path '*/physical-expr-common/src/metrics/builder.rs' \
-///     -exec perl -0ne 'while (/\.(?:counter|global_counter|gauge|subset_time|pruning_metrics|ratio_metrics(?:_with_strategy)?)\(\s*"([A-Za-z0-9_]+)"/g) { print "$1\n" }' {} +
+///     -exec perl -0ne 'while (/\.(?:(?:global_)?(?:bytes_)?(?:counter|gauge)|peak_memory_usage|subset_time|pruning_metrics|ratio_metrics(?:_with_strategy)?)\(\s*"([A-Za-z0-9_]+)"/g) { print "$1\n" }' {} +
 ///   sed -n '/pub fn name/,/^    }/p' datafusion/physical-expr-common/src/metrics/value.rs \
 ///     | grep -E '=> "[A-Za-z0-9_]+"' \
 ///     | cut -d '"' -f 2
-/// ) | grep -Ev '^(test|my_counter|my_metric|the_counter|the_second_counter|the_third_counter|the_time)$' \
+/// ) | grep -Ev '^(test|my_counter|my_metric|the_counter|the_second_counter|the_third_counter|the_time|custom_counter|global|right_input_bytes)$' \
 ///   | sort -u \
 ///   | sed 's/\(.*\)/datafusion.metrics.\1 = tracing::field::Empty,/g'
 /// ```
@@ -125,12 +125,15 @@ macro_rules! instrument_with_spans {
                     datafusion.metrics.avg_fanout = tracing::field::Empty,
                     datafusion.metrics.batches_split = tracing::field::Empty,
                     datafusion.metrics.bloom_filter_eval_time = tracing::field::Empty,
+                    datafusion.metrics.buffered_rows = tracing::field::Empty,
                     datafusion.metrics.build_input_batches = tracing::field::Empty,
                     datafusion.metrics.build_input_rows = tracing::field::Empty,
                     datafusion.metrics.build_mem_used = tracing::field::Empty,
                     datafusion.metrics.build_time = tracing::field::Empty,
+                    datafusion.metrics.bytes_processed = tracing::field::Empty,
                     datafusion.metrics.bytes_scanned = tracing::field::Empty,
                     datafusion.metrics.bytes_written = tracing::field::Empty,
+                    datafusion.metrics.early_emit_count = tracing::field::Empty,
                     datafusion.metrics.elapsed_compute = tracing::field::Empty,
                     datafusion.metrics.emitting_time = tracing::field::Empty,
                     datafusion.metrics.end_timestamp = tracing::field::Empty,
@@ -146,6 +149,7 @@ macro_rules! instrument_with_spans {
                     datafusion.metrics.left_input_batches = tracing::field::Empty,
                     datafusion.metrics.left_input_rows = tracing::field::Empty,
                     datafusion.metrics.limit_pruned_row_groups = tracing::field::Empty,
+                    datafusion.metrics.limit_pruned_rows = tracing::field::Empty,
                     datafusion.metrics.max_mem_used = tracing::field::Empty,
                     datafusion.metrics.max_queued = tracing::field::Empty,
                     datafusion.metrics.mem_used = tracing::field::Empty,
@@ -155,6 +159,7 @@ macro_rules! instrument_with_spans {
                     datafusion.metrics.output_bytes = tracing::field::Empty,
                     datafusion.metrics.output_rows = tracing::field::Empty,
                     datafusion.metrics.page_index_eval_time = tracing::field::Empty,
+                    datafusion.metrics.page_index_load_skipped = tracing::field::Empty,
                     datafusion.metrics.page_index_pages_pruned = tracing::field::Empty,
                     datafusion.metrics.page_index_pages_skipped_by_fully_matched = tracing::field::Empty,
                     datafusion.metrics.page_index_rows_pruned = tracing::field::Empty,
@@ -169,7 +174,9 @@ macro_rules! instrument_with_spans {
                     datafusion.metrics.repartition_time = tracing::field::Empty,
                     datafusion.metrics.right_input_batches = tracing::field::Empty,
                     datafusion.metrics.right_input_rows = tracing::field::Empty,
+                    datafusion.metrics.row_filter_skipped_fully_matched = tracing::field::Empty,
                     datafusion.metrics.row_groups_pruned_bloom_filter = tracing::field::Empty,
+                    datafusion.metrics.row_groups_pruned_dynamic_filter = tracing::field::Empty,
                     datafusion.metrics.row_groups_pruned_statistics = tracing::field::Empty,
                     datafusion.metrics.row_pushdown_eval_time = tracing::field::Empty,
                     datafusion.metrics.row_replacements = tracing::field::Empty,
@@ -189,6 +196,7 @@ macro_rules! instrument_with_spans {
                     datafusion.metrics.time_elapsed_processing = tracing::field::Empty,
                     datafusion.metrics.time_elapsed_scanning_total = tracing::field::Empty,
                     datafusion.metrics.time_elapsed_scanning_until_data = tracing::field::Empty,
+                    datafusion.metrics.topk_maintenance_time = tracing::field::Empty,
                     $($fields)*
                 );
                 for (key, value) in custom_fields.iter() {
