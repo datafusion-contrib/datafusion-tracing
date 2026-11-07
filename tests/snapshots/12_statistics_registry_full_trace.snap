@@ -504,6 +504,29 @@ expression: "captured_trace_lines(log_buffer, test_name)"
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "eliminate_aggregate_distinct"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "12_statistics_registry_full"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 1,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "single_distinct_aggregation_to_group_by"
     },
     "spans": [
@@ -1099,6 +1122,29 @@ expression: "captured_trace_lines(log_buffer, test_name)"
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "eliminate_aggregate_distinct"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "12_statistics_registry_full"
+      },
+      {
+        "datafusion.optimizer.max_passes": 3,
+        "datafusion.optimizer.pass": 2,
+        "name": "Phase",
+        "otel.name": "optimize_logical_plan"
+      }
+    ],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "single_distinct_aggregation_to_group_by"
     },
     "spans": [
@@ -1306,6 +1352,31 @@ expression: "captured_trace_lines(log_buffer, test_name)"
     "message": "close",
     "span": {
       "name": "Rule",
+      "otel.name": "EliminateConstantJoin"
+    },
+    "spans": [
+      {
+        "name": "test",
+        "test_name": "12_statistics_registry_full"
+      },
+      {
+        "logical_plan": "Projection: l.id [id:Int64]\n  Inner Join: l.id = r.id [id:Int64, id:Int64]\n    SubqueryAlias: l [id:Int64]\n      TableScan: left_table projection=[id] [id:Int64]\n    SubqueryAlias: r [id:Int64]\n      TableScan: right_table projection=[id] [id:Int64]",
+        "name": "create_physical_plan"
+      },
+      {
+        "name": "Phase",
+        "otel.name": "optimize_physical_plan"
+      }
+    ],
+    "target": "integration_tests",
+    "time.busy": "0.00ms",
+    "time.idle": "0.00ms"
+  },
+  {
+    "level": "INFO",
+    "message": "close",
+    "span": {
+      "name": "Rule",
       "otel.name": "join_selection (modified)"
     },
     "spans": [
@@ -1406,7 +1477,7 @@ expression: "captured_trace_lines(log_buffer, test_name)"
     "message": "close",
     "span": {
       "name": "Rule",
-      "otel.name": "EnsureRequirements"
+      "otel.name": "EnsureRequirements (modified)"
     },
     "spans": [
       {
@@ -1755,32 +1826,7 @@ expression: "captured_trace_lines(log_buffer, test_name)"
     "level": "INFO",
     "message": "close",
     "span": {
-      "name": "Rule",
-      "otel.name": "SanityCheckPlan"
-    },
-    "spans": [
-      {
-        "name": "test",
-        "test_name": "12_statistics_registry_full"
-      },
-      {
-        "logical_plan": "Projection: l.id [id:Int64]\n  Inner Join: l.id = r.id [id:Int64, id:Int64]\n    SubqueryAlias: l [id:Int64]\n      TableScan: left_table projection=[id] [id:Int64]\n    SubqueryAlias: r [id:Int64]\n      TableScan: right_table projection=[id] [id:Int64]",
-        "name": "create_physical_plan"
-      },
-      {
-        "name": "Phase",
-        "otel.name": "optimize_physical_plan"
-      }
-    ],
-    "target": "integration_tests",
-    "time.busy": "0.00ms",
-    "time.idle": "0.00ms"
-  },
-  {
-    "level": "INFO",
-    "message": "close",
-    "span": {
-      "datafusion.effective_rules": "OutputRequirements, join_selection, ProjectionPushdown, OutputRequirements",
+      "datafusion.effective_rules": "OutputRequirements, join_selection, EnsureRequirements, ProjectionPushdown, OutputRequirements",
       "name": "Phase",
       "otel.name": "optimize_physical_plan"
     },
@@ -1804,7 +1850,7 @@ expression: "captured_trace_lines(log_buffer, test_name)"
     "span": {
       "logical_plan": "Projection: l.id [id:Int64]\n  Inner Join: l.id = r.id [id:Int64, id:Int64]\n    SubqueryAlias: l [id:Int64]\n      TableScan: left_table projection=[id] [id:Int64]\n    SubqueryAlias: r [id:Int64]\n      TableScan: right_table projection=[id] [id:Int64]",
       "name": "create_physical_plan",
-      "physical_plan": "HashJoinExec: mode=Partitioned, join_type=Inner, on=[(id@0, id@0)], projection=[id@0]\n  DataSourceExec: partitions=1, partition_sizes=[1]\n  DataSourceExec: partitions=1, partition_sizes=[1]\n"
+      "physical_plan": "HashJoinExec: mode=Partitioned, join_type=Inner, on=[(id@0, id@0)], projection=[id@0]\n  RepartitionExec: partitioning=Hash([id@0], 2), input_partitions=1\n    DataSourceExec: partitions=1, partition_sizes=[1]\n  RepartitionExec: partitioning=Hash([id@0], 2), input_partitions=1\n    DataSourceExec: partitions=1, partition_sizes=[1]\n"
     },
     "spans": [
       {
