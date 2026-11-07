@@ -298,11 +298,6 @@ impl OptimizerRule for OptimizerPhaseSentinel {
         None
     }
 
-    #[allow(deprecated)]
-    fn supports_rewrite(&self) -> bool {
-        true
-    }
-
     fn rewrite(
         &self,
         plan: LogicalPlan,
@@ -443,6 +438,7 @@ impl Debug for ErrorCleanupAnalyzerRule {
     }
 }
 
+#[warn(clippy::missing_trait_methods)]
 impl AnalyzerRule for ErrorCleanupAnalyzerRule {
     fn analyze(&self, plan: LogicalPlan, config: &ConfigOptions) -> Result<LogicalPlan> {
         let result = self.inner.analyze(plan, config);
@@ -467,6 +463,7 @@ impl Debug for ErrorCleanupOptimizerRule {
     }
 }
 
+#[warn(clippy::missing_trait_methods)]
 impl OptimizerRule for ErrorCleanupOptimizerRule {
     fn name(&self) -> &str {
         self.inner.name()
@@ -474,11 +471,6 @@ impl OptimizerRule for ErrorCleanupOptimizerRule {
 
     fn apply_order(&self) -> Option<ApplyOrder> {
         self.inner.apply_order()
-    }
-
-    #[allow(deprecated)]
-    fn supports_rewrite(&self) -> bool {
-        self.inner.supports_rewrite()
     }
 
     fn rewrite(
@@ -680,6 +672,7 @@ impl InstrumentedAnalyzerRule {
     }
 }
 
+#[warn(clippy::missing_trait_methods)]
 impl AnalyzerRule for InstrumentedAnalyzerRule {
     fn analyze(&self, plan: LogicalPlan, config: &ConfigOptions) -> Result<LogicalPlan> {
         let span = (self.span_create_fn)(self.name());
@@ -791,6 +784,7 @@ impl InstrumentedOptimizerRule {
     }
 }
 
+#[warn(clippy::missing_trait_methods)]
 impl OptimizerRule for InstrumentedOptimizerRule {
     fn name(&self) -> &str {
         self.inner.name()
@@ -801,11 +795,6 @@ impl OptimizerRule for InstrumentedOptimizerRule {
         // This ensures we get a single span per rule application instead of
         // one span per node when the optimizer would normally handle recursion.
         None
-    }
-
-    #[allow(deprecated)]
-    fn supports_rewrite(&self) -> bool {
-        self.inner.supports_rewrite()
     }
 
     fn rewrite(
@@ -1176,6 +1165,7 @@ mod tests {
     use datafusion::physical_plan::operator_statistics::{
         ExtendedStatistics, StatisticsProvider, StatisticsRegistry, StatisticsResult,
     };
+    use datafusion::physical_plan::{ChildStats, StatisticsArgs};
     use datafusion::prelude::{SessionConfig, SessionContext};
     use std::fmt;
     use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
@@ -1438,6 +1428,17 @@ mod tests {
     }
 
     impl StatisticsProvider for CountingStatisticsProvider {
+        fn child_stats_requests(
+            &self,
+            plan: &dyn ExecutionPlan,
+            _: Option<usize>,
+        ) -> Vec<ChildStats> {
+            // This provider does not depend on child statistics. Keep its
+            // injected error on the requested node, rather than on a
+            // speculative child walk that the registry may skip.
+            vec![ChildStats::Skip; plan.children().len()]
+        }
+
         fn compute_statistics(
             &self,
             plan: &dyn ExecutionPlan,
@@ -1471,8 +1472,11 @@ mod tests {
             context: &dyn PhysicalOptimizerContext,
         ) -> Result<Arc<dyn ExecutionPlan>> {
             assert!(context.config_options().optimizer.use_statistics_registry);
-            let registry = context.statistics_registry().expect("registered provider");
-            let stats = registry.compute_base(plan.as_ref())?;
+            context.statistics_registry().expect("registered provider");
+            context
+                .statistics_context()
+                .expect("shared statistics context");
+            let stats = context.compute_statistics(&plan, &StatisticsArgs::new())?;
             assert_eq!(stats.num_rows, Precision::Exact(42));
             Ok(plan)
         }

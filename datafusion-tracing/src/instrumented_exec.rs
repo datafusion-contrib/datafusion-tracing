@@ -32,8 +32,8 @@ use datafusion::{
     physical_expr::{Distribution, OrderingRequirements, PhysicalSortExpr},
     physical_plan::{
         ChildStats, ChildrenPropertiesMode, DisplayAs, DisplayFormatType, ExecutionPlan,
-        ExecutionPlanProperties, InputDistributionRequirements, PhysicalExpr,
-        PlanProperties, ReplaceChildrenOptions, StatisticsArgs,
+        ExecutionPlanProperties, InputDistributionRequirements, LimitBehavior,
+        PhysicalExpr, PlanProperties, ReplaceChildrenOptions, StatisticsArgs,
         execution_plan::{CardinalityEffect, InvariantLevel},
         filter_pushdown::{
             ChildPushdownResult, FilterDescription, FilterPushdownPhase,
@@ -272,7 +272,7 @@ impl ExecutionPlan for InstrumentedExec {
                 args: &StatisticsArgs,
             ) -> Result<Arc<Statistics>>;
             fn child_stats_requests(&self, partition: Option<usize>) -> Vec<ChildStats>;
-            fn supports_limit_pushdown(&self) -> bool;
+            fn limit_behavior(&self) -> LimitBehavior;
             fn fetch(&self) -> Option<usize>;
             fn cardinality_effect(&self) -> CardinalityEffect;
             fn gather_filters_for_pushdown(
@@ -285,6 +285,8 @@ impl ExecutionPlan for InstrumentedExec {
             fn required_input_distribution(&self) -> Vec<Distribution>;
             #[allow(deprecated)]
             fn partition_statistics(&self, partition: Option<usize>) -> Result<Arc<Statistics>>;
+            #[allow(deprecated)]
+            fn supports_limit_pushdown(&self) -> bool;
         }
     }
 
@@ -328,6 +330,7 @@ impl ExecutionPlan for InstrumentedExec {
 
     /// Delegate order-preservation requirements to the inner plan and rewrap with
     /// an InstrumentedExec.
+    #[allow(deprecated)]
     fn with_preserve_order(
         &self,
         preserve_order: bool,
@@ -798,6 +801,52 @@ mod tests {
     // -----------------------------------------------------------------------
     // Tests
     // -----------------------------------------------------------------------
+
+    /// DataFusion 56 reads `limit_behavior` directly. Its default cannot recover
+    /// limit offsets or merge behavior from the deprecated boolean hook.
+    #[test]
+    fn limit_behavior_preserves_limits_and_merges() {
+        use datafusion::physical_plan::coalesce_partitions::CoalescePartitionsExec;
+        use datafusion::physical_plan::limit::{GlobalLimitExec, LocalLimitExec};
+
+        let input = two_partition_inner();
+        let cases: Vec<(Arc<dyn ExecutionPlan>, LimitBehavior)> = vec![
+            (
+                Arc::new(GlobalLimitExec::new(input.clone(), 3, Some(7))),
+                LimitBehavior::Limit {
+                    skip: 3,
+                    fetch: Some(7),
+                },
+            ),
+            (
+                Arc::new(GlobalLimitExec::new(input.clone(), 3, None)),
+                LimitBehavior::Limit {
+                    skip: 3,
+                    fetch: None,
+                },
+            ),
+            (
+                Arc::new(LocalLimitExec::new(input.clone(), 7)),
+                LimitBehavior::Limit {
+                    skip: 0,
+                    fetch: Some(7),
+                },
+            ),
+            (
+                Arc::new(CoalescePartitionsExec::new(input)),
+                LimitBehavior::Merge,
+            ),
+        ];
+
+        for (inner, expected) in cases {
+            let plan = InstrumentedExec::new(
+                inner,
+                Arc::new(Span::none),
+                &InstrumentationOptions::default(),
+            );
+            assert_eq!(plan.limit_behavior(), expected);
+        }
+    }
 
     /// Regression for issue #27: spans must close when the last execution stream
     /// is consumed, not when the plan is dropped.
