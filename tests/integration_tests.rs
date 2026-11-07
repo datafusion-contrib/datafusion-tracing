@@ -21,6 +21,7 @@ mod test_utils;
 
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, Once, OnceLock};
+use std::time::Duration;
 
 use datafusion::arrow::array::{ArrayRef, Int64Array};
 use datafusion::arrow::record_batch::RecordBatch;
@@ -39,8 +40,10 @@ use datafusion_tracing::{RuleInstrumentationOptions, instrument_rules_with_info_
 use insta::{assert_json_snapshot, assert_snapshot};
 use integration_utils::{SessionBuilder, run_traced_query};
 use serde_json::Value;
-use tracing::{Instrument, Level};
-use tracing_subscriber::fmt::format::FmtSpan;
+use tracing::{Event, Instrument, Level, Subscriber};
+use tracing_subscriber::fmt::format::{FmtSpan, FormatEvent, JsonFields, Writer};
+use tracing_subscriber::fmt::{FmtContext, FormattedFields};
+use tracing_subscriber::registry::LookupSpan;
 use tracing_subscriber::{Registry, fmt, prelude::*};
 
 use crate::test_utils::in_memory_writer::InMemoryMakeWriter;
@@ -227,6 +230,31 @@ async fn test_topk_lineitem() -> Result<()> {
     execute_test_case("10_topk_lineitem", &QueryTestCase::new("topk_lineitem")).await
 }
 
+#[tokio::test]
+async fn captures_close_events_after_the_query_future_returns() {
+    let _test_guard = TEST_EXECUTION_LOCK
+        .get_or_init(Default::default)
+        .lock()
+        .await;
+    let log_buffer = init_tracing();
+    log_buffer.lock().unwrap().clear();
+
+    let test_name = "async_cleanup_ancestry";
+    let test_span = tracing::info_span!("test", test_name);
+    let query_span = tracing::info_span!(parent: &test_span, "run_traced_query");
+    let child_span = tracing::info_span!(parent: &query_span, "delayed_execution");
+    drop(query_span);
+    drop(test_span);
+
+    // Close the last descendant on a task with no entered query or test span.
+    // The close events must retain their explicit ancestry in this case too.
+    tokio::spawn(async move { drop(child_span) });
+    let lines = completed_query_trace_lines(log_buffer, test_name).await;
+    assert!(lines.iter().any(|line| {
+        line["message"] == "close" && line["span"]["name"] == "delayed_execution"
+    }));
+}
+
 /// Estimates both join inputs above the collection thresholds, unlike the tiny
 /// tables' built-in statistics. Losing this provider changes the join mode.
 #[derive(Debug)]
@@ -393,7 +421,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
         .instrument(tracing::info_span!("test", test_name = %test_name))
         .await?;
 
-    let json_lines = captured_trace_lines(log_buffer, test_name);
+    let json_lines = completed_query_trace_lines(log_buffer, test_name).await;
 
     // Bind insta settings for snapshot testing.
     let _insta_guard = insta_settings::settings().bind_to_scope();
@@ -438,6 +466,28 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     }
 
     Ok(())
+}
+
+async fn completed_query_trace_lines(
+    log_buffer: &Arc<Mutex<Vec<u8>>>,
+    test_name: &str,
+) -> Vec<Value> {
+    // A LIMIT can finish while cancelled DataFusion tasks are still dropping
+    // their execution spans. The registry keeps parent spans alive until every
+    // child closes, so wait for the query's close event before taking a snapshot.
+    tokio::time::timeout(Duration::from_secs(10), async {
+        loop {
+            let lines = captured_trace_lines(log_buffer, test_name);
+            if lines.iter().any(|line| {
+                line["message"] == "close" && line["span"]["name"] == "run_traced_query"
+            }) {
+                return lines;
+            }
+            tokio::time::sleep(Duration::from_millis(1)).await;
+        }
+    })
+    .await
+    .unwrap_or_else(|_| panic!("query trace did not close within 10s: {test_name}"))
 }
 
 fn captured_trace_lines(log_buffer: &Arc<Mutex<Vec<u8>>>, test_name: &str) -> Vec<Value> {
@@ -589,9 +639,8 @@ fn init_subscriber(log_buffer: Arc<Mutex<Vec<u8>>>) {
     // Create a layer that outputs only spans to the log buffer as JSON.
     let assertion_layer = fmt::layer()
         .with_span_events(FmtSpan::CLOSE)
-        .event_format(fmt::format().json().flatten_event(true).without_time())
         .json()
-        .flatten_event(true)
+        .event_format(CloseEventJson)
         .with_ansi(false)
         .with_writer(
             InMemoryMakeWriter::new(log_buffer)
@@ -609,4 +658,48 @@ fn init_subscriber(log_buffer: Arc<Mutex<Vec<u8>>>) {
         .with(assertion_layer)
         .with(stdout_layer)
         .init();
+}
+
+/// Formats close-event ancestry independently of the worker's entered spans.
+/// The standard JSON formatter uses the current thread's scope for `spans`,
+/// which may be empty when a cancelled task drops the final span reference.
+struct CloseEventJson;
+
+impl<S> FormatEvent<S, JsonFields> for CloseEventJson
+where
+    S: Subscriber + for<'a> LookupSpan<'a>,
+{
+    fn format_event(
+        &self,
+        ctx: &FmtContext<'_, S, JsonFields>,
+        mut writer: Writer<'_>,
+        event: &Event<'_>,
+    ) -> std::fmt::Result {
+        let mut output = String::new();
+        fmt::format()
+            .json()
+            .flatten_event(true)
+            .without_time()
+            .format_event(ctx, Writer::new(&mut output), event)?;
+        let mut line: Value =
+            serde_json::from_str(&output).map_err(|_| std::fmt::Error)?;
+        let mut ancestors = Vec::new();
+        if let Some(scope) = ctx.event_scope() {
+            for span in scope.from_root() {
+                let extensions = span.extensions();
+                let fields = extensions
+                    .get::<FormattedFields<JsonFields>>()
+                    .ok_or(std::fmt::Error)?;
+                let mut fields: Value =
+                    serde_json::from_str(fields).map_err(|_| std::fmt::Error)?;
+                fields["name"] = span.name().into();
+                ancestors.push(fields);
+            }
+            // A close event explicitly parents itself to the closing span.
+            // Keep `spans` as its ancestors; `span` already holds that span.
+            ancestors.pop();
+        }
+        line["spans"] = ancestors.into();
+        writeln!(writer, "{line}")
+    }
 }
