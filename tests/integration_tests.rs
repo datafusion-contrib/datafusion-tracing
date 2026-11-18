@@ -242,16 +242,32 @@ async fn captures_close_events_after_the_query_future_returns() {
     let test_name = "async_cleanup_ancestry";
     let test_span = tracing::info_span!("test", test_name);
     let query_span = tracing::info_span!(parent: &test_span, "run_traced_query");
-    let child_span = tracing::info_span!(parent: &query_span, "delayed_execution");
+    let parent_span = tracing::info_span!(
+        parent: &query_span,
+        "parent_execution",
+        datafusion.node = tracing::field::Empty,
+    );
+    let child_span = tracing::info_span!(parent: &parent_span, "delayed_execution");
+    parent_span.record("datafusion.node", "Completed parent");
+    drop(parent_span);
     drop(query_span);
     drop(test_span);
 
     // Close the last descendant on a task with no entered query or test span.
-    // The close events must retain their explicit ancestry in this case too.
     tokio::spawn(async move { drop(child_span) });
     let lines = completed_query_trace_lines(log_buffer, test_name).await;
+    let child_close = lines
+        .iter()
+        .find(|line| {
+            line["message"] == "close" && line["span"]["name"] == "delayed_execution"
+        })
+        .expect("delayed execution close event");
+    let parent = child_close["spans"].as_array().unwrap().last().unwrap();
+    assert_eq!(parent["name"], "parent_execution");
+    assert!(parent.get("datafusion.node").is_none());
     assert!(lines.iter().any(|line| {
-        line["message"] == "close" && line["span"]["name"] == "delayed_execution"
+        line["span"]["name"] == "parent_execution"
+            && line["span"]["datafusion.node"] == "Completed parent"
     }));
 }
 
@@ -690,10 +706,17 @@ where
                 let fields = extensions
                     .get::<FormattedFields<JsonFields>>()
                     .ok_or(std::fmt::Error)?;
-                let mut fields: Value =
+                let mut fields: serde_json::Map<String, Value> =
                     serde_json::from_str(fields).map_err(|_| std::fmt::Error)?;
-                fields["name"] = span.name().into();
-                ancestors.push(fields);
+                // Execution recorders can finish before or after a child closes.
+                // Snapshot their final fields on the closing span itself.
+                fields.retain(|name, _| {
+                    name != "datafusion.node"
+                        && name != "datafusion.preview"
+                        && !name.starts_with("datafusion.metrics.")
+                });
+                fields.insert("name".into(), span.name().into());
+                ancestors.push(Value::Object(fields));
             }
             // A close event explicitly parents itself to the closing span.
             // Keep `spans` as its ancestors; `span` already holds that span.
