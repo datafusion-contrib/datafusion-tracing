@@ -577,7 +577,6 @@ fn recursive_exec_sort_key(json_line: &Value) -> String {
             [
                 value_to_sort_string(span.get("name")),
                 value_to_sort_string(span.get("otel.name")),
-                value_to_sort_string(span.get("datafusion.node")),
                 value_to_sort_string(span.get("datafusion.partitioning")),
             ]
             .join(":")
