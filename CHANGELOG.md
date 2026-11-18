@@ -12,7 +12,7 @@ Version numbers follow Apache DataFusion releases for compatibility alignment.
 ### Changed
 
 - Migrate to Apache DataFusion 56, pinned to `branch-56` commit
-  `b4b4edddb76ef70d603a6cc75b97b10451f961fb` ahead of its release
+  `7e7ae72a820e2bf87da1205b96639fba334ed2f7` ahead of its release
 - Update minimum supported Rust version to 1.95.0 and object_store to 0.14.2
 - Forward DataFusion 56 limit behavior through execution tracing wrappers and
   capture its new native execution metrics
