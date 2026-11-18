@@ -301,7 +301,6 @@ async fn statistics_registry_join_mode(
 ) -> Result<PartitionMode> {
     let mut config = SessionConfig::new().with_target_partitions(2);
     let optimizer = &mut config.options_mut().optimizer;
-    optimizer.use_statistics_registry = true;
     optimizer.hash_join_single_partition_threshold = 1_024;
     optimizer.hash_join_single_partition_threshold_rows = 10;
     let mut builder = SessionStateBuilder::new()

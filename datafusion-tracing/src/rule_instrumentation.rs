@@ -1471,7 +1471,6 @@ mod tests {
             plan: Arc<dyn ExecutionPlan>,
             context: &dyn PhysicalOptimizerContext,
         ) -> Result<Arc<dyn ExecutionPlan>> {
-            assert!(context.config_options().optimizer.use_statistics_registry);
             context.statistics_registry().expect("registered provider");
             context
                 .statistics_context()
@@ -1525,10 +1524,7 @@ mod tests {
         calls: Arc<AtomicUsize>,
         fail_next: bool,
     ) -> SessionContext {
-        let mut config = SessionConfig::new();
-        config.options_mut().optimizer.use_statistics_registry = true;
         let state = SessionStateBuilder::new()
-            .with_config(config)
             .with_default_features()
             .with_statistics_registry(StatisticsRegistry::with_providers(vec![Arc::new(
                 CountingStatisticsProvider {
