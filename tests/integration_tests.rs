@@ -19,6 +19,7 @@
 
 mod test_utils;
 
+use std::collections::HashSet;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, Once, OnceLock};
 use std::time::Duration;
@@ -222,6 +223,40 @@ async fn test_recursive_all_options() -> Result<()> {
             .collapse_recursive_exec_duplicates(),
     )
     .await
+}
+
+#[test]
+fn recursive_trace_keeps_preview_when_repartition_closes_tie() {
+    let productive = serde_json::json!({
+        "message": "close",
+        "span": {
+            "name": "InstrumentedExec",
+            "otel.name": "RepartitionExec",
+            "datafusion.node": "RepartitionExec: input_partitions=1",
+            "datafusion.metrics.output_rows": "1",
+            "datafusion.metrics.output_batches": "1",
+            "datafusion.metrics.output_bytes": "64.0 KB",
+            "datafusion.preview": "one row",
+        },
+        "spans": [{"name": "InstrumentedExec", "otel.name": "RecursiveQueryExec"}],
+    });
+    let mut previewless = productive.clone();
+    previewless["span"]
+        .as_object_mut()
+        .unwrap()
+        .remove("datafusion.preview");
+    let mut empty = previewless.clone();
+    empty["span"]["datafusion.metrics.output_rows"] = "0".into();
+    empty["span"]["datafusion.metrics.output_batches"] = "0".into();
+    empty["span"]["datafusion.metrics.output_bytes"] = "0.0 B".into();
+    let mut other_node = empty.clone();
+    other_node["span"]["datafusion.node"] = "RepartitionExec: input_partitions=2".into();
+
+    let lines = [previewless, empty, other_node.clone(), productive.clone()];
+    assert_eq!(
+        normalize_full_trace_lines("recursive", &lines, true),
+        vec![productive, other_node]
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
@@ -540,11 +575,39 @@ fn normalize_full_trace_lines(
         }
     }
 
-    recursive_exec_lines.sort_by_key(recursive_exec_sort_key);
+    recursive_exec_lines.sort_by_cached_key(|line| {
+        // Equivalent recorder groups can share output metrics. Prefer the
+        // group that captured the preview when collapsing them in the trace.
+        let preview_missing = collapse_recursive_exec_duplicates
+            && line["span"].get("datafusion.preview").is_none();
+        (recursive_exec_sort_key(line), preview_missing)
+    });
     if collapse_recursive_exec_duplicates {
-        // Without metrics or previews, repeated recursive iterations can emit
-        // indistinguishable close events. Keep asserting the recursive plan
-        // shape, but do not assert scheduler-dependent repeat counts.
+        // Empty repartition streams can close before the data-bearing stream
+        // joins their recorder group. Snapshot the productive close for that
+        // node when both appear, regardless of how the streams were grouped.
+        let productive_repartitions: HashSet<_> = recursive_exec_lines
+            .iter()
+            .filter(|line| {
+                let span = &line["span"];
+                span["otel.name"] == "RepartitionExec"
+                    && span["datafusion.metrics.output_rows"]
+                        .as_str()
+                        .is_some_and(|rows| rows != "0")
+            })
+            .map(recursive_exec_plan_key)
+            .collect();
+        recursive_exec_lines.retain(|line| {
+            let span = &line["span"];
+            !(span["otel.name"] == "RepartitionExec"
+                && span["datafusion.metrics.output_rows"] == "0"
+                && span["datafusion.metrics.output_batches"] == "0"
+                && span["datafusion.metrics.output_bytes"] == "0.0 B"
+                && span.get("datafusion.preview").is_none()
+                && productive_repartitions.contains(&recursive_exec_plan_key(line)))
+        });
+
+        // Repeated recursive iterations can emit equivalent close events.
         recursive_exec_lines.dedup_by(|left, right| {
             recursive_exec_sort_key(left) == recursive_exec_sort_key(right)
         });
@@ -567,7 +630,7 @@ fn is_recursive_exec_close(json_line: &Value) -> bool {
         })
 }
 
-fn recursive_exec_sort_key(json_line: &Value) -> String {
+fn recursive_exec_plan_key(json_line: &Value) -> String {
     let span_path = json_line["spans"]
         .as_array()
         .into_iter()
@@ -589,6 +652,13 @@ fn recursive_exec_sort_key(json_line: &Value) -> String {
         span_field_sort_value(json_line, "otel.name"),
         span_field_sort_value(json_line, "datafusion.node"),
         span_field_sort_value(json_line, "datafusion.partitioning"),
+    ]
+    .join("|")
+}
+
+fn recursive_exec_sort_key(json_line: &Value) -> String {
+    [
+        recursive_exec_plan_key(json_line),
         span_field_sort_value(json_line, "datafusion.metrics.output_rows"),
         span_field_sort_value(json_line, "datafusion.metrics.output_batches"),
         span_field_sort_value(json_line, "datafusion.metrics.output_bytes"),
