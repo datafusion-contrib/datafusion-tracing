@@ -19,8 +19,10 @@
 
 mod test_utils;
 
+use std::collections::HashSet;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, Once, OnceLock};
+use std::time::Duration;
 
 use datafusion::arrow::array::{ArrayRef, Int64Array};
 use datafusion::arrow::record_batch::RecordBatch;
@@ -39,8 +41,10 @@ use datafusion_tracing::{RuleInstrumentationOptions, instrument_rules_with_info_
 use insta::{assert_json_snapshot, assert_snapshot};
 use integration_utils::{SessionBuilder, run_traced_query};
 use serde_json::Value;
-use tracing::{Instrument, Level};
-use tracing_subscriber::fmt::format::FmtSpan;
+use tracing::{Event, Instrument, Level, Subscriber};
+use tracing_subscriber::fmt::format::{FmtSpan, FormatEvent, JsonFields, Writer};
+use tracing_subscriber::fmt::{FmtContext, FormattedFields};
+use tracing_subscriber::registry::LookupSpan;
 use tracing_subscriber::{Registry, fmt, prelude::*};
 
 use crate::test_utils::in_memory_writer::InMemoryMakeWriter;
@@ -221,10 +225,85 @@ async fn test_recursive_all_options() -> Result<()> {
     .await
 }
 
+#[test]
+fn recursive_trace_keeps_preview_when_repartition_closes_tie() {
+    let productive = serde_json::json!({
+        "message": "close",
+        "span": {
+            "name": "InstrumentedExec",
+            "otel.name": "RepartitionExec",
+            "datafusion.node": "RepartitionExec: input_partitions=1",
+            "datafusion.metrics.output_rows": "1",
+            "datafusion.metrics.output_batches": "1",
+            "datafusion.metrics.output_bytes": "64.0 KB",
+            "datafusion.preview": "one row",
+        },
+        "spans": [{"name": "InstrumentedExec", "otel.name": "RecursiveQueryExec"}],
+    });
+    let mut previewless = productive.clone();
+    previewless["span"]
+        .as_object_mut()
+        .unwrap()
+        .remove("datafusion.preview");
+    let mut empty = previewless.clone();
+    empty["span"]["datafusion.metrics.output_rows"] = "0".into();
+    empty["span"]["datafusion.metrics.output_batches"] = "0".into();
+    empty["span"]["datafusion.metrics.output_bytes"] = "0.0 B".into();
+    let mut other_node = empty.clone();
+    other_node["span"]["datafusion.node"] = "RepartitionExec: input_partitions=2".into();
+
+    let lines = [previewless, empty, other_node.clone(), productive.clone()];
+    assert_eq!(
+        normalize_full_trace_lines("recursive", &lines, true),
+        vec![productive, other_node]
+    );
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_topk_lineitem() -> Result<()> {
     // Expect a filled `DynamicFilterPhysicalExpr` on the `DataSourceExec` "datafusion.node" field
     execute_test_case("10_topk_lineitem", &QueryTestCase::new("topk_lineitem")).await
+}
+
+#[tokio::test]
+async fn captures_close_events_after_the_query_future_returns() {
+    let _test_guard = TEST_EXECUTION_LOCK
+        .get_or_init(Default::default)
+        .lock()
+        .await;
+    let log_buffer = init_tracing();
+    log_buffer.lock().unwrap().clear();
+
+    let test_name = "async_cleanup_ancestry";
+    let test_span = tracing::info_span!("test", test_name);
+    let query_span = tracing::info_span!(parent: &test_span, "run_traced_query");
+    let parent_span = tracing::info_span!(
+        parent: &query_span,
+        "parent_execution",
+        datafusion.node = tracing::field::Empty,
+    );
+    let child_span = tracing::info_span!(parent: &parent_span, "delayed_execution");
+    parent_span.record("datafusion.node", "Completed parent");
+    drop(parent_span);
+    drop(query_span);
+    drop(test_span);
+
+    // Close the last descendant on a task with no entered query or test span.
+    tokio::spawn(async move { drop(child_span) });
+    let lines = completed_query_trace_lines(log_buffer, test_name).await;
+    let child_close = lines
+        .iter()
+        .find(|line| {
+            line["message"] == "close" && line["span"]["name"] == "delayed_execution"
+        })
+        .expect("delayed execution close event");
+    let parent = child_close["spans"].as_array().unwrap().last().unwrap();
+    assert_eq!(parent["name"], "parent_execution");
+    assert!(parent.get("datafusion.node").is_none());
+    assert!(lines.iter().any(|line| {
+        line["span"]["name"] == "parent_execution"
+            && line["span"]["datafusion.node"] == "Completed parent"
+    }));
 }
 
 /// Estimates both join inputs above the collection thresholds, unlike the tiny
@@ -257,7 +336,6 @@ async fn statistics_registry_join_mode(
 ) -> Result<PartitionMode> {
     let mut config = SessionConfig::new().with_target_partitions(2);
     let optimizer = &mut config.options_mut().optimizer;
-    optimizer.use_statistics_registry = true;
     optimizer.hash_join_single_partition_threshold = 1_024;
     optimizer.hash_join_single_partition_threshold_rows = 10;
     let mut builder = SessionStateBuilder::new()
@@ -393,7 +471,7 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
         .instrument(tracing::info_span!("test", test_name = %test_name))
         .await?;
 
-    let json_lines = captured_trace_lines(log_buffer, test_name);
+    let json_lines = completed_query_trace_lines(log_buffer, test_name).await;
 
     // Bind insta settings for snapshot testing.
     let _insta_guard = insta_settings::settings().bind_to_scope();
@@ -440,6 +518,28 @@ async fn execute_test_case(test_name: &str, test_case: &QueryTestCase<'_>) -> Re
     Ok(())
 }
 
+async fn completed_query_trace_lines(
+    log_buffer: &Arc<Mutex<Vec<u8>>>,
+    test_name: &str,
+) -> Vec<Value> {
+    // A LIMIT can finish while cancelled DataFusion tasks are still dropping
+    // their execution spans. The registry keeps parent spans alive until every
+    // child closes, so wait for the query's close event before taking a snapshot.
+    tokio::time::timeout(Duration::from_secs(10), async {
+        loop {
+            let lines = captured_trace_lines(log_buffer, test_name);
+            if lines.iter().any(|line| {
+                line["message"] == "close" && line["span"]["name"] == "run_traced_query"
+            }) {
+                return lines;
+            }
+            tokio::time::sleep(Duration::from_millis(1)).await;
+        }
+    })
+    .await
+    .unwrap_or_else(|_| panic!("query trace did not close within 10s: {test_name}"))
+}
+
 fn captured_trace_lines(log_buffer: &Arc<Mutex<Vec<u8>>>, test_name: &str) -> Vec<Value> {
     // Clone the buffer to avoid holding the lock while parsing and filtering.
     let logs = log_buffer.lock().unwrap().clone();
@@ -475,11 +575,39 @@ fn normalize_full_trace_lines(
         }
     }
 
-    recursive_exec_lines.sort_by_key(recursive_exec_sort_key);
+    recursive_exec_lines.sort_by_cached_key(|line| {
+        // Equivalent recorder groups can share output metrics. Prefer the
+        // group that captured the preview when collapsing them in the trace.
+        let preview_missing = collapse_recursive_exec_duplicates
+            && line["span"].get("datafusion.preview").is_none();
+        (recursive_exec_sort_key(line), preview_missing)
+    });
     if collapse_recursive_exec_duplicates {
-        // Without metrics or previews, repeated recursive iterations can emit
-        // indistinguishable close events. Keep asserting the recursive plan
-        // shape, but do not assert scheduler-dependent repeat counts.
+        // Empty repartition streams can close before the data-bearing stream
+        // joins their recorder group. Snapshot the productive close for that
+        // node when both appear, regardless of how the streams were grouped.
+        let productive_repartitions: HashSet<_> = recursive_exec_lines
+            .iter()
+            .filter(|line| {
+                let span = &line["span"];
+                span["otel.name"] == "RepartitionExec"
+                    && span["datafusion.metrics.output_rows"]
+                        .as_str()
+                        .is_some_and(|rows| rows != "0")
+            })
+            .map(recursive_exec_plan_key)
+            .collect();
+        recursive_exec_lines.retain(|line| {
+            let span = &line["span"];
+            !(span["otel.name"] == "RepartitionExec"
+                && span["datafusion.metrics.output_rows"] == "0"
+                && span["datafusion.metrics.output_batches"] == "0"
+                && span["datafusion.metrics.output_bytes"] == "0.0 B"
+                && span.get("datafusion.preview").is_none()
+                && productive_repartitions.contains(&recursive_exec_plan_key(line)))
+        });
+
+        // Repeated recursive iterations can emit equivalent close events.
         recursive_exec_lines.dedup_by(|left, right| {
             recursive_exec_sort_key(left) == recursive_exec_sort_key(right)
         });
@@ -502,7 +630,7 @@ fn is_recursive_exec_close(json_line: &Value) -> bool {
         })
 }
 
-fn recursive_exec_sort_key(json_line: &Value) -> String {
+fn recursive_exec_plan_key(json_line: &Value) -> String {
     let span_path = json_line["spans"]
         .as_array()
         .into_iter()
@@ -511,7 +639,6 @@ fn recursive_exec_sort_key(json_line: &Value) -> String {
             [
                 value_to_sort_string(span.get("name")),
                 value_to_sort_string(span.get("otel.name")),
-                value_to_sort_string(span.get("datafusion.node")),
                 value_to_sort_string(span.get("datafusion.partitioning")),
             ]
             .join(":")
@@ -525,6 +652,13 @@ fn recursive_exec_sort_key(json_line: &Value) -> String {
         span_field_sort_value(json_line, "otel.name"),
         span_field_sort_value(json_line, "datafusion.node"),
         span_field_sort_value(json_line, "datafusion.partitioning"),
+    ]
+    .join("|")
+}
+
+fn recursive_exec_sort_key(json_line: &Value) -> String {
+    [
+        recursive_exec_plan_key(json_line),
         span_field_sort_value(json_line, "datafusion.metrics.output_rows"),
         span_field_sort_value(json_line, "datafusion.metrics.output_batches"),
         span_field_sort_value(json_line, "datafusion.metrics.output_bytes"),
@@ -589,9 +723,8 @@ fn init_subscriber(log_buffer: Arc<Mutex<Vec<u8>>>) {
     // Create a layer that outputs only spans to the log buffer as JSON.
     let assertion_layer = fmt::layer()
         .with_span_events(FmtSpan::CLOSE)
-        .event_format(fmt::format().json().flatten_event(true).without_time())
         .json()
-        .flatten_event(true)
+        .event_format(CloseEventJson)
         .with_ansi(false)
         .with_writer(
             InMemoryMakeWriter::new(log_buffer)
@@ -609,4 +742,55 @@ fn init_subscriber(log_buffer: Arc<Mutex<Vec<u8>>>) {
         .with(assertion_layer)
         .with(stdout_layer)
         .init();
+}
+
+/// Formats close-event ancestry independently of the worker's entered spans.
+/// The standard JSON formatter uses the current thread's scope for `spans`,
+/// which may be empty when a cancelled task drops the final span reference.
+struct CloseEventJson;
+
+impl<S> FormatEvent<S, JsonFields> for CloseEventJson
+where
+    S: Subscriber + for<'a> LookupSpan<'a>,
+{
+    fn format_event(
+        &self,
+        ctx: &FmtContext<'_, S, JsonFields>,
+        mut writer: Writer<'_>,
+        event: &Event<'_>,
+    ) -> std::fmt::Result {
+        let mut output = String::new();
+        fmt::format()
+            .json()
+            .flatten_event(true)
+            .without_time()
+            .format_event(ctx, Writer::new(&mut output), event)?;
+        let mut line: Value =
+            serde_json::from_str(&output).map_err(|_| std::fmt::Error)?;
+        let mut ancestors = Vec::new();
+        if let Some(scope) = ctx.event_scope() {
+            for span in scope.from_root() {
+                let extensions = span.extensions();
+                let fields = extensions
+                    .get::<FormattedFields<JsonFields>>()
+                    .ok_or(std::fmt::Error)?;
+                let mut fields: serde_json::Map<String, Value> =
+                    serde_json::from_str(fields).map_err(|_| std::fmt::Error)?;
+                // Execution recorders can finish before or after a child closes.
+                // Snapshot their final fields on the closing span itself.
+                fields.retain(|name, _| {
+                    name != "datafusion.node"
+                        && name != "datafusion.preview"
+                        && !name.starts_with("datafusion.metrics.")
+                });
+                fields.insert("name".into(), span.name().into());
+                ancestors.push(Value::Object(fields));
+            }
+            // A close event explicitly parents itself to the closing span.
+            // Keep `spans` as its ancestors; `span` already holds that span.
+            ancestors.pop();
+        }
+        line["spans"] = ancestors.into();
+        writeln!(writer, "{line}")
+    }
 }

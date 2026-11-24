@@ -60,6 +60,7 @@ impl TracingQueryPlanner {
 }
 
 #[async_trait]
+#[warn(clippy::missing_trait_methods)]
 impl QueryPlanner for TracingQueryPlanner {
     async fn create_physical_plan(
         &self,
