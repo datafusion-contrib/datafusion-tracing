@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Version numbers follow Apache DataFusion releases for compatibility alignment.
 
-## [56.0.0] - Unreleased
+## [56.0.0] - 2026-11-24
 
 ### Changed
 
@@ -180,7 +180,7 @@ Initial public release of DataFusion Tracing.
 - Preview formatting utilities (`pretty_format_compact_batch`)
 - Integration with Jaeger, DataDog, and other OpenTelemetry-compatible collectors
 
-[56.0.0]: https://github.com/datafusion-contrib/datafusion-tracing/compare/55.0.1...HEAD
+[56.0.0]: https://github.com/datafusion-contrib/datafusion-tracing/compare/55.0.1...56.0.0
 [55.0.1]: https://github.com/datafusion-contrib/datafusion-tracing/compare/55.0.0...55.0.1
 [55.0.0]: https://github.com/datafusion-contrib/datafusion-tracing/compare/54.0.0...55.0.0
 [54.0.0]: https://github.com/datafusion-contrib/datafusion-tracing/compare/53.0.2...54.0.0
