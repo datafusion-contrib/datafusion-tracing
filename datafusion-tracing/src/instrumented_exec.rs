@@ -802,7 +802,7 @@ mod tests {
     // Tests
     // -----------------------------------------------------------------------
 
-    /// DataFusion 56 reads `limit_behavior` directly. Its default cannot recover
+    /// DataFusion reads `limit_behavior` directly. Its default cannot recover
     /// limit offsets or merge behavior from the deprecated boolean hook.
     #[test]
     fn limit_behavior_preserves_limits_and_merges() {
