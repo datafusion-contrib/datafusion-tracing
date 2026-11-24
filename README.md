@@ -33,7 +33,7 @@ DataFusion Tracing is an extension for [Apache DataFusion](https://datafusion.ap
 
 ## Overview
 
-When you run queries with DataFusion Tracing enabled, it automatically adds tracing around execution steps, records all native DataFusion metrics such as execution time and output row count, lets you preview partial results for easier debugging, and integrates with OpenTelemetry for distributed tracing. This makes it simpler to understand and improve query performance.
+When you run queries with DataFusion Tracing enabled, it automatically adds tracing around execution steps, records native DataFusion metrics such as execution time and output row count, lets you preview partial results for easier debugging, and integrates with OpenTelemetry for distributed tracing. This makes it simpler to understand and improve query performance.
 
 ### See it in action
 

@@ -38,9 +38,7 @@ rust-version = "1.95.0"
 
 [workspace.dependencies]
 async-trait = "0.1"
-# TODO: Switch to the crates.io release once DataFusion 56 is published.
-# Pinned to the HEAD of apache/datafusion branch-56.
-datafusion = { git = "https://github.com/apache/datafusion.git", rev = "7e7ae72a820e2bf87da1205b96639fba334ed2f7", default-features = false }
+datafusion = { version = "56.0.0", default-features = false }
 datafusion-tracing = { path = "datafusion-tracing", version = "56.0.0" }
 futures = "0.3"
 instrumented-object-store = { path = "instrumented-object-store", version = "56.0.0" }
